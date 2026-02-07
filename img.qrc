@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/.gitignore</file>
+        <file>img/olife.png</file>
+        <file>img/edit.svg</file>
+        <file>img/delete.svg</file>
+        <file>img/login.svg</file>
+        <file>img/camera.svg</file>
+        <file>img/search.svg</file>
+        <file>img/add.svg</file>
+        <file>img/chart.svg</file>
+        <file>img/settings.svg</file>
+        <file>img/refresh.svg</file>
+        <file>img/export.svg</file>
+        <file>img/filter.svg</file>
+    <file>img/menu.svg</file>
+    </qresource>
+</RCC>
