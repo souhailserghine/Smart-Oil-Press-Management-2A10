@@ -4,6 +4,11 @@
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
 #include <QtCharts/QChartGlobal>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -37,9 +42,10 @@ MainWindow::MainWindow(QWidget *parent)
         auto mainLayout = new QHBoxLayout(ui->mainprogram);
         mainLayout->setContentsMargins(0, 0, 0, 0);
         mainLayout->setSpacing(0);
-        // Respect intended sidebar width constraints
-        ui->sidebar->setMinimumWidth(200);
-        ui->sidebar->setMaximumWidth(220);
+    // Respect intended sidebar width constraints and prevent layout from squashing it
+    ui->sidebar->setMinimumWidth(200);
+    ui->sidebar->setMaximumWidth(220);
+    ui->sidebar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         mainLayout->addWidget(ui->sidebar);
 
         // Wrap the modules in a content area that applies offsets (drop + right shift)
@@ -311,9 +317,80 @@ void MainWindow::setupPersonnelChart()
     if (!layout) {
         layout = new QVBoxLayout(ui->chartStatusContainer);
         layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(12);
     }
     
     layout->addWidget(chartView);
+
+    // Add a stacked bar chart: status distribution across categories
+    QBarSet *setActifs = new QBarSet("Actifs");
+    QBarSet *setConge  = new QBarSet("En congé");
+    QBarSet *setSusp   = new QBarSet("Suspendus");
+    // Example data for three departments
+    *setActifs << 18 << 15 << 9;
+    *setConge  << 3  << 2  << 3;
+    *setSusp   << 1  << 1  << 1;
+
+    QBarSeries *barSeries = new QBarSeries();
+    barSeries->append(setActifs);
+    barSeries->append(setConge);
+    barSeries->append(setSusp);
+
+    QChart *barChart = new QChart();
+    barChart->addSeries(barSeries);
+    barChart->setTitle("Statut par département");
+    barChart->setAnimationOptions(QChart::AllAnimations);
+    QStringList categories;
+    categories << "Production" << "Qualité" << "Support";
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, 20);
+    axisY->setTitleText("Employés");
+    barChart->addAxis(axisX, Qt::AlignBottom);
+    barChart->addAxis(axisY, Qt::AlignLeft);
+    barSeries->attachAxis(axisX);
+    barSeries->attachAxis(axisY);
+    barChart->legend()->setVisible(true);
+    barChart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *barView = new QChartView(barChart);
+    barView->setRenderHint(QPainter::Antialiasing);
+    layout->addWidget(barView);
+
+    // Add a line chart: headcount trend over months
+    QLineSeries *lineSeries = new QLineSeries();
+    lineSeries->setName("Effectif total");
+    // Example monthly totals
+    lineSeries->append(0, 38);
+    lineSeries->append(1, 39);
+    lineSeries->append(2, 40);
+    lineSeries->append(3, 41);
+    lineSeries->append(4, 43);
+    lineSeries->append(5, 45);
+
+    QChart *lineChart = new QChart();
+    lineChart->addSeries(lineSeries);
+    lineChart->setTitle("Tendance de l'effectif (semestre)");
+    lineChart->setAnimationOptions(QChart::AllAnimations);
+
+    QValueAxis *xAxis = new QValueAxis();
+    xAxis->setLabelFormat("%d");
+    xAxis->setTitleText("Mois");
+    xAxis->setTickCount(7);
+    xAxis->setRange(0, 5);
+    QValueAxis *yAxis = new QValueAxis();
+    yAxis->setTitleText("Employés");
+    yAxis->setRange(35, 50);
+    lineChart->addAxis(xAxis, Qt::AlignBottom);
+    lineChart->addAxis(yAxis, Qt::AlignLeft);
+    lineSeries->attachAxis(xAxis);
+    lineSeries->attachAxis(yAxis);
+    lineChart->legend()->setVisible(false);
+
+    QChartView *lineView = new QChartView(lineChart);
+    lineView->setRenderHint(QPainter::Antialiasing);
+    layout->addWidget(lineView);
 }
 
 void MainWindow::setupPersonnelTable()
