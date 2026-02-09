@@ -220,7 +220,7 @@ border-top-left-radius : 50px;</string>
          </rect>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="module1">
          <widget class="QStackedWidget" name="metierspersonnel">
@@ -2594,7 +2594,421 @@ color: rgb(0, 0, 0);</string>
           <widget class="QWidget" name="metieravancee_4"/>
          </widget>
         </widget>
-        <widget class="QWidget" name="module6"/>
+        <widget class="QWidget" name="module6">
+         <widget class="QStackedWidget" name="metierspersonnel_3">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>50</y>
+            <width>700</width>
+            <height>500</height>
+           </rect>
+          </property>
+          <property name="currentIndex">
+           <number>2</number>
+          </property>
+          <widget class="QWidget" name="ajoutpersonnel_4">
+           <widget class="QWidget" name="formLayoutWidget_7">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>120</y>
+              <width>621</width>
+              <height>378</height>
+             </rect>
+            </property>
+            <layout class="QFormLayout" name="formLayout_7">
+             <property name="verticalSpacing">
+              <number>43</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="nomLabel_2">
+               <property name="text">
+                <string>Nom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="prNomLabel_3">
+               <property name="text">
+                <string>Prénom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="prNomLineEdit_4">
+               <property name="placeholderText">
+                <string>Prénom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="fonctionLabel_2">
+               <property name="text">
+                <string>Fonction</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="fonctionComboBox_2">
+               <item>
+                <property name="text">
+                 <string>Technicien</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Manager</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="dateDEmbaucheLabel_2">
+               <property name="text">
+                <string>Date d’embauche</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDateEdit" name="dateDEmbaucheDateEdit_3"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="statusLabel_3">
+               <property name="text">
+                <string>Status</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QComboBox" name="statusComboBox_2">
+               <item>
+                <property name="text">
+                 <string>Actif</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Suspendu</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>En congé</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="nomLineEdit_3">
+               <property name="placeholderText">
+                <string>Nom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <layout class="QHBoxLayout" name="qjouterEmpRow_4">
+               <item>
+                <spacer name="horizontalSpacer_ajouteremp_6">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="ajouterEmpBtn_3">
+                 <property name="text">
+                  <string>Ajouter</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="img.qrc">
+                   <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>18</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="consulterpersonnel_4">
+           <layout class="QVBoxLayout" name="consulterLayout_6">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <item>
+               <widget class="QLineEdit" name="lineEdit_4"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_4">
+                <item>
+                 <property name="text">
+                  <string>Date</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Name</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Status</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <spacer name="horizontalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_18">
+                <property name="text">
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="img.qrc">
+                  <normaloff>:/img/refresh.svg</normaloff>:/img/refresh.svg</iconset>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_19">
+                <property name="text">
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="img.qrc">
+                  <normaloff>:/img/filter.svg</normaloff>:/img/filter.svg</iconset>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_20">
+                <property name="text">
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="img.qrc">
+                  <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_21">
+                <property name="text">
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="img.qrc">
+                  <normaloff>:/img/search.svg</normaloff>:/img/search.svg</iconset>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="tableWidget_5">
+              <row/>
+              <column>
+               <property name="text">
+                <string>Id</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Nom</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Status</string>
+               </property>
+              </column>
+              <item row="0" column="0">
+               <property name="text">
+                <string>1</string>
+               </property>
+              </item>
+              <item row="0" column="1">
+               <property name="text">
+                <string>Souhail</string>
+               </property>
+              </item>
+              <item row="0" column="2">
+               <property name="text">
+                <string>Actvie</string>
+               </property>
+               <property name="icon">
+                <iconset theme="QIcon::ThemeIcon::ContactNew"/>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="exportRow_5">
+              <item>
+               <spacer name="horizontalSpacer_export_6">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_4">
+                <property name="text">
+                 <string>Exporter</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="img.qrc">
+                  <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>18</width>
+                  <height>18</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="statPersonnel_4">
+           <layout class="QVBoxLayout" name="statPersonnelLayout_6">
+            <item>
+             <widget class="QWidget" name="chartStatusContainer_6" native="true"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="metieravancee_5"/>
+         </widget>
+         <widget class="QWidget" name="horizontalLayoutWidget_8">
+          <property name="geometry">
+           <rect>
+            <x>490</x>
+            <y>20</y>
+            <width>201</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_18">
+           <item>
+            <spacer name="horizontalSpacer_11">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnConsulterEmp_2">
+             <property name="toolTip">
+              <string>Consulter</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="img.qrc">
+               <normaloff>:/img/search.svg</normaloff>:/img/search.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAjouterEmp_2">
+             <property name="toolTip">
+              <string>Ajouter</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="img.qrc">
+               <normaloff>:/img/add.svg</normaloff>:/img/add.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnStatEmp_2">
+             <property name="toolTip">
+              <string>Statistiques</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="img.qrc">
+               <normaloff>:/img/chart.svg</normaloff>:/img/chart.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAdvEmp_4">
+             <property name="toolTip">
+              <string>Avancé</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="img.qrc">
+               <normaloff>:/img/settings.svg</normaloff>:/img/settings.svg</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
         <widget class="QWidget" name="module2">
          <widget class="QWidget" name="horizontalLayoutWidget_4">
           <property name="geometry">
