@@ -4,6 +4,12 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QTableWidget>
+#include <QToolButton>
+
+class QLabel;
+class QWidget;
+class QTimer;
+class HoverShadowFilter; // Forward declaration for HoverShadowFilter
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -53,6 +59,18 @@ private slots:
     void on_btnStatQualite_clicked();
     void on_btnAdvEmp_2_clicked();
 
+    // Module 5 (Machines) toolbar actions
+    void on_btnConsulterMachines_clicked();
+    void on_btnAjouterMachines_clicked();
+    void on_btnStatMachines_clicked();
+    void on_btnAvanceMachines_clicked();
+
+    // Module 6 (Agriculteurs) toolbar actions
+    void on_btnConsulterAgr_clicked();
+    void on_btnAjouterAgr_clicked();
+    void on_btnStatAgr_clicked();
+    void on_btnAvanceAgr_clicked();
+
 private:
     Ui::MainWindow *ui;
     
@@ -73,6 +91,7 @@ private:
     void crossFadeToIndex(QStackedWidget* stack, int newIndex);
     void animateSidebarToggle(bool collapse);
     void setupInteractiveHooks();
+    void setupToolbarsTweaks();
     void filterPersonnelTable();
 
     // Top-right user info positioning
@@ -80,6 +99,23 @@ private:
     void resizeEvent(QResizeEvent* event) override;
     bool eventFilter(QObject* obj, QEvent* event) override;
 
+    // Avatar rendering
+    void makeAvatarCircular();
+
+    // Chat launcher positioning
+    void repositionChatLauncher();
+
+    // System clock update
+    void updateClock();
+
     bool m_sidebarCollapsed = false;
+    QToolButton* m_chatLauncher = nullptr;
+    // Bottom-center clock in status bar
+    QLabel* m_clockLabel = nullptr;
+    QWidget* m_clockLeftSpacer = nullptr;
+    QWidget* m_clockRightSpacer = nullptr;
+    class QTimer* m_clockTimer = nullptr;
+         HoverShadowFilter* m_hoverShadowFilter = nullptr;
 };
+    class HoverShadowFilter;
 #endif // MAINWINDOW_H

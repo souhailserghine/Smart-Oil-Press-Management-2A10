@@ -14,8 +14,14 @@
         <file>img/refresh.svg</file>
         <file>img/export.svg</file>
         <file>img/filter.svg</file>
-        <file>img/images (3).png</file>
+    <file>img/people.svg</file>
+    <file>img/stock.svg</file>
+    <file>img/cistern.svg</file>
+    <file>img/olive_oil.svg</file>
+    <file>img/machine.svg</file>
+    <file>img/farmer.svg</file>
         <file>img/menu.svg</file>
         <file>img/logo2.png</file>
+            <file>img/chat.svg</file>
     </qresource>
 </RCC>

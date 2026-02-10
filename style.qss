@@ -203,7 +203,7 @@ QToolButton {
     border-radius: 6px;
     padding: 6px 10px;
     color: #2b2d2f;
-    qproperty-iconSize: 18px 18px;
+    qproperty-iconSize: 20px 20px;
 }
 
 /* Hover and active states */
@@ -217,12 +217,7 @@ QToolButton:pressed {
     border-color: #6d7a40;
 }
 
-QToolButton:checked {
-    background-color: #e8f0dc;
-    border-color: #8a9b5f;
-    color: #6d7a40;
-    font-weight: 600;
-}
+/* Checked state unified below to add underline and consistent color */
 
 QToolButton:disabled {
     background-color: transparent;
@@ -230,10 +225,34 @@ QToolButton:disabled {
     border-color: transparent;
 }
 
-/* Tool buttons inside a toolbar get slightly larger icons */
+/* Toolbar-like buttons: larger icons and text-under-icon spacing */
 QToolBar QToolButton {
-    qproperty-iconSize: 20px 20px;
-    padding: 6px 8px;
+    qproperty-iconSize: 24px 24px;
+    font-size: 10.5pt;
+    font-weight: 600;
+    min-height: 72px; /* ensure enough space for text-under-icon */
+}
+
+/* UI toolbar containers (IDs) hosting QToolButtons */
+#horizontalLayoutWidget_3 QToolButton,
+#horizontalLayoutWidget_4 QToolButton,
+#horizontalLayoutWidget_5 QToolButton,
+#horizontalLayoutWidget_6 QToolButton,
+#horizontalLayoutWidget_7 QToolButton,
+#horizontalLayoutWidget_8 QToolButton {
+    qproperty-iconSize: 20px 20px;      /* smaller icon to save width */
+    padding: 4px 6px 6px 6px;           /* tighter padding for compact fit */
+    font-size: 9.5pt;                   /* slight font reduction */
+    font-weight: 600;
+    min-height: 60px; /* slightly shorter to fit more */
+    min-width: 115px; /* fit more buttons without clipping */
+}
+
+/* Ensure full text for Citernes advanced button */
+QToolButton#MetierAvanceCiterne {
+    font-weight: 500; /* slightly lighter to reduce glyph width while staying readable */
+    font-size: 9.25pt; /* small reduction for tighter fit without noticeable visual change */
+    padding: 4px 4px 6px 4px; /* trim horizontal padding to reclaim space */
 }
 
 /* Dropdown indicator spacing for popup menus */
@@ -243,11 +262,23 @@ QToolButton::menu-indicator {
     right: 6px;
 }
 
-/* Optional: text-under-icon layout gets a bit more breathing room */
-QToolButton[toolButtonStyle="3"] { /* Qt::ToolButtonTextUnderIcon */
-    padding: 8px 10px 10px 10px;
-    font-size: 10.5pt; /* Improve readability for text-under-icon buttons */
+/* Checked state shows selection underline for toolbar-like buttons */
+QToolButton:checked {
+    background-color: #e8f0dc;
+    border-color: #8a9b5f;
+    color: #2b2d2f;
     font-weight: 600;
+    border-bottom: 2px solid #8a9b5f;
+}
+
+/* Keep checked underline from increasing total height by compensating padding */
+#horizontalLayoutWidget_3 QToolButton:checked,
+#horizontalLayoutWidget_4 QToolButton:checked,
+#horizontalLayoutWidget_5 QToolButton:checked,
+#horizontalLayoutWidget_6 QToolButton:checked,
+#horizontalLayoutWidget_7 QToolButton:checked,
+#horizontalLayoutWidget_8 QToolButton:checked {
+    padding-bottom: 4px; /* compensate for 2px underline */
 }
 
 /*
@@ -792,6 +823,13 @@ QStatusBar QLabel {
     font-size: 10pt; /* Slight bump for status text readability */
 }
 
+/* Bottom-center clock label in status bar */
+QLabel#clockLabel {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #6d7a40; /* dark olive to match pressed/brand accents */
+}
+
 /*
 ==============================================================================
 TOOLBAR
@@ -845,7 +883,9 @@ QLabel[type="heading"] {
 QLabel#label_personnel,
 QLabel#label_5,
 QLabel#label_qualite,
-QLabel#label_2 {
+QLabel#label_2,
+QLabel#label_7,
+QLabel#label_8 {
     font-size: 20pt; /* Elevate module header prominence */
     font-weight: bold;
     color: #8a9b5f;
@@ -875,7 +915,7 @@ STACKED WIDGET
 ==============================================================================
 */
 QStackedWidget {
-    background-color: #ffffff;
+    background-color: transparent; /* avoid forcing white background on all stacked pages */
 }
 
 /*
@@ -920,6 +960,19 @@ QPushButton#loginbtn:pressed {
         x1:0, y1:0, x2:0, y2:1,
         stop:0 #7e8e4f, stop:1 #6d7a40
     );
+}
+
+/*
+==============================================================================
+LOGIN PAGE HEADLINE (ID-Scoped)
+==============================================================================
+*/
+QLabel#logintext {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #8a9b5f; /* brand olive */
+    qproperty-alignment: AlignCenter;
+    background: transparent;
 }
 
 /*
@@ -995,37 +1048,25 @@ QLabel#userNameLabel {
     color: #8a9b5f;
 }
 
-/*
-==============================================================================
-TOOL BUTTONS
-==============================================================================
-*/
-QToolButton {
-    background-color: transparent;
-    color: #2b2d2f;
-    border: none;
-    padding: 6px 10px;
-}
-
-QToolButton:hover {
-    background-color: #e8f0dc;
-    color: #2b2d2f;
-}
-
-QToolButton:pressed {
+/* Floating chat launcher button (bottom-left) */
+QToolButton#chatLauncher {
     background-color: #8a9b5f;
     color: #ffffff;
+    border: none;
+    border-radius: 24px; /* for 48x48 button */
+    padding: 8px;
+    qproperty-iconSize: 24px 24px;
 }
 
-QToolButton:disabled {
-    color: #8a8d90;
+QToolButton#chatLauncher:hover {
+    background-color: #9eb673;
 }
 
-QToolButton:checked {
-    background-color: #dfe9cc;
-    color: #2b2d2f;
-    border-bottom: 2px solid #8a9b5f;
+QToolButton#chatLauncher:pressed {
+    background-color: #6d7a40;
 }
+
+/* Consolidated above: QToolButton rules unified and toolbar buttons sized to 24px */
 
 /*
 ==============================================================================
@@ -1110,9 +1151,18 @@ MODULES CONTAINER - Card style
 ==============================================================================
 */
 QStackedWidget#modules {
-    background-color: #ffffff;
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
+    background-color: #ffffff; /* restore white card background for modules */
+    border: 1px solid #e8e8e8; /* subtle border */
+    border-radius: 12px; /* rounded corners as before */
+}
+
+/* Transparent scroll areas so page backgrounds remain consistent */
+QScrollArea {
+    background: transparent;
+    border: none;
+}
+QScrollArea > QWidget#qt_scrollarea_viewport {
+    background: transparent;
 }
 
 /* Subtle background for main program area */
