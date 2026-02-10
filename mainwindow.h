@@ -96,6 +96,18 @@ void on_ajouterlineseriemachine_2_clicked();
     void disconnectMachineSensor();
     void readMachineSerialData();
 
+    // Module 5 (Machines) toolbar actions
+    void on_btnConsulterMachines_clicked();
+    void on_btnAjouterMachines_clicked();
+    void on_btnStatMachines_clicked();
+    void on_btnAvanceMachines_clicked();
+
+    // Module 6 (Agriculteurs) toolbar actions
+    void on_btnConsulterAgr_clicked();
+    void on_btnAjouterAgr_clicked();
+    void on_btnStatAgr_clicked();
+    void on_btnAvanceAgr_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -171,6 +183,7 @@ private:
     void crossFadeToIndex(QStackedWidget* stack, int newIndex);
     void animateSidebarToggle(bool collapse);
     void setupInteractiveHooks();
+    void setupToolbarsTweaks();
     void filterPersonnelTable();
 
 // ===== Module machines =====
@@ -272,6 +285,13 @@ void openStocksWindow(int pageIndex = -1);
     Citernes* m_citernesWindow = nullptr;
     Stocks* m_stocksWindow = nullptr;
     bool m_sidebarCollapsed = false;
+    QToolButton* m_chatLauncher = nullptr;
+    // Bottom-center clock in status bar
+    QLabel* m_clockLabel = nullptr;
+    QWidget* m_clockLeftSpacer = nullptr;
+    QWidget* m_clockRightSpacer = nullptr;
+    class QTimer* m_clockTimer = nullptr;
+         HoverShadowFilter* m_hoverShadowFilter = nullptr;
 };
 
 #endif // MAINWINDOW_H

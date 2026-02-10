@@ -29,6 +29,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
+#include <QParallelAnimationGroup>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QSqlQuery>
@@ -128,16 +129,27 @@ MainWindow::MainWindow(QWidget *parent)
         ui->sidebar->setMaximumWidth(220);
         ui->sidebar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         mainLayout->addWidget(ui->sidebar);
-
+        // Ensure button text is never elided: compute required width per button via style and set minimums
         // Wrap the modules in a content area that applies offsets (drop + right shift)
         auto* contentArea = new QWidget(ui->mainprogram);
         auto* contentLayout = new QVBoxLayout(contentArea);
         qreal dpiX = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchX() : 96.0;
-        qreal dpiY = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchY() : 96.0;
-        int leftMarginPx = static_cast<int>((20.0 / 25.4) * dpiX); // 20 mm ~ 2 cm
-        int topMarginPx  = static_cast<int>((10.0 / 25.4) * dpiY); // 10 mm ~ 1 cm
+    qreal dpiY = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchY() : 96.0;
+    int leftMarginPx = static_cast<int>((8.0 / 25.4) * dpiX);  // 8 mm ~ compact left margin for more content width
+    int topMarginPx  = static_cast<int>((2.0 / 25.4) * dpiY);  // reduce top offset to ~2 mm to remove excess top space
         contentLayout->setContentsMargins(leftMarginPx, topMarginPx, 0, 0);
-        contentLayout->setSpacing(0);
+        contentLayout->setSpacing(8); // small gap between user info and content
+
+        // Place the user info bar above modules within the content area so it's layout-managed
+        if (ui->userInfoContainer) {
+            ui->userInfoContainer->setProperty("role", "panel");
+            ui->userInfoContainer->setMinimumHeight(56);
+            ui->userInfoContainer->setMaximumHeight(56);
+            ui->userInfoContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            contentLayout->addWidget(ui->userInfoContainer);
+        }
+
+        // Modules sit below the user info bar
         contentLayout->addWidget(ui->modules);
         mainLayout->addWidget(contentArea);
     }
@@ -595,33 +607,70 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
 
     QWidget* current = stack->currentWidget();
     QWidget* next = stack->widget(newIndex);
-    if (current == next) return;
+    if (!current || !next || current == next) {
+        return;
+    }
 
-    auto* outEffect = new QGraphicsOpacityEffect(current);
-    current->setGraphicsEffect(outEffect);
-    auto* outAnim = new QPropertyAnimation(outEffect, "opacity", current);
-    outAnim->setDuration(180);
+    // Create overlays sized to the stacked widget area
+    const QRect area = stack->rect();
+    auto* currentOverlay = new QLabel(stack);
+    auto* nextOverlay    = new QLabel(stack);
+    currentOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    nextOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    currentOverlay->setGeometry(area);
+    nextOverlay->setGeometry(area);
+
+    // Render snapshots of both pages (works even if 'next' is not visible)
+    QPixmap currentShot(area.size());
+    currentShot.fill(Qt::transparent);
+    current->update();
+    current->render(&currentShot, QPoint(), QRegion(), QWidget::DrawChildren);
+
+    QPixmap nextShot(area.size());
+    nextShot.fill(Qt::transparent);
+    next->update();
+    next->render(&nextShot, QPoint(), QRegion(), QWidget::DrawChildren);
+
+    currentOverlay->setPixmap(currentShot);
+    nextOverlay->setPixmap(nextShot);
+    currentOverlay->raise();
+    nextOverlay->raise();
+
+    // Prepare opacity effects for parallel fade
+    auto* currEff = new QGraphicsOpacityEffect(currentOverlay);
+    auto* nextEff = new QGraphicsOpacityEffect(nextOverlay);
+    currentOverlay->setGraphicsEffect(currEff);
+    nextOverlay->setGraphicsEffect(nextEff);
+    currEff->setOpacity(1.0);
+    nextEff->setOpacity(0.0);
+
+    // Show target page beneath overlays to avoid a blank gap
+    stack->setCurrentIndex(newIndex);
+    stack->setEnabled(false); // temporarily block input during transition
+
+    // Parallel fade animations
+    auto* outAnim = new QPropertyAnimation(currEff, "opacity", currentOverlay);
+    outAnim->setDuration(220);
     outAnim->setStartValue(1.0);
     outAnim->setEndValue(0.0);
     outAnim->setEasingCurve(QEasingCurve::OutCubic);
 
-    QObject::connect(outAnim, &QPropertyAnimation::finished, this, [this, stack, newIndex, current]() {
-        current->setGraphicsEffect(nullptr);
-        stack->setCurrentIndex(newIndex);
-        QWidget* incoming = stack->currentWidget();
-        auto* inEffect = new QGraphicsOpacityEffect(incoming);
-        incoming->setGraphicsEffect(inEffect);
-        auto* inAnim = new QPropertyAnimation(inEffect, "opacity", incoming);
-        inAnim->setDuration(180);
-        inAnim->setStartValue(0.0);
-        inAnim->setEndValue(1.0);
-        inAnim->setEasingCurve(QEasingCurve::OutCubic);
-        QObject::connect(inAnim, &QPropertyAnimation::finished, incoming, [incoming]() {
-            incoming->setGraphicsEffect(nullptr);
-        });
-        inAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    auto* inAnim = new QPropertyAnimation(nextEff, "opacity", nextOverlay);
+    inAnim->setDuration(220);
+    inAnim->setStartValue(0.0);
+    inAnim->setEndValue(1.0);
+    inAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto* group = new QParallelAnimationGroup(stack);
+    group->addAnimation(outAnim);
+    group->addAnimation(inAnim);
+    QObject::connect(group, &QParallelAnimationGroup::finished, this, [this, stack, currentOverlay, nextOverlay]() {
+        stack->setEnabled(true);
+        // Clean up overlays
+        currentOverlay->deleteLater();
+        nextOverlay->deleteLater();
     });
-    outAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void MainWindow::animateSidebarToggle(bool collapse)

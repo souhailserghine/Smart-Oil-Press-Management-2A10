@@ -203,7 +203,7 @@ QToolButton {
     border-radius: 6px;
     padding: 6px 10px;
     color: #2b2d2f;
-    qproperty-iconSize: 18px 18px;
+    qproperty-iconSize: 20px 20px;
 }
 
 /* Hover and active states */
@@ -217,12 +217,7 @@ QToolButton:pressed {
     border-color: #6d7a40;
 }
 
-QToolButton:checked {
-    background-color: #e8f0dc;
-    border-color: #8a9b5f;
-    color: #6d7a40;
-    font-weight: 600;
-}
+/* Checked state unified below to add underline and consistent color */
 
 QToolButton:disabled {
     background-color: transparent;
@@ -230,10 +225,34 @@ QToolButton:disabled {
     border-color: transparent;
 }
 
-/* Tool buttons inside a toolbar get slightly larger icons */
+/* Toolbar-like buttons: larger icons and text-under-icon spacing */
 QToolBar QToolButton {
-    qproperty-iconSize: 20px 20px;
-    padding: 6px 8px;
+    qproperty-iconSize: 24px 24px;
+    font-size: 10.5pt;
+    font-weight: 600;
+    min-height: 72px; /* ensure enough space for text-under-icon */
+}
+
+/* UI toolbar containers (IDs) hosting QToolButtons */
+#horizontalLayoutWidget_3 QToolButton,
+#horizontalLayoutWidget_4 QToolButton,
+#horizontalLayoutWidget_5 QToolButton,
+#horizontalLayoutWidget_6 QToolButton,
+#horizontalLayoutWidget_7 QToolButton,
+#horizontalLayoutWidget_8 QToolButton {
+    qproperty-iconSize: 20px 20px;      /* smaller icon to save width */
+    padding: 4px 6px 6px 6px;           /* tighter padding for compact fit */
+    font-size: 9.5pt;                   /* slight font reduction */
+    font-weight: 600;
+    min-height: 60px; /* slightly shorter to fit more */
+    min-width: 115px; /* fit more buttons without clipping */
+}
+
+/* Ensure full text for Citernes advanced button */
+QToolButton#MetierAvanceCiterne {
+    font-weight: 500; /* slightly lighter to reduce glyph width while staying readable */
+    font-size: 9.25pt; /* small reduction for tighter fit without noticeable visual change */
+    padding: 4px 4px 6px 4px; /* trim horizontal padding to reclaim space */
 }
 
 /* Dropdown indicator spacing for popup menus */
@@ -786,6 +805,13 @@ QStatusBar QLabel {
     padding: 2px 8px;
 }
 
+/* Bottom-center clock label in status bar */
+QLabel#clockLabel {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #6d7a40; /* dark olive to match pressed/brand accents */
+}
+
 /*
 ==============================================================================
 TOOLBAR
@@ -859,7 +885,7 @@ STACKED WIDGET
 ==============================================================================
 */
 QStackedWidget {
-    background-color: #ffffff;
+    background-color: transparent; /* avoid forcing white background on all stacked pages */
 }
 
 /*
@@ -904,6 +930,19 @@ QPushButton#loginbtn:pressed {
         x1:0, y1:0, x2:0, y2:1,
         stop:0 #7e8e4f, stop:1 #6d7a40
     );
+}
+
+/*
+==============================================================================
+LOGIN PAGE HEADLINE (ID-Scoped)
+==============================================================================
+*/
+QLabel#logintext {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #8a9b5f; /* brand olive */
+    qproperty-alignment: AlignCenter;
+    background: transparent;
 }
 
 /*

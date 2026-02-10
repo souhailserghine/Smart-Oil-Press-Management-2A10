@@ -2255,6 +2255,35 @@ color: rgb(0, 0, 0);</string>
            <bool>true</bool>
           </property>
          </widget>
+         <widget class="QToolButton" name="module4Icon">
+          <property name="geometry">
+           <rect>
+            <x>340</x>
+            <y>20</y>
+            <width>51</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Qualité</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="img.qrc">
+            <normaloff>:/img/olive_oil.svg</normaloff>:/img/olive_oil.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="module5">
          <widget class="QWidget" name="horizontalLayoutWidget_7">
