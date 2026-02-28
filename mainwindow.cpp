@@ -22,6 +22,7 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QAbstractItemView>
+#include <QAbstractButton>
 #include <QString>
 #include <QDialog>
 #include <QLabel>
@@ -74,7 +75,6 @@
 #include <cmath>
 #include <limits>
 
-// Qt 6: Charts classes are accessible without a QtCharts namespace when linked
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -236,6 +236,100 @@ void MainWindow::on_btnAjouterEmp_clicked()
     if (ui->modules->currentIndex() != 0)
         crossFadeToIndex(ui->modules, 0);
     crossFadeToIndex(ui->metierspersonnel, 0);
+}
+
+void MainWindow::on_ajouterEmpBtn_clicked()
+{
+    // ── Read form fields ────────────────────────────────────────────────────
+    QString nom    = ui->nomLineEdit->text().trimmed();
+    QString prenom = ui->prNomLineEdit->text().trimmed();
+    QString email  = ui->emailLineEdit->text().trimmed();
+    QString role   = ui->roleComboBox->currentText().trimmed();
+    QString mdp    = ui->mdpLineEdit->text();
+
+    if (role.isEmpty())
+        role = "Technicien";
+
+    qDebug() << "[ajouterEmp] nom=" << nom << "prenom=" << prenom
+             << "email=" << email << "role=" << role
+             << "mdp.size=" << mdp.size()
+             << "photo.size=" << m_selectedPhoto.size();
+
+    // ── Check if we are editing an existing employee ────────────────────────
+    QVariant editingIdVar = ui->ajouterEmpBtn->property("editingId");
+    bool isEditing = editingIdVar.isValid() && editingIdVar.toInt() > 0;
+    int editingId  = isEditing ? editingIdVar.toInt() : 0;
+
+    // ── Basic validation ────────────────────────────────────────────────────
+    // Mot de passe is required only when adding; optional when editing
+    if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs requis"),
+                             tr("Veuillez remplir tous les champs obligatoires\n"
+                                "(Nom, Prénom, Email)."));
+        return;
+    }
+    if (!isEditing && mdp.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs requis"),
+                             tr("Le mot de passe est obligatoire pour un nouvel employé."));
+        return;
+    }
+
+    if (isEditing) {
+        // ── UPDATE mode ─────────────────────────────────────────────────────
+        Employe emp(editingId, nom, prenom, email, role, mdp, QDate(), m_selectedPhoto);
+        if (!emp.modifier()) {
+            QMessageBox::critical(this, tr("Erreur de modification"),
+                tr("Impossible de modifier l'employé :\n%1").arg(emp.lastError().text()));
+            return;
+        }
+        QMessageBox::information(this, tr("Succès"),
+            tr("L'employé (ID : %1) a été modifié avec succès.").arg(editingId));
+
+        // Reset button to Add mode
+        ui->ajouterEmpBtn->setProperty("editingId", QVariant());
+        ui->ajouterEmpBtn->setText(tr("Ajouter"));
+
+    } else {
+        // ── INSERT mode ─────────────────────────────────────────────────────
+        Employe emp(0, nom, prenom, email, role, mdp, QDate(), m_selectedPhoto);
+        if (!emp.ajouter()) {
+            QMessageBox::critical(this, tr("Erreur d'ajout"),
+                tr("Impossible d'ajouter l'employé :\n%1").arg(emp.lastError().text()));
+            return;
+        }
+        QMessageBox::information(this, tr("Succès"),
+            tr("L'employé a été ajouté avec succès (ID : %1).").arg(emp.getIdEmp()));
+    }
+
+    // ── Clear the form ──────────────────────────────────────────────────────
+    ui->nomLineEdit->clear();
+    ui->prNomLineEdit->clear();
+    ui->emailLineEdit->clear();
+    ui->roleComboBox->setCurrentIndex(0);
+    ui->mdpLineEdit->clear();
+    ui->photoPathLineEdit->clear();
+    m_selectedPhoto.clear();
+}
+
+void MainWindow::on_parcourirPhotoBtn_clicked()
+{
+    QString path = QFileDialog::getOpenFileName(
+        this,
+        tr("Choisir une photo"),
+        QString(),
+        tr("Images (*.png *.jpg *.jpeg *.bmp)"));
+
+    if (path.isEmpty())
+        return;
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    m_selectedPhoto = file.readAll();
+    file.close();
+
+    ui->photoPathLineEdit->setText(path);
 }
 
 void MainWindow::on_btnConsulterEmp_clicked()
@@ -820,6 +914,57 @@ void MainWindow::setupPersonnelChart()
     layout->addWidget(lineView);
 }
 
+void MainWindow::loadEmployeeTable()
+{
+    QTableWidget* table = ui->tableEmp;
+    if (!table) return;
+
+    // ── Query the DB ────────────────────────────────────────────────────────
+    Employe emp;
+    QSqlQueryModel* model = emp.afficher();
+
+    // ── Set up columns (ID / Nom / Prénom / Email / Rôle / Actions) ─────────
+    const int dataCols = 5; // id, nom, prenom, email, role
+    table->setColumnCount(dataCols + 1);
+    table->setHorizontalHeaderLabels({
+        "ID", "Nom", QStringLiteral("Pr\u00e9nom"), "Email",
+        QStringLiteral("R\u00f4le"), "Actions"
+    });
+
+    // ── Fill rows ───────────────────────────────────────────────────────────
+    int rowCount = model->rowCount();
+    table->setRowCount(rowCount);
+
+    for (int r = 0; r < rowCount; ++r) {
+        for (int c = 0; c < dataCols; ++c) {
+            QString text = model->data(model->index(r, c)).toString();
+            QTableWidgetItem* item = new QTableWidgetItem(text);
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            table->setItem(r, c, item);
+        }
+        addActionButtonsToRow(table, r);
+    }
+
+    delete model;
+
+    // ── Column sizing ───────────────────────────────────────────────────────
+    if (table->horizontalHeader()) {
+        table->horizontalHeader()->setStretchLastSection(false);
+        // ID column: compact
+        table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+        // Data columns: stretch
+        for (int c = 1; c < dataCols; ++c)
+            table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+        // Actions column: fixed
+        table->horizontalHeader()->setSectionResizeMode(dataCols, QHeaderView::Fixed);
+        table->setColumnWidth(dataCols, 72);
+    }
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    if (table->verticalHeader())
+        table->verticalHeader()->setDefaultSectionSize(30);
+}
+
 void MainWindow::setupPersonnelTable()
 {
     if (!ui->tableWidget_4)
@@ -866,7 +1011,7 @@ void MainWindow::setupPersonnelTable()
         for (int c = 0; c < last; ++c)
             table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
         table->horizontalHeader()->setSectionResizeMode(last, QHeaderView::ResizeToContents);
-        table->setColumnWidth(last, 90);
+        table->setColumnWidth(last, 68);
     }
 }
 
