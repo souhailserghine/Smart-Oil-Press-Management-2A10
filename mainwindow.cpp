@@ -5,7 +5,6 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
-#include <QtCharts/QChartGlobal>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarCategoryAxis>
@@ -344,6 +343,7 @@ void MainWindow::on_btnStatEmp_clicked()
     if (ui->modules->currentIndex() != 0)
         crossFadeToIndex(ui->modules, 0);
     crossFadeToIndex(ui->metierspersonnel, 2);
+    loadEmployeeStats();
 }
 
 void MainWindow::on_btnAdvEmp_clicked()
@@ -701,7 +701,11 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
 
     QWidget* current = stack->currentWidget();
     QWidget* next = stack->widget(newIndex);
+
+    // If already on the target page, just make sure it's enabled and return
     if (!current || !next || current == next) {
+        stack->setCurrentIndex(newIndex);
+        stack->setEnabled(true);
         return;
     }
 
@@ -742,6 +746,13 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
     stack->setCurrentIndex(newIndex);
     stack->setEnabled(false); // temporarily block input during transition
 
+    // Safety timer: unconditionally re-enable the stack after the animation
+    // duration (+ a small buffer) so a failed/skipped animation never leaves
+    // the stack permanently disabled and unresponsive to user input.
+    QTimer::singleShot(400, stack, [stack]() {
+        stack->setEnabled(true);
+    });
+
     // Parallel fade animations
     auto* outAnim = new QPropertyAnimation(currEff, "opacity", currentOverlay);
     outAnim->setDuration(220);
@@ -758,7 +769,7 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
     auto* group = new QParallelAnimationGroup(stack);
     group->addAnimation(outAnim);
     group->addAnimation(inAnim);
-    QObject::connect(group, &QParallelAnimationGroup::finished, this, [this, stack, currentOverlay, nextOverlay]() {
+    QObject::connect(group, &QParallelAnimationGroup::finished, this, [stack, currentOverlay, nextOverlay]() {
         stack->setEnabled(true);
         // Clean up overlays
         currentOverlay->deleteLater();

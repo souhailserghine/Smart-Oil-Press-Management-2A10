@@ -238,7 +238,7 @@ border-top-left-radius : 50px;</string>
            </rect>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="ajoutpersonnel">
            <widget class="QWidget" name="formLayoutWidget">
