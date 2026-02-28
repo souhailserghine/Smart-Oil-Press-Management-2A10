@@ -40,6 +40,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         img.qrc
         connection.h
         connection.cpp
+        employe.h employe.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

@@ -5,6 +5,7 @@
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QToolButton>
+#include <QByteArray>
 
 class QLabel;
 class QWidget;
@@ -27,7 +28,9 @@ public:
 
 private slots:
     void on_loginbtn_clicked();
-    void on_btnAjouterEmp_clicked();
+    void on_btnAjouterEmp_clicked();   // toolbar button → navigate to form page
+    void on_ajouterEmpBtn_clicked();   // form submit button → INSERT employee
+    void on_parcourirPhotoBtn_clicked(); // photo browse button
     void on_btnConsulterEmp_clicked();
     void on_btnStatEmp_clicked();
     void on_btnAdvEmp_clicked();
@@ -71,12 +74,15 @@ private slots:
     void on_btnStatAgr_clicked();
     void on_btnAvanceAgr_clicked();
 
+    void on_toolButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     
     // Helper methods
     void setupPersonnelChart();
     void setupPersonnelTable();
+    void loadEmployeeTable();          // populate tableWidget from DB
     void setupCiterneChart();
     void setupStocksChart();
     void setupQualiteChart();
@@ -109,6 +115,7 @@ private:
     void updateClock();
 
     bool m_sidebarCollapsed = false;
+    QByteArray m_selectedPhoto;
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
     QLabel* m_clockLabel = nullptr;

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1303</width>
-    <height>913</height>
+    <width>1325</width>
+    <height>1005</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="loginpage">
        <widget class="QLabel" name="logintext">
@@ -220,34 +220,34 @@ border-top-left-radius : 50px;</string>
          <rect>
           <x>330</x>
           <y>72</y>
-          <width>800</width>
-          <height>640</height>
+          <width>1011</width>
+          <height>861</height>
          </rect>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="module1">
          <widget class="QStackedWidget" name="metierspersonnel">
           <property name="geometry">
            <rect>
-            <x>80</x>
-            <y>80</y>
-            <width>700</width>
-            <height>540</height>
+            <x>10</x>
+            <y>70</y>
+            <width>919</width>
+            <height>761</height>
            </rect>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="ajoutpersonnel">
            <widget class="QWidget" name="formLayoutWidget">
             <property name="geometry">
              <rect>
-              <x>30</x>
-              <y>30</y>
-              <width>621</width>
-              <height>387</height>
+              <x>140</x>
+              <y>20</y>
+              <width>700</width>
+              <height>560</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout">
@@ -276,14 +276,28 @@ border-top-left-radius : 50px;</string>
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="fonctionLabel">
+              <widget class="QLabel" name="emailLabel">
                <property name="text">
-                <string>Fonction</string>
+                <string>Email</string>
                </property>
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QComboBox" name="fonctionComboBox">
+              <widget class="QLineEdit" name="emailLineEdit">
+               <property name="placeholderText">
+                <string>exemple@email.com</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="roleLabel">
+               <property name="text">
+                <string>Rôle</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="roleComboBox">
                <item>
                 <property name="text">
                  <string>Technicien</string>
@@ -294,16 +308,43 @@ border-top-left-radius : 50px;</string>
                  <string>Manager</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>Operateur</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Administrateur</string>
+                </property>
+               </item>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
+              <widget class="QLabel" name="mdpLabel">
+               <property name="text">
+                <string>Mot de passe</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="mdpLineEdit">
+               <property name="echoMode">
+                <enum>QLineEdit::EchoMode::Password</enum>
+               </property>
+               <property name="placeholderText">
+                <string>Mot de passe</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
               <widget class="QLabel" name="dateDEmbaucheLabel">
                <property name="text">
                 <string>Date d’embauche</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="5" column="1">
               <widget class="QDateEdit" name="dateDEmbaucheDateEdit">
                <property name="displayFormat">
                 <string>dd/MM/yyyy</string>
@@ -313,32 +354,6 @@ border-top-left-radius : 50px;</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="statusLabel">
-               <property name="text">
-                <string>Status</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QComboBox" name="statusComboBox">
-               <item>
-                <property name="text">
-                 <string>Actif</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Suspendu</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>En congé</string>
-                </property>
-               </item>
-              </widget>
-             </item>
              <item row="0" column="1">
               <widget class="QLineEdit" name="nomLineEdit">
                <property name="placeholderText">
@@ -346,8 +361,49 @@ border-top-left-radius : 50px;</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="6" column="0">
+              <widget class="QLabel" name="photoLabel">
+               <property name="text">
+                <string>Photo</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <layout class="QHBoxLayout" name="photoRow">
+               <item>
+                <widget class="QLineEdit" name="photoPathLineEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                 <property name="placeholderText">
+                  <string>Aucune photo sélectionnée</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="parcourirPhotoBtn">
+                 <property name="text">
+                  <string>Parcourir…</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="img.qrc">
+                   <normaloff>:/img/camera.svg</normaloff>:/img/camera.svg</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>18</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="7" column="1">
               <layout class="QHBoxLayout" name="qjouterEmpRow">
+               <property name="spacing">
+                <number>7</number>
+               </property>
                <item>
                 <spacer name="horizontalSpacer_ajouteremp">
                  <property name="orientation">
@@ -368,7 +424,7 @@ border-top-left-radius : 50px;</string>
                  </property>
                  <property name="icon">
                   <iconset resource="img.qrc">
-                   <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+                   <normaloff>:/img/add.svg</normaloff>:/img/add.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -388,23 +444,32 @@ border-top-left-radius : 50px;</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout">
               <item>
-               <widget class="QLineEdit" name="lineEdit"/>
+               <widget class="QLineEdit" name="lineEdit">
+                <property name="placeholderText">
+                 <string>Rechercher...</string>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QComboBox" name="comboBox">
                 <item>
                  <property name="text">
-                  <string>Date</string>
+                  <string>Nom</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Name</string>
+                  <string>Email</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Status</string>
+                  <string>Rôle</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Date d'embauche</string>
                  </property>
                 </item>
                </widget>
@@ -428,12 +493,18 @@ border-top-left-radius : 50px;</string>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_2">
+                <property name="toolTip">
+                 <string>Actualiser</string>
+                </property>
                 <property name="text">
-                 <string>...</string>
+                 <string>Actualiser</string>
                 </property>
                 <property name="icon">
                  <iconset resource="img.qrc">
                   <normaloff>:/img/refresh.svg</normaloff>:/img/refresh.svg</iconset>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -442,12 +513,18 @@ border-top-left-radius : 50px;</string>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_4">
+                <property name="toolTip">
+                 <string>Filtrer</string>
+                </property>
                 <property name="text">
-                 <string>...</string>
+                 <string>Filtrer</string>
                 </property>
                 <property name="icon">
                  <iconset resource="img.qrc">
                   <normaloff>:/img/filter.svg</normaloff>:/img/filter.svg</iconset>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -456,12 +533,18 @@ border-top-left-radius : 50px;</string>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_3">
+                <property name="toolTip">
+                 <string>Exporter</string>
+                </property>
                 <property name="text">
-                 <string>...</string>
+                 <string>Exporter</string>
                 </property>
                 <property name="icon">
                  <iconset resource="img.qrc">
                   <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -469,13 +552,19 @@ border-top-left-radius : 50px;</string>
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="toolButton">
+               <widget class="QToolButton" name="searchEmpButton">
+                <property name="toolTip">
+                 <string>Rechercher</string>
+                </property>
                 <property name="text">
-                 <string>...</string>
+                 <string>Rechercher</string>
                 </property>
                 <property name="icon">
                  <iconset resource="img.qrc">
                   <normaloff>:/img/search.svg</normaloff>:/img/search.svg</iconset>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -485,7 +574,13 @@ border-top-left-radius : 50px;</string>
              </layout>
             </item>
             <item>
-             <widget class="QTableWidget" name="tableWidget">
+             <widget class="QTableWidget" name="tableEmp">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="editTriggers">
                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
               </property>
@@ -504,7 +599,7 @@ border-top-left-radius : 50px;</string>
               <row/>
               <column>
                <property name="text">
-                <string>Id</string>
+                <string>ID</string>
                </property>
               </column>
               <column>
@@ -514,24 +609,19 @@ border-top-left-radius : 50px;</string>
               </column>
               <column>
                <property name="text">
-                <string>Status</string>
+                <string>Prénom</string>
                </property>
               </column>
-              <item row="0" column="0">
+              <column>
                <property name="text">
-                <string>1</string>
+                <string>Email</string>
                </property>
-              </item>
-              <item row="0" column="1">
+              </column>
+              <column>
                <property name="text">
-                <string>Souhail</string>
+                <string>Rôle</string>
                </property>
-              </item>
-              <item row="0" column="2">
-               <property name="text">
-                <string>Actif</string>
-               </property>
-              </item>
+              </column>
              </widget>
             </item>
             <item>
@@ -550,7 +640,7 @@ border-top-left-radius : 50px;</string>
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="export_emp_btn">
                 <property name="text">
                  <string>Exporter</string>
                 </property>
@@ -597,24 +687,11 @@ border-top-left-radius : 50px;</string>
            <rect>
             <x>540</x>
             <y>10</y>
-            <width>325</width>
-            <height>56</height>
+            <width>465</width>
+            <height>72</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QToolButton" name="btnConsulterEmp">
              <property name="toolTip">
@@ -712,8 +789,8 @@ border-top-left-radius : 50px;</string>
          <widget class="QLabel" name="label_personnel">
           <property name="geometry">
            <rect>
-            <x>70</x>
-            <y>30</y>
+            <x>55</x>
+            <y>20</y>
             <width>351</width>
             <height>31</height>
            </rect>
@@ -725,10 +802,10 @@ border-top-left-radius : 50px;</string>
          <widget class="QToolButton" name="module1Icon">
           <property name="geometry">
            <rect>
-            <x>430</x>
-            <y>20</y>
-            <width>51</width>
-            <height>51</height>
+            <x>15</x>
+            <y>15</y>
+            <width>36</width>
+            <height>36</height>
            </rect>
           </property>
           <property name="toolTip">
@@ -758,8 +835,8 @@ border-top-left-radius : 50px;</string>
            <rect>
             <x>540</x>
             <y>10</y>
-            <width>325</width>
-            <height>56</height>
+            <width>465</width>
+            <height>72</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -1427,24 +1504,11 @@ border-top-left-radius : 50px;</string>
            <rect>
             <x>540</x>
             <y>10</y>
-            <width>325</width>
-            <height>56</height>
+            <width>465</width>
+            <height>72</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_10">
-           <item>
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QToolButton" name="btnConsulterQualite">
              <property name="toolTip">
@@ -2204,24 +2268,11 @@ color: rgb(0, 0, 0);</string>
            <rect>
             <x>540</x>
             <y>10</y>
-            <width>325</width>
-            <height>56</height>
+            <width>465</width>
+            <height>72</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_13">
-           <item>
-            <spacer name="horizontalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QToolButton" name="btnConsulterMachines">
              <property name="toolTip">
@@ -2760,24 +2811,11 @@ color: rgb(0, 0, 0);</string>
            <rect>
             <x>540</x>
             <y>10</y>
-            <width>325</width>
-            <height>56</height>
+            <width>465</width>
+            <height>72</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_18">
-           <item>
-            <spacer name="horizontalSpacer_11">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QToolButton" name="btnConsulterAgr">
              <property name="toolTip">
@@ -2920,7 +2958,7 @@ color: rgb(0, 0, 0);</string>
             <x>60</x>
             <y>80</y>
             <width>700</width>
-            <height>641</height>
+            <height>711</height>
            </rect>
           </property>
           <property name="currentIndex">
@@ -3411,24 +3449,11 @@ color: rgb(0, 0, 0);</string>
            <rect>
             <x>540</x>
             <y>10</y>
-            <width>325</width>
-            <height>56</height>
+            <width>465</width>
+            <height>72</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QToolButton" name="btnConsulterstc">
              <property name="toolTip">
@@ -3529,7 +3554,7 @@ color: rgb(0, 0, 0);</string>
             <x>10</x>
             <y>80</y>
             <width>771</width>
-            <height>501</height>
+            <height>761</height>
            </rect>
           </property>
           <property name="currentIndex">
@@ -3542,7 +3567,7 @@ color: rgb(0, 0, 0);</string>
               <x>40</x>
               <y>0</y>
               <width>671</width>
-              <height>641</height>
+              <height>751</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
@@ -4346,7 +4371,7 @@ color: rgb(0, 0, 0);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1303</width>
+     <width>1325</width>
      <height>26</height>
     </rect>
    </property>

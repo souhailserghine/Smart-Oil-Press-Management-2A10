@@ -1,5 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "employe.h"
+#include <QDebug>
+#include <QFileDialog>
+#include <QFile>
+#include <QPixmap>
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
@@ -20,6 +25,7 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QAbstractItemView>
+#include <QAbstractButton>
 #include <QString>
 #include <QDialog>
 #include <QLabel>
@@ -43,7 +49,9 @@
 #include <QBoxLayout>
 #include <QGraphicsDropShadowEffect>
 #include <QEvent>
-// Large hover shadow filter for toolbar buttons, without changing layout size
+
+
+
 class HoverShadowFilter : public QObject {
 public:
     explicit HoverShadowFilter(QObject* parent = nullptr) : QObject(parent) {}
@@ -74,7 +82,6 @@ protected:
 #include <QTimer>
 #include <QDateTime>
 
-// Qt 6: Charts classes are accessible without a QtCharts namespace when linked
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -208,31 +215,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Make long toolbar rows horizontally scrollable to prevent rightmost button clipping
     auto wrapScrollable = [](QWidget* rowWidget) {
         if (!rowWidget) return;
-        QWidget* parent = rowWidget->parentWidget();
-        if (!parent || !parent->layout()) return;
-        // Create scroll area and configure
-    auto* sa = new QScrollArea(parent);
-    sa->setFrameShape(QFrame::NoFrame);
-    sa->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    sa->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    sa->setWidgetResizable(false); // keep natural width so horizontal scroll appears instead of clipping
-    sa->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    sa->viewport()->setContentsMargins(0, 0, 16, 0); // slightly more space at right to avoid edge clipping
-    rowWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-        // Replace the rowWidget in its parent layout with the scroll area at the same index
-        QLayout* layout = parent->layout();
-        for (int i = 0; i < layout->count(); ++i) {
-            if (layout->itemAt(i) && layout->itemAt(i)->widget() == rowWidget) {
-                layout->removeWidget(rowWidget);
-                sa->setWidget(rowWidget);
-                if (auto* bl = qobject_cast<QBoxLayout*>(layout)) {
-                    bl->insertWidget(i, sa);
-                } else {
-                    layout->addWidget(sa);
-                }
-                break;
-            }
-        }
+        // Toolbar rows use absolute geometry (no parent layout manages them).
+        // Simply ensure the widget itself does not clip its children by being too small.
+        rowWidget->setFixedHeight(72);
     };
 
     wrapScrollable(ui->horizontalLayoutWidget_3);
@@ -242,37 +227,9 @@ MainWindow::MainWindow(QWidget *parent)
     wrapScrollable(ui->horizontalLayoutWidget_7);
     wrapScrollable(ui->horizontalLayoutWidget_8);
 
-    // Add a small trailing spacer in each toolbar row to avoid visual edge clipping
-    auto addEndPadding = [](QWidget* rowWidget, int padPx){
-        if (!rowWidget || !rowWidget->layout()) return;
-        auto* pad = new QWidget(rowWidget);
-        pad->setFixedWidth(padPx);
-        pad->setFixedHeight(1);
-        pad->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        rowWidget->layout()->addWidget(pad);
-    };
-    addEndPadding(ui->horizontalLayoutWidget_3, 16);
-    addEndPadding(ui->horizontalLayoutWidget_4, 16);
-    // Citernes row: remove end padding to avoid any perceived gap after the last button
-    addEndPadding(ui->horizontalLayoutWidget_5, 0);
-    addEndPadding(ui->horizontalLayoutWidget_6, 16);
-    addEndPadding(ui->horizontalLayoutWidget_7, 16);
-    addEndPadding(ui->horizontalLayoutWidget_8, 16);
-
-    // Reduce the right viewport margin specifically for the Citernes row scroll area
-    auto reduceRightViewportMargin = [](QWidget* rowWidget, int newRight){
-        if (!rowWidget) return;
-        QWidget* parent = rowWidget->parentWidget();
-        if (!parent) return;
-        const auto areas = parent->findChildren<QScrollArea*>();
-        for (auto* sa : areas) {
-            if (sa->widget() == rowWidget) {
-                sa->viewport()->setContentsMargins(0, 0, newRight, 0);
-                break;
-            }
-        }
-    };
-    reduceRightViewportMargin(ui->horizontalLayoutWidget_5, 4);
+    // (No scroll-area wrapping needed; toolbars are 325px wide with 4 buttons — they fit.)
+    // (No trailing-spacer padding needed; buttons expand naturally via QHBoxLayout stretch.)
+    // (No viewport margin reduction needed.)
 
     // Install hover shadow filter on all tool buttons within module toolbar rows
     m_hoverShadowFilter = new HoverShadowFilter(this);
@@ -374,45 +331,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-    // Shift toolbar rows horizontally by a DPI-aware millimeter offset
-    auto shiftRowByMM = [&](QWidget* rowWidget, double mm) {
-        if (!rowWidget) return;
-        QLayout* lay = rowWidget->layout();
-        if (!lay) return;
-        // Convert millimeters to pixels using widget DPI
-        const double dpiX = this->logicalDpiX();
-        const int px = qRound(mm * dpiX / 25.4);
-        const QMargins m = lay->contentsMargins();
-        const int newLeft = std::max(0, m.left() + px);
-        lay->setContentsMargins(newLeft, m.top(), m.right(), m.bottom());
-    };
-    // Bring buttons to the left by ~2mm (negative offset)
-    shiftRowByMM(ui->horizontalLayoutWidget_3, -2.0);
-    shiftRowByMM(ui->horizontalLayoutWidget_4, -2.0);
-    shiftRowByMM(ui->horizontalLayoutWidget_5, -2.0);
-    shiftRowByMM(ui->horizontalLayoutWidget_6, -2.0);
-    shiftRowByMM(ui->horizontalLayoutWidget_7, -2.0);
-    shiftRowByMM(ui->horizontalLayoutWidget_8, -2.0);
-
-    // Additional left shift by approx N characters using font metrics
-    auto shiftRowLeftChars = [&](QWidget* rowWidget, int chars) {
-        if (!rowWidget || chars <= 0) return;
-        QLayout* lay = rowWidget->layout();
-        if (!lay) return;
-        QFontMetrics fm(rowWidget->font());
-        int px = fm.averageCharWidth() * chars;
-        const QMargins m = lay->contentsMargins();
-        const int newLeft = std::max(0, m.left() - px);
-        lay->setContentsMargins(newLeft, m.top(), m.right(), m.bottom());
-    };
-    // Move further left by ~3 characters across all rows
-    shiftRowLeftChars(ui->horizontalLayoutWidget_3, 3);
-    shiftRowLeftChars(ui->horizontalLayoutWidget_4, 3);
-    shiftRowLeftChars(ui->horizontalLayoutWidget_5, 3);
-    shiftRowLeftChars(ui->horizontalLayoutWidget_6, 3);
-    shiftRowLeftChars(ui->horizontalLayoutWidget_7, 3);
-    shiftRowLeftChars(ui->horizontalLayoutWidget_8, 3);
-
     // Citernes order is now persisted in the .ui; no runtime swapping needed
     
     // Initialize the personnel statistics chart
@@ -457,12 +375,107 @@ void MainWindow::on_btnAjouterEmp_clicked()
     crossFadeToIndex(ui->metierspersonnel, 0);
 }
 
+void MainWindow::on_ajouterEmpBtn_clicked()
+{
+    // ── Read form fields ────────────────────────────────────────────────────
+    QString nom    = ui->nomLineEdit->text().trimmed();
+    QString prenom = ui->prNomLineEdit->text().trimmed();
+    QString email  = ui->emailLineEdit->text().trimmed();
+    QString role   = ui->roleComboBox->currentText().trimmed();
+    QString mdp    = ui->mdpLineEdit->text();
+
+    if (role.isEmpty())
+        role = "Technicien";
+
+    qDebug() << "[ajouterEmp] nom=" << nom << "prenom=" << prenom
+             << "email=" << email << "role=" << role
+             << "mdp.size=" << mdp.size()
+             << "photo.size=" << m_selectedPhoto.size();
+
+    // ── Check if we are editing an existing employee ────────────────────────
+    QVariant editingIdVar = ui->ajouterEmpBtn->property("editingId");
+    bool isEditing = editingIdVar.isValid() && editingIdVar.toInt() > 0;
+    int editingId  = isEditing ? editingIdVar.toInt() : 0;
+
+    // ── Basic validation ────────────────────────────────────────────────────
+    // Mot de passe is required only when adding; optional when editing
+    if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs requis"),
+                             tr("Veuillez remplir tous les champs obligatoires\n"
+                                "(Nom, Prénom, Email)."));
+        return;
+    }
+    if (!isEditing && mdp.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs requis"),
+                             tr("Le mot de passe est obligatoire pour un nouvel employé."));
+        return;
+    }
+
+    if (isEditing) {
+        // ── UPDATE mode ─────────────────────────────────────────────────────
+        Employe emp(editingId, nom, prenom, email, role, mdp, QDate(), m_selectedPhoto);
+        if (!emp.modifier()) {
+            QMessageBox::critical(this, tr("Erreur de modification"),
+                tr("Impossible de modifier l'employé :\n%1").arg(emp.lastError().text()));
+            return;
+        }
+        QMessageBox::information(this, tr("Succès"),
+            tr("L'employé (ID : %1) a été modifié avec succès.").arg(editingId));
+
+        // Reset button to Add mode
+        ui->ajouterEmpBtn->setProperty("editingId", QVariant());
+        ui->ajouterEmpBtn->setText(tr("Ajouter"));
+
+    } else {
+        // ── INSERT mode ─────────────────────────────────────────────────────
+        Employe emp(0, nom, prenom, email, role, mdp, QDate(), m_selectedPhoto);
+        if (!emp.ajouter()) {
+            QMessageBox::critical(this, tr("Erreur d'ajout"),
+                tr("Impossible d'ajouter l'employé :\n%1").arg(emp.lastError().text()));
+            return;
+        }
+        QMessageBox::information(this, tr("Succès"),
+            tr("L'employé a été ajouté avec succès (ID : %1).").arg(emp.getIdEmp()));
+    }
+
+    // ── Clear the form ──────────────────────────────────────────────────────
+    ui->nomLineEdit->clear();
+    ui->prNomLineEdit->clear();
+    ui->emailLineEdit->clear();
+    ui->roleComboBox->setCurrentIndex(0);
+    ui->mdpLineEdit->clear();
+    ui->photoPathLineEdit->clear();
+    m_selectedPhoto.clear();
+}
+
+void MainWindow::on_parcourirPhotoBtn_clicked()
+{
+    QString path = QFileDialog::getOpenFileName(
+        this,
+        tr("Choisir une photo"),
+        QString(),
+        tr("Images (*.png *.jpg *.jpeg *.bmp)"));
+
+    if (path.isEmpty())
+        return;
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    m_selectedPhoto = file.readAll();
+    file.close();
+
+    ui->photoPathLineEdit->setText(path);
+}
+
 void MainWindow::on_btnConsulterEmp_clicked()
 {
     // Ensure we're on the personnel module first
     if (ui->modules->currentIndex() != 0)
-    crossFadeToIndex(ui->metiersagriculteurs, 1); // consulteragriculteur
-    // Switch to "View Personnel" page (index 1)
+        crossFadeToIndex(ui->modules, 0);
+    // Load fresh data then switch to the consult page (index 1)
+    loadEmployeeTable();
     crossFadeToIndex(ui->metierspersonnel, 1);
 }
 
@@ -957,7 +970,7 @@ void MainWindow::setupInteractiveHooks()
     });
 
     // Live filter for personnel table
-    if (ui->lineEdit && ui->comboBox && ui->tableWidget) {
+    if (ui->lineEdit && ui->comboBox && ui->tableEmp) {
         QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, [this](const QString&){ filterPersonnelTable(); });
         QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this, [this](const QString&){ filterPersonnelTable(); });
     }
@@ -975,15 +988,6 @@ void MainWindow::setupToolbarsTweaks()
     raiseIf(ui->horizontalLayoutWidget_7);
     raiseIf(ui->horizontalLayoutWidget_8);
 
-    // Enforce minimum height for toolbar containers so text-under-icon has room
-    auto setMinH = [](QWidget* w){ if (w) w->setMinimumHeight(72); };
-    setMinH(ui->horizontalLayoutWidget_3);
-    setMinH(ui->horizontalLayoutWidget_4);
-    setMinH(ui->horizontalLayoutWidget_5);
-    setMinH(ui->horizontalLayoutWidget_6);
-    setMinH(ui->horizontalLayoutWidget_7);
-    setMinH(ui->horizontalLayoutWidget_8);
-
     // Also set a minimum height on the actual toolbuttons inside each container
     auto tuneButtons = [](QWidget* container){
         if (!container) return;
@@ -991,7 +995,7 @@ void MainWindow::setupToolbarsTweaks()
         for (auto* b : buttons) {
             b->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
             b->setIconSize(QSize(24,24));
-            b->setMinimumHeight(72);
+            b->setMinimumHeight(64);
             b->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         }
     };
@@ -1020,8 +1024,7 @@ void MainWindow::setupToolbarsTweaks()
             // Fallback: also compute robust text width for safety across styles
             QFontMetrics fm(b->font());
             const int textW = fm.boundingRect(b->text()).width();
-            const int iconW = b->toolButtonStyle() == Qt::ToolButtonTextUnderIcon ? 0 : b->iconSize().width();
-            const int computed = qMax(styleSz.width(), qMax(textW, iconW) + 48);
+            const int computed = qMax(styleSz.width(), textW + 32);
 
             if (computed > b->minimumWidth()) {
                 b->setMinimumWidth(computed);
@@ -1042,18 +1045,22 @@ void MainWindow::setupToolbarsTweaks()
 // Simple filter on the personnel table based on combo selection
 void MainWindow::filterPersonnelTable()
 {
-    if (!ui->tableWidget || !ui->comboBox) return;
+    if (!ui->tableEmp || !ui->comboBox) return;
     QString needle = ui->lineEdit ? ui->lineEdit->text().trimmed() : QString();
     QString mode = ui->comboBox->currentText();
-    int col = 0;
-    if (mode.compare(QStringLiteral("Name"), Qt::CaseInsensitive) == 0 || mode.compare(QStringLiteral("Nom"), Qt::CaseInsensitive) == 0) col = 1;
-    else if (mode.compare(QStringLiteral("Status"), Qt::CaseInsensitive) == 0) col = 2;
-    else col = 0; // Date/Id fallback to first column
 
-    for (int r = 0; r < ui->tableWidget->rowCount(); ++r) {
-        auto* item = ui->tableWidget->item(r, col);
+    int col = 0; // default: ID
+    if (mode.compare(QStringLiteral("Nom"), Qt::CaseInsensitive) == 0)
+        col = 1;
+    else if (mode.compare(QStringLiteral("Email"), Qt::CaseInsensitive) == 0)
+        col = 3;
+    else if (mode.compare(QStringLiteral("R\u00f4le"), Qt::CaseInsensitive) == 0)
+        col = 4;
+
+    for (int r = 0; r < ui->tableEmp->rowCount(); ++r) {
+        auto* item = ui->tableEmp->item(r, col);
         bool match = needle.isEmpty() || (item && item->text().contains(needle, Qt::CaseInsensitive));
-        ui->tableWidget->setRowHidden(r, !match);
+        ui->tableEmp->setRowHidden(r, !match);
     }
 }
 
@@ -1369,10 +1376,65 @@ void MainWindow::setupQualiteChart()
     grid4->setRowStretch(0, 1);
 }
 
+void MainWindow::loadEmployeeTable()
+{
+    QTableWidget* table = ui->tableEmp;
+    if (!table) return;
+
+    // ── Query the DB ────────────────────────────────────────────────────────
+    Employe emp;
+    QSqlQueryModel* model = emp.afficher();
+
+    // ── Set up columns (ID / Nom / Prénom / Email / Rôle / Actions) ─────────
+    const int dataCols = 5; // id, nom, prenom, email, role
+    table->setColumnCount(dataCols + 1);
+    table->setHorizontalHeaderLabels({
+        "ID", "Nom", QStringLiteral("Pr\u00e9nom"), "Email",
+        QStringLiteral("R\u00f4le"), "Actions"
+    });
+
+    // ── Fill rows ───────────────────────────────────────────────────────────
+    int rowCount = model->rowCount();
+    table->setRowCount(rowCount);
+
+    for (int r = 0; r < rowCount; ++r) {
+        for (int c = 0; c < dataCols; ++c) {
+            QString text = model->data(model->index(r, c)).toString();
+            QTableWidgetItem* item = new QTableWidgetItem(text);
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            table->setItem(r, c, item);
+        }
+        addActionButtonsToRow(table, r);
+    }
+
+    delete model;
+
+    // ── Column sizing ───────────────────────────────────────────────────────
+    if (table->horizontalHeader()) {
+        table->horizontalHeader()->setStretchLastSection(false);
+        // ID column: compact
+        table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+        // Data columns: stretch
+        for (int c = 1; c < dataCols; ++c)
+            table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+        // Actions column: fixed
+        table->horizontalHeader()->setSectionResizeMode(dataCols, QHeaderView::Fixed);
+        table->setColumnWidth(dataCols, 72);
+    }
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    if (table->verticalHeader())
+        table->verticalHeader()->setDefaultSectionSize(30);
+}
+
 void MainWindow::setupPersonnelTable()
 {
-    if (!ui->tableWidget) return;
-    addActionsColumnTo(ui->tableWidget);
+    // Called once at startup – just prepare layout; data loaded on demand
+    if (!ui->tableEmp) return;
+    ui->tableEmp->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableEmp->setSelectionMode(QAbstractItemView::SingleSelection);
+    if (ui->tableEmp->verticalHeader())
+        ui->tableEmp->verticalHeader()->setDefaultSectionSize(30);
 }
 
 void MainWindow::setupActionsForAllTables()
@@ -1392,59 +1454,104 @@ void MainWindow::addActionButtonsToRow(QTableWidget* table, int row)
     // Container widget with horizontal layout to hold the two buttons
     QWidget* container = new QWidget(table);
     auto* h = new QHBoxLayout(container);
-    h->setContentsMargins(0, 0, 0, 0);
-    h->setSpacing(6);
-    h->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    h->setContentsMargins(2, 1, 2, 1);
+    h->setSpacing(4);
+    h->setAlignment(Qt::AlignCenter);
     container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
-    // Modify (warning / yellow)
     QPushButton* btnModify = new QPushButton(QString(), container);
     btnModify->setProperty("type", "warning");
-    btnModify->setProperty("size", "small");
     btnModify->setObjectName("modifyBtn");
     btnModify->setFocusPolicy(Qt::NoFocus);
     btnModify->setToolTip(tr("Modifier"));
     btnModify->setIcon(QIcon(QStringLiteral(":/img/edit.svg")));
-    btnModify->setIconSize(QSize(16,16));
-    btnModify->setFixedSize(28, 24);
+    btnModify->setIconSize(QSize(16, 16));
+    btnModify->setFixedHeight(24);
+    btnModify->setCursor(Qt::PointingHandCursor);
 
-    // Delete (danger / red)
     QPushButton* btnDelete = new QPushButton(QString(), container);
     btnDelete->setProperty("type", "danger");
-    btnDelete->setProperty("size", "small");
     btnDelete->setObjectName("deleteBtn");
     btnDelete->setFocusPolicy(Qt::NoFocus);
     btnDelete->setToolTip(tr("Supprimer"));
     btnDelete->setIcon(QIcon(QStringLiteral(":/img/delete.svg")));
-    btnDelete->setIconSize(QSize(16,16));
-    btnDelete->setFixedSize(28, 24);
+    btnDelete->setIconSize(QSize(16, 16));
+    btnDelete->setFixedHeight(24);
+    btnDelete->setCursor(Qt::PointingHandCursor);
 
     h->addWidget(btnModify);
     h->addWidget(btnDelete);
     container->setLayout(h);
 
-    table->setCellWidget(row, table->columnCount() - 1, container);
-    table->setRowHeight(row, 34);
+    int actionsCol = table->columnCount() - 1;
+    table->setCellWidget(row, actionsCol, container);
 
-    // Connect actions using runtime row lookup to stay correct after deletions
+    // ── Modify: pre-fill the add form and switch to it ──────────────────────
     connect(btnModify, &QPushButton::clicked, this, [this]() {
         QTableWidget* t = findOwningTable(sender());
         if (!t) return;
-        int row = findRowForButton(t, sender());
-        if (row < 0) return;
-        t->selectRow(row);
-        QMessageBox::information(this, tr("Modifier"), tr("Modifier la ligne %1").arg(row + 1));
+        int r = findRowForButton(t, sender());
+        if (r < 0) return;
+
+        // Read row data (col 0=ID, 1=Nom, 2=Prénom, 3=Email, 4=Rôle)
+        auto cell = [&](int c) {
+            auto* it = t->item(r, c);
+            return it ? it->text() : QString();
+        };
+
+        bool ok = false;
+        int empId = cell(0).toInt(&ok);
+        if (!ok || empId <= 0) return;
+
+        // Store the id being edited so the submit button knows to UPDATE
+        ui->nomLineEdit->setText(cell(1));
+        ui->prNomLineEdit->setText(cell(2));
+        ui->emailLineEdit->setText(cell(3));
+
+        // Set role comboBox to the correct entry
+        int roleIdx = ui->roleComboBox->findText(cell(4));
+        if (roleIdx >= 0) ui->roleComboBox->setCurrentIndex(roleIdx);
+
+        ui->mdpLineEdit->clear();
+        ui->photoPathLineEdit->clear();
+        m_selectedPhoto.clear();
+
+        // Tag the form with the employee id being modified
+        ui->ajouterEmpBtn->setProperty("editingId", empId);
+        ui->ajouterEmpBtn->setText(tr("Enregistrer"));
+
+        // Navigate to the add/edit form (index 0 = ajoutpersonnel)
+        crossFadeToIndex(ui->metierspersonnel, 0);
     });
 
+    // ── Delete: confirm, call DB, reload table ───────────────────────────────
     connect(btnDelete, &QPushButton::clicked, this, [this]() {
         QTableWidget* t = findOwningTable(sender());
         if (!t) return;
-        int row = findRowForButton(t, sender());
-        if (row < 0) return;
-        auto reply = QMessageBox::question(this, tr("Supprimer"), tr("Supprimer la ligne %1 ?").arg(row + 1));
-        if (reply == QMessageBox::Yes) {
-            t->removeRow(row);
+        int r = findRowForButton(t, sender());
+        if (r < 0) return;
+
+        auto* idItem = t->item(r, 0);
+        if (!idItem) return;
+        bool ok = false;
+        int empId = idItem->text().toInt(&ok);
+        if (!ok || empId <= 0) return;
+
+        QString nom = t->item(r, 1) ? t->item(r, 1)->text() : QString::number(empId);
+        auto reply = QMessageBox::question(
+            this, tr("Confirmer la suppression"),
+            tr("Supprimer l'employé \"%1\" (ID %2) ?").arg(nom).arg(empId),
+            QMessageBox::Yes | QMessageBox::No);
+        if (reply != QMessageBox::Yes) return;
+
+        Employe emp;
+        if (!emp.supprimer(empId)) {
+            QMessageBox::critical(this, tr("Erreur"),
+                tr("Impossible de supprimer l'employé :\n%1").arg(emp.lastError().text()));
+            return;
         }
+        // Reload the table to reflect deletion
+        loadEmployeeTable();
     });
 }
 
@@ -1456,8 +1563,8 @@ int MainWindow::findRowForButton(QTableWidget* table, QObject* button) const
         QWidget* cell = table->cellWidget(r, table->columnCount() - 1);
         if (!cell) continue;
         // Look for either modify or delete child matching the sender
-        auto* mod = cell->findChild<QPushButton*>("modifyBtn");
-        auto* del = cell->findChild<QPushButton*>("deleteBtn");
+        auto* mod = cell->findChild<QAbstractButton*>("modifyBtn");
+        auto* del = cell->findChild<QAbstractButton*>("deleteBtn");
         if (mod == button || del == button) {
             return r;
         }
@@ -1511,7 +1618,7 @@ void MainWindow::addActionsColumnTo(QTableWidget* table)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     if (table->verticalHeader()) {
-        table->verticalHeader()->setDefaultSectionSize(32);
+        table->verticalHeader()->setDefaultSectionSize(30);
     }
 
     // Create action buttons for each existing row
@@ -1527,7 +1634,7 @@ void MainWindow::addActionsColumnTo(QTableWidget* table)
             table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
         }
         table->horizontalHeader()->setSectionResizeMode(last, QHeaderView::ResizeToContents);
-        table->setColumnWidth(last, 90);
+        table->setColumnWidth(last, 68);
     }
 }
 
@@ -1577,5 +1684,11 @@ void MainWindow::on_faceBtn_clicked()
     QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::reject);
 
     dlg.exec();
+}
+
+
+void MainWindow::on_toolButton_clicked()
+{
+
 }
 
