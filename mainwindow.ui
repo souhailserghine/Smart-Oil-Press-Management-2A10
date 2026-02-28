@@ -238,7 +238,7 @@ border-top-left-radius : 50px;</string>
            </rect>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="ajoutpersonnel">
            <widget class="QWidget" name="formLayoutWidget">
@@ -532,7 +532,7 @@ border-top-left-radius : 50px;</string>
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="toolButton_3">
+               <widget class="QToolButton" name="exportEmpBtn">
                 <property name="toolTip">
                  <string>Exporter</string>
                 </property>
@@ -623,40 +623,6 @@ border-top-left-radius : 50px;</string>
                </property>
               </column>
              </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="exportRow">
-              <item>
-               <spacer name="horizontalSpacer_export">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="export_emp_btn">
-                <property name="text">
-                 <string>Exporter</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="img.qrc">
-                  <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>18</width>
-                  <height>18</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </item>
            </layout>
           </widget>

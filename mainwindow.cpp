@@ -8,7 +8,6 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
-#include <QtCharts/QChartGlobal>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarCategoryAxis>
@@ -46,9 +45,21 @@
 #include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QScrollArea>
-#include <QBoxLayout>
-#include <QGraphicsDropShadowEffect>
-#include <QEvent>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QtCharts/QPieSlice>
+#include <QMap>
+#include <QFont>
+#include <QPdfWriter>
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QTextTable>
+#include <QTextTableFormat>
+#include <QTextCharFormat>
+#include <QTextBlockFormat>
+#include <QMenu>
+#include <QDir>
+#include <QCursor>
 
 
 
@@ -486,6 +497,7 @@ void MainWindow::on_btnStatEmp_clicked()
         crossFadeToIndex(ui->modules, 0);
     // Switch to "Statistics" page (index 2)
     crossFadeToIndex(ui->metierspersonnel, 2);
+    loadEmployeeStats();
 }
 
 void MainWindow::on_btnAdvEmp_clicked()
@@ -500,10 +512,6 @@ void MainWindow::on_btnAdvEmp_clicked()
 // Module 2 (Stocks) toolbar actions: map to metiersstocks pages
 void MainWindow::on_btnConsulterstc_clicked()
 {
-        // Respect intended sidebar width constraints and prevent layout from squashing it
-        ui->sidebar->setMinimumWidth(200);
-        ui->sidebar->setMaximumWidth(220);
-        ui->sidebar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     if (ui->modules->currentIndex() != 5)
         crossFadeToIndex(ui->modules, 5);
     crossFadeToIndex(ui->metiersstocks, 1); // consulterqtolives
@@ -724,9 +732,18 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
     if (!stack || newIndex < 0 || newIndex >= stack->count()) {
         return;
     }
+
+    // Always re-enable the stack first to clear any stale disabled state
+    // left over from a previous animation that may not have cleaned up properly.
+    stack->setEnabled(true);
+
     QWidget* current = stack->currentWidget();
     QWidget* next = stack->widget(newIndex);
+
+    // If already on the target page, just make sure it's enabled and return
     if (!current || !next || current == next) {
+        stack->setCurrentIndex(newIndex);
+        stack->setEnabled(true);
         return;
     }
 
@@ -767,6 +784,13 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
     stack->setCurrentIndex(newIndex);
     stack->setEnabled(false); // temporarily block input during transition
 
+    // Safety timer: unconditionally re-enable the stack after the animation
+    // duration (+ a small buffer) so a failed/skipped animation never leaves
+    // the stack permanently disabled and unresponsive to user input.
+    QTimer::singleShot(400, stack, [stack]() {
+        stack->setEnabled(true);
+    });
+
     // Parallel fade animations
     auto* outAnim = new QPropertyAnimation(currEff, "opacity", currentOverlay);
     outAnim->setDuration(220);
@@ -783,7 +807,7 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
     auto* group = new QParallelAnimationGroup(stack);
     group->addAnimation(outAnim);
     group->addAnimation(inAnim);
-    QObject::connect(group, &QParallelAnimationGroup::finished, this, [this, stack, currentOverlay, nextOverlay]() {
+    QObject::connect(group, &QParallelAnimationGroup::finished, this, [stack, currentOverlay, nextOverlay]() {
         stack->setEnabled(true);
         // Clean up overlays
         currentOverlay->deleteLater();
@@ -795,16 +819,9 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
 // Keep the user info container anchored at the top-right of the modules area
 void MainWindow::repositionUserInfo()
 {
-    // If the parent has a layout (our case), skip manual geometry to avoid fighting layout
+    // userInfoContainer is layout-managed inside contentArea; no manual geometry needed
     if (!ui->userInfoContainer || !ui->modules) return;
     if (ui->mainprogram && ui->mainprogram->layout()) return;
-    // Fallback manual positioning only when layout management is not available
-    ui->userInfoContainer->setFixedSize(220, 56);
-    QRect m = ui->modules->geometry();
-    int x = m.right() - ui->userInfoContainer->width() - 10;
-    int y = m.top() + 10;
-    ui->userInfoContainer->setGeometry(x, y, ui->userInfoContainer->width(), ui->userInfoContainer->height());
-    ui->userInfoContainer->raise();
 }
 
 // Render the user avatar pixmap as a true circle with antialiasing
@@ -1175,6 +1192,141 @@ void MainWindow::setupPersonnelChart()
     grid->setColumnStretch(1, 1);
     grid->setRowStretch(0, 1);
     grid->setRowStretch(1, 1);
+}
+
+void MainWindow::loadEmployeeStats()
+{
+    QWidget* container = ui->chartStatusContainer;
+
+    // ── clear any previous charts ─────────────────────────────────────────
+    QLayout* oldLayout = container->layout();
+    if (oldLayout) {
+        QLayoutItem* item;
+        while ((item = oldLayout->takeAt(0)) != nullptr) {
+            if (item->widget()) item->widget()->deleteLater();
+            delete item;
+        }
+        delete oldLayout;
+    }
+
+    // ── query: COUNT per role ─────────────────────────────────────────────
+    QSqlQuery q;
+    q.prepare("SELECT role, COUNT(*) AS nb FROM EMPLOYE GROUP BY role ORDER BY role");
+    if (!q.exec()) {
+        QVBoxLayout* lay = new QVBoxLayout(container);
+        QLabel* err = new QLabel("Erreur DB: " + q.lastError().text(), container);
+        err->setAlignment(Qt::AlignCenter);
+        err->setStyleSheet("color: red; font-size: 12pt;");
+        lay->addWidget(err);
+        return;
+    }
+
+    QMap<QString, int> roleCount;
+    int total = 0;
+    while (q.next()) {
+        roleCount[q.value(0).toString()] = q.value(1).toInt();
+        total += q.value(1).toInt();
+    }
+
+    if (total == 0) {
+        QVBoxLayout* lay = new QVBoxLayout(container);
+        QLabel* empty = new QLabel("Aucun employé dans la base de données.", container);
+        empty->setAlignment(Qt::AlignCenter);
+        empty->setStyleSheet("font-size: 12pt; color: gray;");
+        lay->addWidget(empty);
+        return;
+    }
+
+    // ── title label ───────────────────────────────────────────────────────
+    QLabel* title = new QLabel(
+        QString("Statistiques des employés  —  %1 employé(s) au total").arg(total));
+    title->setAlignment(Qt::AlignCenter);
+    title->setStyleSheet("font-size: 14pt; font-weight: bold; padding: 8px;");
+
+    // ── fixed colours per role ────────────────────────────────────────────
+    QMap<QString, QColor> roleColors;
+    roleColors["Administrateur"] = QColor("#2E5265");
+    roleColors["Manager"]        = QColor("#4A90D9");
+    roleColors["Technicien"]     = QColor("#50C878");
+    roleColors["Operateur"]      = QColor("#F4A460");
+
+    // ══ CHART 1: Pie — répartition par rôle ══════════════════════════════
+    QPieSeries* pieSeries = new QPieSeries();
+    for (auto it = roleCount.constBegin(); it != roleCount.constEnd(); ++it) {
+        double pct = 100.0 * it.value() / total;
+        QPieSlice* slice = pieSeries->append(
+            QString("%1\n%2 (%3%)").arg(it.key()).arg(it.value())
+                .arg(QString::number(pct, 'f', 1)),
+            it.value());
+        if (roleColors.contains(it.key()))
+            slice->setColor(roleColors[it.key()]);
+        slice->setLabelVisible(true);
+        slice->setLabelColor(Qt::black);
+    }
+    QChart* pieChart = new QChart();
+    pieChart->addSeries(pieSeries);
+    pieChart->setTitle("Répartition par rôle");
+    pieChart->setTitleFont(QFont("Segoe UI", 11, QFont::Bold));
+    pieChart->legend()->setAlignment(Qt::AlignRight);
+    pieChart->setAnimationOptions(QChart::AllAnimations);
+    pieChart->setBackgroundVisible(false);
+    QChartView* pieView = new QChartView(pieChart);
+    pieView->setRenderHint(QPainter::Antialiasing);
+    pieView->setMinimumHeight(280);
+    pieView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // ══ CHART 2: Bar — nombre d'employés par rôle ════════════════════════
+    QBarSet* barSet = new QBarSet("Employés");
+    QStringList categories;
+    for (auto it = roleCount.constBegin(); it != roleCount.constEnd(); ++it) {
+        *barSet << it.value();
+        categories << it.key();
+    }
+    if (roleColors.contains(categories.first()))
+        barSet->setColor(roleColors[categories.first()]);
+
+    QBarSeries* barSeries = new QBarSeries();
+    barSeries->append(barSet);
+    barSeries->setLabelsVisible(true);
+    barSeries->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+
+    QBarCategoryAxis* axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    axisX->setTitleText("Rôle");
+
+    QValueAxis* axisY = new QValueAxis();
+    axisY->setTitleText("Nombre d'employés");
+    axisY->setLabelFormat("%d");
+    axisY->setRange(0, total + 1);
+
+    QChart* barChart = new QChart();
+    barChart->addSeries(barSeries);
+    barChart->setTitle("Nombre d'employés par rôle");
+    barChart->setTitleFont(QFont("Segoe UI", 11, QFont::Bold));
+    barChart->addAxis(axisX, Qt::AlignBottom);
+    barChart->addAxis(axisY, Qt::AlignLeft);
+    barSeries->attachAxis(axisX);
+    barSeries->attachAxis(axisY);
+    barChart->legend()->setVisible(false);
+    barChart->setAnimationOptions(QChart::SeriesAnimations);
+    barChart->setBackgroundVisible(false);
+
+    QChartView* barView = new QChartView(barChart);
+    barView->setRenderHint(QPainter::Antialiasing);
+    barView->setMinimumHeight(280);
+    barView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // ── assemble layout ───────────────────────────────────────────────────
+    QVBoxLayout* mainLay = new QVBoxLayout(container);
+    mainLay->setContentsMargins(10, 10, 10, 10);
+    mainLay->setSpacing(16);
+    mainLay->addWidget(title);
+
+    QHBoxLayout* chartsRow = new QHBoxLayout();
+    chartsRow->setSpacing(12);
+    chartsRow->addWidget(pieView, 1);
+    chartsRow->addWidget(barView, 1);
+    mainLay->addLayout(chartsRow, 1);
 }
 
 void MainWindow::setupCiterneChart()
@@ -1686,9 +1838,192 @@ void MainWindow::on_faceBtn_clicked()
     dlg.exec();
 }
 
+void MainWindow::on_exportEmpBtn_clicked()
+{
+    qDebug() << "[exportEmpBtn] slot fired";
+
+    // Use a modal QDialog instead of QMenu::exec so the format choice always
+    // appears centred over the main window and cannot be dismissed by accident.
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Exporter la liste des employés"));
+    dlg.setFixedSize(320, 130);
+
+    auto* root = new QVBoxLayout(&dlg);
+    root->setContentsMargins(16, 16, 16, 16);
+    root->setSpacing(10);
+
+    auto* lbl = new QLabel(tr("Choisissez le format d'export :"), &dlg);
+    root->addWidget(lbl);
+
+    auto* btnRow = new QHBoxLayout();
+    auto* btnPdf = new QPushButton(QIcon(QStringLiteral(":/img/export.svg")),
+                                   tr("PDF (.pdf)"), &dlg);
+    auto* btnCsv = new QPushButton(QIcon(QStringLiteral(":/img/export.svg")),
+                                   tr("Excel (.csv)"), &dlg);
+    auto* btnCancel = new QPushButton(tr("Annuler"), &dlg);
+    btnPdf->setProperty("type", "primary");
+    btnCsv->setProperty("type", "primary");
+    btnRow->addWidget(btnPdf);
+    btnRow->addWidget(btnCsv);
+    btnRow->addWidget(btnCancel);
+    root->addLayout(btnRow);
+
+    int choice = 0; // 0=cancel, 1=pdf, 2=csv
+    QObject::connect(btnPdf,    &QPushButton::clicked, &dlg, [&](){ choice = 1; dlg.accept(); });
+    QObject::connect(btnCsv,    &QPushButton::clicked, &dlg, [&](){ choice = 2; dlg.accept(); });
+    QObject::connect(btnCancel, &QPushButton::clicked, &dlg, &QDialog::reject);
+
+    if (dlg.exec() != QDialog::Accepted || choice == 0) return;
+
+    if (choice == 1) {
+        QString path = QFileDialog::getSaveFileName(
+            this, tr("Enregistrer la liste en PDF"),
+            QStringLiteral("liste_employes.pdf"),
+            tr("PDF (*.pdf)"));
+        if (!path.isEmpty()) exportEmployeesToPdf(path);
+
+    } else if (choice == 2) {
+        QString path = QFileDialog::getSaveFileName(
+            this, tr("Enregistrer la liste Excel"),
+            QStringLiteral("liste_employes.csv"),
+            tr("CSV Excel (*.csv);;Tous les fichiers (*.*)"));
+        if (!path.isEmpty()) exportEmployeesToCsv(path);
+    }
+}
+
+// ── PDF export ────────────────────────────────────────────────────────────────
+void MainWindow::exportEmployeesToPdf(const QString& filePath)
+{
+    QTableWidget* table = ui->tableEmp;
+    if (!table) return;
+
+    // Columns to export (skip the last "Actions" column)
+    const int dataCols = table->columnCount() - 1;
+    const int rows     = table->rowCount();
+
+    // ── Build an HTML table ──────────────────────────────────────────────────
+    QString html;
+    html.reserve(4096);
+    html += QStringLiteral(
+        "<html><head><meta charset='utf-8'/>"
+        "<style>"
+        "  body { font-family: Arial, sans-serif; font-size: 10pt; }"
+        "  h2   { color: #2E5265; margin-bottom: 4px; }"
+        "  p.sub { color: #555; font-size: 9pt; margin-top: 0; }"
+        "  table { border-collapse: collapse; width: 100%; margin-top: 12px; }"
+        "  th { background-color: #2E5265; color: white; padding: 6px 10px;"
+        "        text-align: left; font-size: 9pt; }"
+        "  td { padding: 5px 10px; font-size: 9pt; border-bottom: 1px solid #ddd; }"
+        "  tr:nth-child(even) td { background-color: #f4f8fb; }"
+        "</style></head><body>");
+
+    html += QStringLiteral("<h2>Liste des Employ&eacute;s</h2>");
+    html += QStringLiteral("<p class='sub'>Smart Oil Press &mdash; Rapport g&eacute;n&eacute;r&eacute; le ")
+          + QDateTime::currentDateTime().toString(QStringLiteral("dd/MM/yyyy hh:mm"))
+          + QStringLiteral("</p>");
+    html += QStringLiteral("<table><tr>");
+
+    // Header row
+    for (int c = 0; c < dataCols; ++c) {
+        auto* hItem = table->horizontalHeaderItem(c);
+        html += QStringLiteral("<th>") + (hItem ? hItem->text().toHtmlEscaped() : QString()) + QStringLiteral("</th>");
+    }
+    html += QStringLiteral("</tr>");
+
+    // Count visible rows (respect active filter)
+    int visibleRows = 0;
+    for (int r = 0; r < rows; ++r) {
+        if (table->isRowHidden(r)) continue;
+        ++visibleRows;
+        html += QStringLiteral("<tr>");
+        for (int c = 0; c < dataCols; ++c) {
+            auto* item = table->item(r, c);
+            QString text = item ? item->text().toHtmlEscaped() : QString();
+            html += QStringLiteral("<td>") + text + QStringLiteral("</td>");
+        }
+        html += QStringLiteral("</tr>");
+    }
+    html += QStringLiteral("</table>");
+    html += QStringLiteral("<p class='sub' style='margin-top:8px;'>")
+          + QString::number(visibleRows) + tr(" employé(s) exporté(s)")
+          + QStringLiteral("</p></body></html>");
+
+    // ── Write PDF ────────────────────────────────────────────────────────────
+    QPdfWriter writer(filePath);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+    writer.setResolution(150);
+
+    QTextDocument doc;
+    doc.setPageSize(QSizeF(writer.width(), writer.height()));
+    doc.setHtml(html);
+    doc.print(&writer);
+
+    QMessageBox::information(this, tr("Export PDF"),
+        tr("La liste a été exportée avec succès :\n%1\n(%2 employé(s))")
+            .arg(QDir::toNativeSeparators(filePath)).arg(visibleRows));
+}
+
+// ── CSV / Excel export ────────────────────────────────────────────────────────
+void MainWindow::exportEmployeesToCsv(const QString& filePath)
+{
+    QTableWidget* table = ui->tableEmp;
+    if (!table) return;
+
+    const int dataCols = table->columnCount() - 1; // skip Actions
+    const int rows     = table->rowCount();
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'écrire dans le fichier :\n%1").arg(filePath));
+        return;
+    }
+
+    QTextStream out(&file);
+    // UTF-8 BOM so Excel opens accented characters correctly
+    out.setEncoding(QStringConverter::Utf8);
+    out << "\xEF\xBB\xBF";
+
+    // ── Helper: quote a cell value ───────────────────────────────────────────
+    auto csvCell = [](const QString& val) -> QString {
+        // If value contains comma, semicolon, newline or quote → wrap in quotes
+        QString v = val;
+        v.replace(QStringLiteral("\""), QStringLiteral("\"\""));
+        if (v.contains(QLatin1Char(';')) || v.contains(QLatin1Char(','))
+                || v.contains(QLatin1Char('\n')) || v.contains(QLatin1Char('"')))
+            return QStringLiteral("\"") + v + QStringLiteral("\"");
+        return v;
+    };
+
+    // Header row
+    QStringList headerCells;
+    for (int c = 0; c < dataCols; ++c) {
+        auto* hItem = table->horizontalHeaderItem(c);
+        headerCells << csvCell(hItem ? hItem->text() : QString());
+    }
+    out << headerCells.join(QLatin1Char(';')) << "\n";
+
+    // Data rows (only visible ones)
+    int visibleRows = 0;
+    for (int r = 0; r < rows; ++r) {
+        if (table->isRowHidden(r)) continue;
+        ++visibleRows;
+        QStringList cells;
+        for (int c = 0; c < dataCols; ++c) {
+            auto* item = table->item(r, c);
+            cells << csvCell(item ? item->text() : QString());
+        }
+        out << cells.join(QLatin1Char(';')) << "\n";
+    }
+    file.close();
+
+    QMessageBox::information(this, tr("Export Excel"),
+        tr("La liste a été exportée avec succès :\n%1\n(%2 employé(s))")
+            .arg(QDir::toNativeSeparators(filePath)).arg(visibleRows));
+}
 
 void MainWindow::on_toolButton_clicked()
 {
-
+    // Reserved for future use (toolButton widget in UI)
 }
-

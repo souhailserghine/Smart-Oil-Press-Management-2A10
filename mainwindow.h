@@ -35,6 +35,7 @@ private slots:
     void on_btnStatEmp_clicked();
     void on_btnAdvEmp_clicked();
     void on_faceBtn_clicked();
+    void on_exportEmpBtn_clicked();     // export employee list → PDF or Excel
 
     // Sidebar module navigation
     void on_btnmod1_clicked(); // Personnel (module1)
@@ -83,6 +84,9 @@ private:
     void setupPersonnelChart();
     void setupPersonnelTable();
     void loadEmployeeTable();          // populate tableWidget from DB
+    void loadEmployeeStats();          // populate stats charts from DB
+    void exportEmployeesToPdf(const QString& filePath);
+    void exportEmployeesToCsv(const QString& filePath);
     void setupCiterneChart();
     void setupStocksChart();
     void setupQualiteChart();
