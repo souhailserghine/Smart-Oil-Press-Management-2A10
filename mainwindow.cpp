@@ -373,8 +373,49 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_loginbtn_clicked()
 {
-    // Switch to the 2nd page (index 1)
-    ui->stackedWidget->setCurrentIndex(1);
+    const QString email = ui->userinput->text().trimmed();
+    const QString mdp   = ui->pwdinput->text();
+
+    // ── Basic field validation ────────────────────────────────────────────
+    if (email.isEmpty() || mdp.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs requis"),
+                             tr("Veuillez entrer votre email et votre mot de passe."));
+        return;
+    }
+
+    // ── Authenticate against DB ───────────────────────────────────────────
+    Employe emp;
+    const int userId = emp.authenticate(email, mdp);
+
+    if (userId < 0) {
+        // Wrong credentials — shake the login area and show an error
+        QMessageBox::critical(this, tr("Échec de connexion"),
+                              tr("Email ou mot de passe incorrect.\n"
+                                 "Veuillez réessayer."));
+        ui->pwdinput->clear();
+        ui->pwdinput->setFocus();
+        return;
+    }
+
+    // ── Success — remember who is logged in ───────────────────────────────
+    m_loggedInId = userId;
+
+    // Fetch the employee's name to display in the top-right info bar
+    QSqlQuery q;
+    q.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
+    q.bindValue(":id", userId);
+    if (q.exec() && q.next()) {
+        const QString fullName = q.value(0).toString() + " " + q.value(1).toString();
+        if (ui->userNameLabel)
+            ui->userNameLabel->setText(fullName);
+    }
+
+    // Clear credentials so they are not visible if the user later logs out
+    ui->userinput->clear();
+    ui->pwdinput->clear();
+
+    // Navigate to the main application page (index 1 of MainStacked)
+    ui->MainStacked->setCurrentIndex(1);
 }
 
 void MainWindow::on_btnAjouterEmp_clicked()
@@ -658,7 +699,7 @@ void MainWindow::on_btnAvanceAgr_clicked()
 // Order in UI: module1 (0), module3 (1), module4 (2), module5 (3), module6 (4), module2 (5)
 void MainWindow::on_btnmod1_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1); // ensure mainprogram
+    ui->MainStacked->setCurrentIndex(1); // ensure mainprogram
     crossFadeToIndex(ui->modules, 0);
     // Always reset to the first page in the module
     crossFadeToIndex(ui->metierspersonnel, 0);
@@ -667,7 +708,7 @@ void MainWindow::on_btnmod1_clicked()
 
 void MainWindow::on_btnmod2_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->MainStacked->setCurrentIndex(1);
     crossFadeToIndex(ui->modules, 5);
     crossFadeToIndex(ui->metiersstocks, 0);
     setActiveModuleButton(5);
@@ -675,7 +716,7 @@ void MainWindow::on_btnmod2_clicked()
 
 void MainWindow::on_btnmod3_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->MainStacked->setCurrentIndex(1);
     crossFadeToIndex(ui->modules, 1);
     crossFadeToIndex(ui->metiersCiternes, 0);
     setActiveModuleButton(1);
@@ -683,7 +724,7 @@ void MainWindow::on_btnmod3_clicked()
 
 void MainWindow::on_btnmod4_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->MainStacked->setCurrentIndex(1);
     crossFadeToIndex(ui->modules, 2);
     crossFadeToIndex(ui->metiersqualite, 0);
     setActiveModuleButton(2);
@@ -691,7 +732,7 @@ void MainWindow::on_btnmod4_clicked()
 
 void MainWindow::on_btnmod5_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->MainStacked->setCurrentIndex(1);
     crossFadeToIndex(ui->modules, 3);
     crossFadeToIndex(ui->metierspersonnel_2, 0);
     setActiveModuleButton(3);
@@ -699,7 +740,7 @@ void MainWindow::on_btnmod5_clicked()
 
 void MainWindow::on_btnmod6_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->MainStacked->setCurrentIndex(1);
     crossFadeToIndex(ui->modules, 4);
     crossFadeToIndex(ui->metiersagriculteurs, 0);
     setActiveModuleButton(4);

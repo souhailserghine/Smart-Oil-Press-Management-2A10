@@ -16,9 +16,9 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QStackedWidget" name="stackedWidget">
+     <widget class="QStackedWidget" name="MainStacked">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="loginpage">
        <widget class="QLabel" name="logintext">

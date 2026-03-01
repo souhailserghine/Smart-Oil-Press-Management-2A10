@@ -119,6 +119,7 @@ private:
     void updateClock();
 
     bool m_sidebarCollapsed = false;
+    int  m_loggedInId = -1;            // id_emp of the currently authenticated user
     QByteArray m_selectedPhoto;
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
