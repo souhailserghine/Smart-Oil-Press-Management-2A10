@@ -78,9 +78,9 @@ bool Employe::ajouter()
     QSqlQuery query;
     query.prepare(
         "INSERT INTO EMPLOYE "
-        "  (nom_emp, prenom_emp, email, role, mdp, photo) "
+        "  (nom_emp, prenom_emp, email, role, mdp, photo, modele_faciale) "
         "VALUES "
-        "  (:nom_emp, :prenom_emp, :email, :role, :mdp, :photo)"
+        "  (:nom_emp, :prenom_emp, :email, :role, :mdp, :photo, :modele_faciale)"
     );
     query.bindValue(":nom_emp",    m_nomEmp);
     query.bindValue(":prenom_emp", m_prenomEmp);
@@ -88,11 +88,15 @@ bool Employe::ajouter()
     query.bindValue(":role",       m_role);
     query.bindValue(":mdp",        m_mdp);
 
-    if (m_photo.isEmpty()) {
+    if (m_photo.isEmpty())
         query.bindValue(":photo", QVariant(QMetaType(QMetaType::QByteArray)));
-    } else {
+    else
         query.bindValue(":photo", m_photo);
-    }
+
+    if (m_modeleFaciale.isEmpty())
+        query.bindValue(":modele_faciale", QVariant(QMetaType(QMetaType::QByteArray)));
+    else
+        query.bindValue(":modele_faciale", m_modeleFaciale);
 
     if (!query.exec()) {
         m_lastError = query.lastError();
@@ -137,22 +141,24 @@ bool Employe::modifier()
     if (m_mdp.isEmpty()) {
         query.prepare(
             "UPDATE EMPLOYE SET "
-            "  nom_emp    = :nom_emp, "
-            "  prenom_emp = :prenom_emp, "
-            "  email      = :email, "
-            "  role       = :role, "
-            "  photo      = :photo "
+            "  nom_emp         = :nom_emp, "
+            "  prenom_emp      = :prenom_emp, "
+            "  email           = :email, "
+            "  role            = :role, "
+            "  photo           = :photo, "
+            "  modele_faciale  = :modele_faciale "
             "WHERE id_emp = :id_emp"
         );
     } else {
         query.prepare(
             "UPDATE EMPLOYE SET "
-            "  nom_emp    = :nom_emp, "
-            "  prenom_emp = :prenom_emp, "
-            "  email      = :email, "
-            "  role       = :role, "
-            "  mdp        = :mdp, "
-            "  photo      = :photo "
+            "  nom_emp         = :nom_emp, "
+            "  prenom_emp      = :prenom_emp, "
+            "  email           = :email, "
+            "  role            = :role, "
+            "  mdp             = :mdp, "
+            "  photo           = :photo, "
+            "  modele_faciale  = :modele_faciale "
             "WHERE id_emp = :id_emp"
         );
         query.bindValue(":mdp", m_mdp);
@@ -167,6 +173,11 @@ bool Employe::modifier()
         query.bindValue(":photo", QVariant(QMetaType(QMetaType::QByteArray)));
     else
         query.bindValue(":photo", m_photo);
+
+    if (m_modeleFaciale.isEmpty())
+        query.bindValue(":modele_faciale", QVariant(QMetaType(QMetaType::QByteArray)));
+    else
+        query.bindValue(":modele_faciale", m_modeleFaciale);
 
     query.bindValue(":id_emp", m_idEmp);
 

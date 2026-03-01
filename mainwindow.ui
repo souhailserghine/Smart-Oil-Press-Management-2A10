@@ -399,7 +399,45 @@ border-top-left-radius : 50px;</string>
                </item>
               </layout>
              </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="faceModelLabel">
+               <property name="text">
+                <string>Visage</string>
+               </property>
+              </widget>
+             </item>
              <item row="7" column="1">
+              <layout class="QHBoxLayout" name="faceRow">
+               <item>
+                <widget class="QLabel" name="faceStatusLabel">
+                 <property name="text">
+                  <string>Aucun visage capturé</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="captureFaceBtn">
+                 <property name="text">
+                  <string>Capturer</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="img.qrc">
+                   <normaloff>:/img/camera.svg</normaloff>:/img/camera.svg</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>18</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="8" column="1">
               <layout class="QHBoxLayout" name="qjouterEmpRow">
                <property name="spacing">
                 <number>7</number>

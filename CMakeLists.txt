@@ -88,3 +88,44 @@ install(TARGETS smartoil
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(smartoil)
 endif()
+
+
+set(OpenCV_DIR "C:/opencv/build_mingw")
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui dnn objdetect videoio)
+target_link_libraries(smartoil PRIVATE ${OpenCV_LIBS})
+
+# Copy face recognition model files next to the executable at build time
+add_custom_command(TARGET smartoil POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/models/face_detection_yunet_2023mar.onnx"
+        "$<TARGET_FILE_DIR:smartoil>/face_detection_yunet_2023mar.onnx"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/models/face_recognition_sface_2021dec.onnx"
+        "$<TARGET_FILE_DIR:smartoil>/face_recognition_sface_2021dec.onnx"
+)
+
+# Copy OpenCV MinGW DLLs next to the executable at build time
+foreach(_dll
+    libopencv_core4120
+    libopencv_imgproc4120
+    libopencv_imgcodecs4120
+    libopencv_highgui4120
+    libopencv_dnn4120
+    libopencv_objdetect4120
+    libopencv_videoio4120
+    libopencv_calib3d4120
+    libopencv_features2d4120
+    libopencv_flann4120
+)
+    add_custom_command(TARGET smartoil POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "C:/opencv/build_mingw/bin/${_dll}.dll"
+            "$<TARGET_FILE_DIR:smartoil>/${_dll}.dll"
+    )
+endforeach()
+# ffmpeg helper DLL (different naming)
+add_custom_command(TARGET smartoil POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "C:/opencv/build_mingw/bin/opencv_videoio_ffmpeg4120_64.dll"
+        "$<TARGET_FILE_DIR:smartoil>/opencv_videoio_ffmpeg4120_64.dll"
+)
