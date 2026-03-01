@@ -67,6 +67,13 @@ private slots:
     void on_reloadhuilebutton_clicked();
     void on_btnAdvHuile_clicked();
 
+    // ── Affectation slots ────────────────────────────────────────────────────
+    void on_affNewBtn_clicked();        // show the affectation form (affStack → 0)
+    void on_affSaveBtn_clicked();       // INSERT affectation into EMP_MACH
+    void on_affCancelBtn_clicked();     // back to table (affStack → 1)
+    void on_affRefreshBtn_clicked();    // reload affectation table
+    void on_affSearchEdit_textChanged(const QString& text);
+
     // Sidebar module navigation
     void on_btnmod1_clicked();
     void on_btnmod2_clicked();
@@ -293,6 +300,14 @@ void openStocksWindow(int pageIndex = -1);
     int  m_loggedInId = -1;            // id_emp of the currently authenticated user
     QByteArray m_selectedPhoto;
     QByteArray m_capturedFaceBlob;     // face embedding captured via webcam for new employee
+    // Composite PK tracking for EMP_MACH edit mode
+    int  m_editingAffIdEmp   = -1;     // id_emp being edited (-1 = insert mode)
+    int  m_editingAffIdSerie = -1;     // id_serie being edited (-1 = insert mode)
+
+    // ── Affectation helpers ──────────────────────────────────────────────────
+    void loadAffectationTable();
+    void populateAffCombos();
+    void filterAffTable();
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
     QLabel* m_clockLabel = nullptr;

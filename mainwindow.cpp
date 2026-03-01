@@ -518,6 +518,10 @@ void MainWindow::on_btnAdvEmp_clicked()
     if (ui->modules->currentIndex() != 0)
         crossFadeToIndex(ui->modules, 0);
     crossFadeToIndex(ui->metierspersonnel, 3);
+    populateAffCombos();
+    loadAffectationTable();
+    // Start on the table view
+    ui->affStack->setCurrentIndex(1);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
