@@ -47,6 +47,7 @@ private slots:
     void on_btnAjouterEmp_clicked();   // toolbar button → navigate to form page
     void on_ajouterEmpBtn_clicked();   // form submit button → INSERT employee
     void on_parcourirPhotoBtn_clicked(); // photo browse button
+    void on_captureFaceBtn_clicked();    // webcam capture for face model
     void on_btnConsulterEmp_clicked();
     void on_btnStatEmp_clicked();
     void on_btnAdvEmp_clicked();
@@ -291,6 +292,7 @@ void openStocksWindow(int pageIndex = -1);
     bool m_sidebarCollapsed = false;
     int  m_loggedInId = -1;            // id_emp of the currently authenticated user
     QByteArray m_selectedPhoto;
+    QByteArray m_capturedFaceBlob;     // face embedding captured via webcam for new employee
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
     QLabel* m_clockLabel = nullptr;

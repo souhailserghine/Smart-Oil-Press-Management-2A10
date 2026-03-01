@@ -275,7 +275,13 @@ void MainWindow::on_ajouterEmpBtn_clicked()
 
     if (isEditing) {
         // ── UPDATE mode ─────────────────────────────────────────────────────
-        Employe emp(editingId, nom, prenom, email, role, mdp, QDate(), m_selectedPhoto);
+        // Priority: live webcam capture > photo-file encoding > keep existing in DB
+        QByteArray faceBlob = m_capturedFaceBlob;
+        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
+            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+
+        Employe emp(editingId, nom, prenom, email, role, mdp, QDate(),
+                    m_selectedPhoto, QByteArray(), faceBlob);
         if (!emp.modifier()) {
             QMessageBox::critical(this, tr("Erreur de modification"),
                 tr("Impossible de modifier l'employé :\n%1").arg(emp.lastError().text()));
@@ -290,7 +296,16 @@ void MainWindow::on_ajouterEmpBtn_clicked()
 
     } else {
         // ── INSERT mode ─────────────────────────────────────────────────────
-        Employe emp(0, nom, prenom, email, role, mdp, QDate(), m_selectedPhoto);
+        // Priority: live webcam capture > photo-file encoding
+        QByteArray faceBlob = m_capturedFaceBlob;
+        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
+            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+
+        qDebug() << "[ajouterEmp] faceBlob size:" << faceBlob.size()
+                 << "| capturedBlob size:" << m_capturedFaceBlob.size();
+
+        Employe emp(0, nom, prenom, email, role, mdp, QDate(),
+                    m_selectedPhoto, QByteArray(), faceBlob);
         if (!emp.ajouter()) {
             QMessageBox::critical(this, tr("Erreur d'ajout"),
                 tr("Impossible d'ajouter l'employé :\n%1").arg(emp.lastError().text()));
@@ -308,6 +323,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     ui->mdpLineEdit->clear();
     ui->photoPathLineEdit->clear();
     m_selectedPhoto.clear();
+    m_capturedFaceBlob.clear();
+    ui->faceStatusLabel->setText(tr("Aucun visage capturé"));
+    ui->faceStatusLabel->setStyleSheet("");
 }
 
 void MainWindow::on_parcourirPhotoBtn_clicked()
@@ -329,6 +347,155 @@ void MainWindow::on_parcourirPhotoBtn_clicked()
     file.close();
 
     ui->photoPathLineEdit->setText(path);
+
+    // If no live capture done yet, try to encode the face from the chosen photo
+    // so the status label gives instant feedback
+    if (m_capturedFaceBlob.isEmpty() && m_faceDetector && m_faceRecognizer) {
+        QByteArray blob = encodeFaceFromFile(path);
+        if (!blob.isEmpty()) {
+            m_capturedFaceBlob = blob;
+            ui->faceStatusLabel->setText(tr("✔ Visage détecté depuis la photo"));
+            ui->faceStatusLabel->setStyleSheet("color: #2e7d32;");
+        }
+    }
+}
+
+void MainWindow::on_captureFaceBtn_clicked()
+{
+    if (!m_faceDetector || !m_faceRecognizer) {
+        QMessageBox::warning(this, tr("Indisponible"),
+            tr("Les modèles de reconnaissance faciale ne sont pas chargés."));
+        return;
+    }
+
+    // ── Build live-capture dialog ────────────────────────────────────────────
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Capture du visage"));
+    dlg.resize(680, 540);
+
+    auto* root = new QVBoxLayout(&dlg);
+    root->setContentsMargins(10, 10, 10, 10);
+    root->setSpacing(8);
+
+    auto* camLbl = new QLabel(&dlg);
+    camLbl->setAlignment(Qt::AlignCenter);
+    camLbl->setMinimumSize(640, 460);
+    camLbl->setStyleSheet("background:#111; border-radius:6px;");
+    root->addWidget(camLbl, 1);
+
+    auto* infoLbl = new QLabel(
+        tr("Regardez la caméra puis cliquez sur  « Capturer »"), &dlg);
+    infoLbl->setAlignment(Qt::AlignCenter);
+    root->addWidget(infoLbl);
+
+    auto* btnRow   = new QHBoxLayout();
+    auto* btnCap   = new QPushButton(tr("📸  Capturer"), &dlg);
+    auto* btnClose = new QPushButton(tr("Annuler"), &dlg);
+    btnCap->setEnabled(false);   // enabled once a face is visible
+    btnRow->addStretch();
+    btnRow->addWidget(btnCap);
+    btnRow->addWidget(btnClose);
+    root->addLayout(btnRow);
+
+    QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::reject);
+
+    // ── Open webcam ──────────────────────────────────────────────────────────
+    cv::VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'ouvrir la webcam (index 0)."));
+        return;
+    }
+
+    // Shared state between timer lambda and capture button
+    cv::Mat lastFrame;      // most recent raw frame
+    bool faceVisible = false;
+
+    auto* frameTimer = new QTimer(&dlg);
+    QObject::connect(frameTimer, &QTimer::timeout, &dlg,
+        [&, camLbl, infoLbl, btnCap]() {
+            cv::Mat frame;
+            cap >> frame;
+            if (frame.empty()) return;
+
+            m_faceDetector->setInputSize(frame.size());
+            cv::Mat faces;
+            m_faceDetector->detect(frame, faces);
+            faceVisible = (faces.rows > 0);
+            btnCap->setEnabled(faceVisible);
+
+            // Draw bounding box
+            for (int i = 0; i < faces.rows; ++i) {
+                int fx = static_cast<int>(faces.at<float>(i, 0));
+                int fy = static_cast<int>(faces.at<float>(i, 1));
+                int fw = static_cast<int>(faces.at<float>(i, 2));
+                int fh = static_cast<int>(faces.at<float>(i, 3));
+                cv::rectangle(frame, cv::Rect(fx, fy, fw, fh),
+                              cv::Scalar(0, 220, 80), 2);
+            }
+            infoLbl->setText(faceVisible
+                ? tr("✔ Visage détecté — cliquez sur « Capturer »")
+                : tr("Aucun visage détecté — repositionnez-vous"));
+
+            // Show in label
+            cv::Mat rgb;
+            cv::cvtColor(frame, rgb, cv::COLOR_BGR2RGB);
+            QImage img(rgb.data, rgb.cols, rgb.rows,
+                       static_cast<int>(rgb.step), QImage::Format_RGB888);
+            camLbl->setPixmap(
+                QPixmap::fromImage(img.copy())
+                    .scaled(camLbl->size(), Qt::KeepAspectRatio,
+                            Qt::SmoothTransformation));
+
+            lastFrame = frame.clone(); // keep most recent for capture
+        }
+    );
+    frameTimer->start(30);
+
+    // ── Capture button: encode from the current frame ────────────────────────
+    QObject::connect(btnCap, &QPushButton::clicked, &dlg,
+        [&]() {
+            if (lastFrame.empty()) return;
+
+            m_faceDetector->setInputSize(lastFrame.size());
+            cv::Mat faces;
+            m_faceDetector->detect(lastFrame, faces);
+            if (faces.rows == 0) {
+                QMessageBox::warning(&dlg, tr("Aucun visage"),
+                    tr("Aucun visage n'a été détecté sur la frame courante.\n"
+                       "Réessayez."));
+                return;
+            }
+
+            cv::Mat aligned, embedding;
+            m_faceRecognizer->alignCrop(lastFrame, faces.row(0), aligned);
+            m_faceRecognizer->feature(aligned, embedding); // 1×128 float32
+
+            QByteArray blob(
+                reinterpret_cast<const char*>(embedding.data),
+                static_cast<int>(embedding.total() * sizeof(float)));
+
+            frameTimer->stop();
+            cap.release();
+
+            // Store result and close dialog
+            m_capturedFaceBlob = blob;
+            dlg.accept();
+        }
+    );
+
+    dlg.exec();
+    frameTimer->stop();
+    if (cap.isOpened()) cap.release();
+
+    // ── Update status label on the form ─────────────────────────────────────
+    if (!m_capturedFaceBlob.isEmpty()) {
+        ui->faceStatusLabel->setText(tr("✔ Visage capturé avec succès"));
+        ui->faceStatusLabel->setStyleSheet("color: #2e7d32; font-weight: bold;");
+    } else {
+        ui->faceStatusLabel->setText(tr("Aucun visage capturé"));
+        ui->faceStatusLabel->setStyleSheet("");
+    }
 }
 
 void MainWindow::on_btnConsulterEmp_clicked()
@@ -1100,16 +1267,18 @@ int MainWindow::findRowForButton(QObject* button) const
 void MainWindow::on_faceBtn_clicked()
 {
     QDialog dlg(this);
-    dlg.setWindowTitle(tr("Facial Recognition"));
-    dlg.resize(640, 420);
+    dlg.setWindowTitle(tr("Reconnaissance Faciale"));
+    dlg.resize(680, 560);
 
-    auto* root = new QVBoxLayout(&dlg);
-    root->setContentsMargins(16, 16, 16, 16);
-    root->setSpacing(12);
+    auto* root    = new QVBoxLayout(&dlg);
+    root->setContentsMargins(12, 12, 12, 12);
+    root->setSpacing(8);
 
-    auto* heading = new QLabel(tr("Facial Recognition"), &dlg);
-    heading->setProperty("type", "heading");
-    root->addWidget(heading);
+    auto* camLbl = new QLabel(&dlg);
+    camLbl->setAlignment(Qt::AlignCenter);
+    camLbl->setMinimumSize(640, 480);
+    camLbl->setStyleSheet("background:#000;");
+    root->addWidget(camLbl, 1);
 
     auto* preview = new QWidget(&dlg);
     preview->setObjectName("facePreview");
@@ -1124,11 +1293,13 @@ void MainWindow::on_faceBtn_clicked()
     auto* btnClose = new QPushButton(tr("Close"), &dlg);
     btnStart->setProperty("type", "primary");
 
-    footer->addWidget(status);
-    footer->addItem(spacer);
-    footer->addWidget(btnStart);
-    footer->addWidget(btnClose);
-    root->addLayout(footer);
+    // ── Open webcam ─────────────────────────────────────────────────────────
+    cv::VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'ouvrir la webcam (index 0)."));
+        return;
+    }
 
     bool running = false;
     QObject::connect(btnStart, &QPushButton::clicked, &dlg, [&, status, btnStart]() mutable {
@@ -1139,6 +1310,101 @@ void MainWindow::on_faceBtn_clicked()
     QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::reject);
 
     dlg.exec();
+
+    // Ensure resources freed even on Cancel
+    frameTimer->stop();
+    if (cap.isOpened()) cap.release();
+
+    // ── Handle successful match ──────────────────────────────────────────────
+    if (matchedId > 0) {
+        m_loggedInId = matchedId;
+
+        QSqlQuery q;
+        q.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
+        q.bindValue(":id", matchedId);
+        if (q.exec() && q.next()) {
+            QString fullName = q.value(0).toString() + " " + q.value(1).toString();
+            if (ui->userNameLabel)
+                ui->userNameLabel->setText(fullName);
+        }
+        ui->MainStacked->setCurrentIndex(1);
+    }
+}
+
+// ── Face helper implementations ─────────────────────────────────────────────
+
+QByteArray MainWindow::encodeFaceFromFile(const QString& imagePath)
+{
+    if (!m_faceDetector || !m_faceRecognizer) return {};
+
+    cv::Mat img = cv::imread(imagePath.toStdString());
+    if (img.empty()) {
+        qWarning() << "[FaceRecog] Cannot read image:" << imagePath;
+        return {};
+    }
+
+    m_faceDetector->setInputSize(img.size());
+    cv::Mat faces;
+    m_faceDetector->detect(img, faces);
+    if (faces.rows == 0) {
+        qWarning() << "[FaceRecog] No face detected in:" << imagePath;
+        return {};
+    }
+
+    // Use the first (best-scoring) detected face
+    cv::Mat aligned, embedding;
+    m_faceRecognizer->alignCrop(img, faces.row(0), aligned);
+    m_faceRecognizer->feature(aligned, embedding); // 1×128 float32
+
+    QByteArray blob(reinterpret_cast<const char*>(embedding.data),
+                    static_cast<int>(embedding.total() * sizeof(float)));
+    qDebug() << "[FaceRecog] Encoded face blob size:" << blob.size() << "bytes";
+    return blob;
+}
+
+void MainWindow::loadFaceEmbeddings()
+{
+    m_faceEmbeddings.clear();
+    if (!m_faceRecognizer) return;
+
+    QSqlQuery q;
+    if (!q.exec("SELECT id_emp, modele_faciale FROM EMPLOYE "
+                "WHERE modele_faciale IS NOT NULL")) {
+        qWarning() << "[FaceRecog] loadFaceEmbeddings query failed:"
+                   << q.lastError().text();
+        return;
+    }
+
+    constexpr int expectedBytes = 128 * static_cast<int>(sizeof(float));
+    while (q.next()) {
+        int id           = q.value(0).toInt();
+        QByteArray blob  = q.value(1).toByteArray();
+        if (blob.size() != expectedBytes) {
+            qWarning() << "[FaceRecog] Skipping id" << id
+                       << "— blob size" << blob.size()
+                       << "(expected" << expectedBytes << ")";
+            continue;
+        }
+        cv::Mat embedding(1, 128, CV_32F);
+        std::memcpy(embedding.data, blob.constData(), blob.size());
+        m_faceEmbeddings.insert(id, embedding);
+    }
+    qDebug() << "[FaceRecog] Loaded" << m_faceEmbeddings.size()
+             << "face embedding(s) from DB";
+}
+
+int MainWindow::matchFaceEmbedding(const cv::Mat& embedding)
+{
+    if (!m_faceRecognizer || m_faceEmbeddings.isEmpty()) return -1;
+
+    for (auto it = m_faceEmbeddings.cbegin(); it != m_faceEmbeddings.cend(); ++it) {
+        double score = m_faceRecognizer->match(
+            embedding, it.value(), cv::FaceRecognizerSF::FR_COSINE);
+        qDebug() << "[FaceRecog] id" << it.key() << "cosine score:" << score;
+        if (score > 0.363) // official SFace cosine threshold
+            return it.key();
+    }
+    return -1;
 }
 // ════════════════════════════════════════════════════════════════════════════
 //  HUILE — BOUTONS ACTION (séparé du module Personnel)
