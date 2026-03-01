@@ -733,11 +733,342 @@ void MainWindow::on_btnAdvEmp_clicked()
     // Ensure we're on the personnel module first
     if (ui->modules->currentIndex() != 0)
         crossFadeToIndex(ui->modules, 0);
-    // Switch to "Advanced" page (index 3)
+    // Switch to "Advanced" page (index 3) and refresh data
     crossFadeToIndex(ui->metierspersonnel, 3);
+    populateAffCombos();
+    loadAffectationTable();
+    // Start on the table view
+    ui->affStack->setCurrentIndex(1);
 }
 
-// Module 2 (Stocks) toolbar actions: map to metiersstocks pages
+// ── Affectation helpers ──────────────────────────────────────────────────────
+// Schema:
+//   EMP_MACH  (ID_EMP, ID_SERIE)          — composite PK, only 2 columns
+//   SERIE     (ID_SERIE, NOM_SERIE, ...)   — ID_SERIE is PK
+//   MACHINE   (ID_MACHINE, NOM_MACHINE, ..., ID_SERIE)  — FK to SERIE
+
+void MainWindow::populateAffCombos()
+{
+    // ── Employees ────────────────────────────────────────────────────────────
+    ui->affEmpCombo->clear();
+    QSqlQuery qEmp(
+        "SELECT id_emp, nom_emp || ' ' || prenom_emp "
+        "FROM   EMPLOYE "
+        "ORDER BY nom_emp");
+    while (qEmp.next())
+        ui->affEmpCombo->addItem(qEmp.value(1).toString(), qEmp.value(0).toInt());
+
+    // ── Séries (joined with Machine name for display) ─────────────────────
+    // MACHINE has ID_SERIE FK → we join to show "NomMachine – NomSerie"
+    ui->affSerieCombo->clear();
+    QSqlQuery qSerie(
+        "SELECT s.id_serie, "
+        "       m.nom_machine || ' – ' || s.nom_serie "
+        "FROM   SERIE_MACHINE s "
+        "LEFT JOIN MACHINE m ON m.id_serie = s.id_serie "
+        "ORDER BY m.nom_machine, s.nom_serie");
+    while (qSerie.next())
+        ui->affSerieCombo->addItem(qSerie.value(1).toString(), qSerie.value(0).toInt());
+}
+
+void MainWindow::loadAffectationTable()
+{
+    QTableWidget* t = ui->affTable;
+    t->setRowCount(0);
+    t->setSortingEnabled(false);
+
+    // Columns: 0=ID_EMP  1=Employé  2=Série  3=Machine  4=Poste  5=Date début  6=Date fin  7=Actions
+    QSqlQuery q(
+        "SELECT em.id_emp, "
+        "       e.nom_emp || ' ' || e.prenom_emp, "
+        "       s.nom_serie, "
+        "       em.id_serie, "
+        "       NVL(m.nom_machine, '-'), "
+        "       NVL(em.poste, '-'), "
+        "       TO_CHAR(em.date_debut, 'DD/MM/YYYY'), "
+        "       TO_CHAR(em.date_fin,   'DD/MM/YYYY') "
+        "FROM   EMP_MACH em "
+        "JOIN   EMPLOYE       e ON e.id_emp   = em.id_emp "
+        "JOIN   SERIE_MACHINE s ON s.id_serie = em.id_serie "
+        "LEFT JOIN MACHINE    m ON m.id_serie = em.id_serie "
+        "ORDER BY e.nom_emp, s.nom_serie"
+    );
+
+    auto setCell = [&](int r, int c, const QString& txt) {
+        auto* item = new QTableWidgetItem(txt);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        t->setItem(r, c, item);
+    };
+
+    while (q.next()) {
+        int row = t->rowCount();
+        t->insertRow(row);
+
+        int idEmp   = q.value(0).toInt();
+        int idSerie = q.value(3).toInt();
+        setCell(row, 0, QString::number(idEmp));
+        setCell(row, 1, q.value(1).toString());
+        setCell(row, 2, q.value(2).toString());
+        setCell(row, 3, q.value(4).toString());  // machine name
+        setCell(row, 4, q.value(5).toString());  // poste
+        setCell(row, 5, q.value(6).toString());  // date_debut
+        setCell(row, 6, q.value(7).toString());  // date_fin
+
+        // ── Action buttons ────────────────────────────────────────────────
+        auto* cell  = new QWidget();
+        auto* hlay  = new QHBoxLayout(cell);
+        hlay->setContentsMargins(2, 2, 2, 2);
+        hlay->setSpacing(4);
+
+        auto* btnEdit = new QToolButton();
+        btnEdit->setIcon(QIcon(":/img/edit.svg"));
+        btnEdit->setToolTip(tr("Modifier"));
+        btnEdit->setAutoRaise(true);
+
+        auto* btnDel = new QToolButton();
+        btnDel->setIcon(QIcon(":/img/delete.svg"));
+        btnDel->setToolTip(tr("Supprimer l'affectation"));
+        btnDel->setAutoRaise(true);
+
+        hlay->addStretch();
+        hlay->addWidget(btnEdit);
+        hlay->addWidget(btnDel);
+        t->setCellWidget(row, 7, cell);
+
+        // Edit: pre-fill form and switch to form page
+        connect(btnEdit, &QToolButton::clicked, this, [this, idEmp, idSerie, row]() {
+            // Pre-select employee
+            int empIdx = ui->affEmpCombo->findData(idEmp);
+            if (empIdx >= 0) ui->affEmpCombo->setCurrentIndex(empIdx);
+            // Pre-select serie
+            int serieIdx = ui->affSerieCombo->findData(idSerie);
+            if (serieIdx >= 0) ui->affSerieCombo->setCurrentIndex(serieIdx);
+            // Poste
+            QString poste = ui->affTable->item(row, 4)
+                            ? ui->affTable->item(row, 4)->text() : QString();
+            int posteIdx = ui->affPosteCombo->findText(poste);
+            if (posteIdx >= 0) ui->affPosteCombo->setCurrentIndex(posteIdx);
+            // Dates
+            QString sdeb = ui->affTable->item(row, 5)
+                           ? ui->affTable->item(row, 5)->text() : QString();
+            QString sfin = ui->affTable->item(row, 6)
+                           ? ui->affTable->item(row, 6)->text() : QString();
+            ui->affDateDebEdit->setDate(
+                sdeb.isEmpty() ? QDate::currentDate()
+                               : QDate::fromString(sdeb, "dd/MM/yyyy"));
+            ui->affDateFinEdit->setDate(
+                sfin.isEmpty() ? QDate::currentDate().addMonths(1)
+                               : QDate::fromString(sfin, "dd/MM/yyyy"));
+
+            m_editingAffIdEmp   = idEmp;
+            m_editingAffIdSerie = idSerie;
+            ui->affSaveBtn->setText(tr("Modifier"));
+            ui->affStack->setCurrentIndex(0);
+        });
+
+        // Delete: confirm then remove from EMP_MACH
+        connect(btnDel, &QToolButton::clicked, this, [this, idEmp, idSerie, row]() {
+            if (QMessageBox::question(this, tr("Confirmer la suppression"),
+                    tr("Supprimer l'affectation de cet employé à cette série ?"))
+                    != QMessageBox::Yes)
+                return;
+            QSqlQuery qd;
+            qd.prepare(
+                "DELETE FROM EMP_MACH "
+                "WHERE  id_emp   = :id_emp "
+                "AND    id_serie = :id_serie");
+            qd.bindValue(":id_emp",   idEmp);
+            qd.bindValue(":id_serie", idSerie);
+            if (qd.exec()) {
+                ui->affTable->removeRow(row);
+            } else {
+                QMessageBox::critical(this, tr("Erreur"),
+                    tr("Impossible de supprimer :\n%1").arg(qd.lastError().text()));
+            }
+        });
+    }
+
+    // Column sizing
+    t->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    t->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    t->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    t->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    t->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    t->horizontalHeader()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+    t->horizontalHeader()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
+    t->horizontalHeader()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+    t->setSortingEnabled(true);
+}
+
+void MainWindow::filterAffTable()
+{
+    QString search = ui->affSearchEdit->text().trimmed().toLower();
+
+    for (int r = 0; r < ui->affTable->rowCount(); ++r) {
+        auto* empItem   = ui->affTable->item(r, 1);  // Employé
+        auto* serieItem = ui->affTable->item(r, 2);  // Série
+        auto* machItem  = ui->affTable->item(r, 3);  // Machine
+        auto* posteItem = ui->affTable->item(r, 4);  // Poste
+
+        bool matchSearch = search.isEmpty()
+            || (empItem   && empItem->text().toLower().contains(search))
+            || (serieItem && serieItem->text().toLower().contains(search))
+            || (machItem  && machItem->text().toLower().contains(search))
+            || (posteItem && posteItem->text().toLower().contains(search));
+
+        ui->affTable->setRowHidden(r, !matchSearch);
+    }
+}
+
+// ── Affectation slots ────────────────────────────────────────────────────────
+
+void MainWindow::on_affNewBtn_clicked()
+{
+    m_editingAffIdEmp   = -1;
+    m_editingAffIdSerie = -1;
+    ui->affSaveBtn->setText(tr("Affecter"));
+    ui->affEmpCombo->setCurrentIndex(0);
+    ui->affSerieCombo->setCurrentIndex(0);
+    ui->affPosteCombo->setCurrentIndex(0);
+    ui->affDateDebEdit->setDate(QDate::currentDate());
+    ui->affDateFinEdit->setDate(QDate::currentDate().addMonths(1));
+    ui->affStack->setCurrentIndex(0);
+}
+
+void MainWindow::on_affCancelBtn_clicked()
+{
+    m_editingAffIdEmp   = -1;
+    m_editingAffIdSerie = -1;
+    ui->affSaveBtn->setText(tr("Affecter"));
+    ui->affStack->setCurrentIndex(1);
+}
+
+void MainWindow::on_affRefreshBtn_clicked()
+{
+    loadAffectationTable();
+}
+
+void MainWindow::on_affSearchEdit_textChanged(const QString&)
+{
+    filterAffTable();
+}
+
+void MainWindow::on_affSaveBtn_clicked()
+{
+    int     newEmpId   = ui->affEmpCombo->currentData().toInt();
+    int     newSerieId = ui->affSerieCombo->currentData().toInt();
+    QString poste      = ui->affPosteCombo->currentText();
+    QDate   dateDeb    = ui->affDateDebEdit->date();
+    QDate   dateFin    = ui->affDateFinEdit->date();
+
+    if (newEmpId <= 0 || newSerieId <= 0) {
+        QMessageBox::warning(this, tr("Champs requis"),
+            tr("Veuillez sélectionner un employé et une série."));
+        return;
+    }
+    if (dateFin < dateDeb) {
+        QMessageBox::warning(this, tr("Dates invalides"),
+            tr("La date de fin doit être postérieure à la date de début."));
+        return;
+    }
+
+    QSqlQuery q;
+
+    if (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0) {
+        // ── EDIT mode ────────────────────────────────────────────────────────
+        if (newEmpId == m_editingAffIdEmp && newSerieId == m_editingAffIdSerie) {
+            // Same PK — just UPDATE the extra columns in place
+            q.prepare(
+                "UPDATE EMP_MACH SET "
+                "  poste      = :poste, "
+                "  date_debut = :date_debut, "
+                "  date_fin   = :date_fin "
+                "WHERE id_emp   = :id_emp "
+                "AND   id_serie = :id_serie");
+            q.bindValue(":poste",      poste);
+            q.bindValue(":date_debut", dateDeb);
+            q.bindValue(":date_fin",   dateFin);
+            q.bindValue(":id_emp",     m_editingAffIdEmp);
+            q.bindValue(":id_serie",   m_editingAffIdSerie);
+        } else {
+            // PK changed — check duplicate first
+            QSqlQuery qCheck;
+            qCheck.prepare(
+                "SELECT COUNT(*) FROM EMP_MACH "
+                "WHERE id_emp = :id_emp AND id_serie = :id_serie");
+            qCheck.bindValue(":id_emp",   newEmpId);
+            qCheck.bindValue(":id_serie", newSerieId);
+            qCheck.exec();
+            if (qCheck.next() && qCheck.value(0).toInt() > 0) {
+                QMessageBox::warning(this, tr("Doublon"),
+                    tr("Cet employé est déjà affecté à cette série."));
+                return;
+            }
+            // Delete old row
+            QSqlQuery qDel;
+            qDel.prepare(
+                "DELETE FROM EMP_MACH "
+                "WHERE id_emp = :old_emp AND id_serie = :old_serie");
+            qDel.bindValue(":old_emp",   m_editingAffIdEmp);
+            qDel.bindValue(":old_serie", m_editingAffIdSerie);
+            if (!qDel.exec()) {
+                QMessageBox::critical(this, tr("Erreur"),
+                    tr("Impossible de modifier l'affectation :\n%1")
+                        .arg(qDel.lastError().text()));
+                return;
+            }
+            // Insert new row
+            q.prepare(
+                "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
+                "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)");
+            q.bindValue(":id_emp",     newEmpId);
+            q.bindValue(":id_serie",   newSerieId);
+            q.bindValue(":poste",      poste);
+            q.bindValue(":date_debut", dateDeb);
+            q.bindValue(":date_fin",   dateFin);
+        }
+    } else {
+        // ── INSERT mode ───────────────────────────────────────────────────────
+        QSqlQuery qCheck;
+        qCheck.prepare(
+            "SELECT COUNT(*) FROM EMP_MACH "
+            "WHERE id_emp = :id_emp AND id_serie = :id_serie");
+        qCheck.bindValue(":id_emp",   newEmpId);
+        qCheck.bindValue(":id_serie", newSerieId);
+        qCheck.exec();
+        if (qCheck.next() && qCheck.value(0).toInt() > 0) {
+            QMessageBox::warning(this, tr("Doublon"),
+                tr("Cet employé est déjà affecté à cette série."));
+            return;
+        }
+        q.prepare(
+            "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
+            "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)");
+        q.bindValue(":id_emp",     newEmpId);
+        q.bindValue(":id_serie",   newSerieId);
+        q.bindValue(":poste",      poste);
+        q.bindValue(":date_debut", dateDeb);
+        q.bindValue(":date_fin",   dateFin);
+    }
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'enregistrer l'affectation :\n%1").arg(q.lastError().text()));
+        return;
+    }
+
+    bool wasEdit = (m_editingAffIdEmp > 0);
+    m_editingAffIdEmp   = -1;
+    m_editingAffIdSerie = -1;
+    ui->affSaveBtn->setText(tr("Affecter"));
+    loadAffectationTable();
+    ui->affStack->setCurrentIndex(1);
+    QMessageBox::information(this, tr("Succès"),
+        wasEdit ? tr("Affectation modifiée avec succès.")
+                : tr("Affectation enregistrée avec succès."));
+}
+
+
 void MainWindow::on_btnConsulterstc_clicked()
 {
     if (ui->modules->currentIndex() != 5)
