@@ -132,11 +132,8 @@ MainWindow::MainWindow(QWidget *parent)
         // Wrap the modules in a content area that applies offsets (drop + right shift)
         auto* contentArea = new QWidget(ui->mainprogram);
         auto* contentLayout = new QVBoxLayout(contentArea);
-        qreal dpiX = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchX() : 96.0;
-    qreal dpiY = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchY() : 96.0;
-    int leftMarginPx = static_cast<int>((8.0 / 25.4) * dpiX);  // 8 mm ~ compact left margin for more content width
-    int topMarginPx  = static_cast<int>((2.0 / 25.4) * dpiY);  // reduce top offset to ~2 mm to remove excess top space
-        contentLayout->setContentsMargins(leftMarginPx, topMarginPx, 0, 0);
+        // Keep margins simple and predictable; no need for DPI-based mm conversion here.
+        contentLayout->setContentsMargins(16, 8, 0, 0);
         contentLayout->setSpacing(8); // small gap between user info and content
 
         // Place the user info bar above modules within the content area so it's layout-managed
@@ -210,6 +207,27 @@ void MainWindow::openCiternesWindow(int pageIndex)
     m_citernesWindow->activateWindow();
 }
 
+QByteArray MainWindow::encodeFaceFromFile(const QString& imagePath)
+{
+    return m_faceService ? m_faceService->encodeFaceFromFile(imagePath) : QByteArray{};
+}
+
+void MainWindow::loadFaceEmbeddings()
+{
+    if (m_faceService) m_faceService->loadFaceEmbeddings();
+}
+
+int MainWindow::matchFaceEmbedding(const QByteArray& embeddingBlob)
+{
+    return m_faceService ? m_faceService->matchFaceEmbeddingBlob(embeddingBlob) : -1;
+}
+
+void MainWindow::on_toolButton_clicked()
+{
+    // Slot required by Qt auto-connect (on_<objectName>_clicked).
+    // If this button is not used anymore, remove/rename it in `mainwindow.ui`.
+}
+
 MainWindow::~MainWindow()
 {
     if (machineSerial && machineSerial->isOpen())
@@ -235,6 +253,7 @@ void MainWindow::on_btnAjouterEmp_clicked()
     if (ui->modules->currentIndex() != 0)
         crossFadeToIndex(ui->modules, 0);
     crossFadeToIndex(ui->metierspersonnel, 0);
+    validateEmployeeForm(false);
 }
 
 void MainWindow::on_ajouterEmpBtn_clicked()
@@ -249,27 +268,22 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     if (role.isEmpty())
         role = "Technicien";
 
-    qDebug() << "[ajouterEmp] nom=" << nom << "prenom=" << prenom
-             << "email=" << email << "role=" << role
-             << "mdp.size=" << mdp.size()
-             << "photo.size=" << m_selectedPhoto.size();
-
     // ── Check if we are editing an existing employee ────────────────────────
     QVariant editingIdVar = ui->ajouterEmpBtn->property("editingId");
     bool isEditing = editingIdVar.isValid() && editingIdVar.toInt() > 0;
     int editingId  = isEditing ? editingIdVar.toInt() : 0;
 
-    // ── Basic validation ────────────────────────────────────────────────────
-    // Mot de passe is required only when adding; optional when editing
-    if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
-        QMessageBox::warning(this, tr("Champs requis"),
-                             tr("Veuillez remplir tous les champs obligatoires\n"
-                                "(Nom, Prénom, Email)."));
-        return;
-    }
-    if (!isEditing && mdp.isEmpty()) {
-        QMessageBox::warning(this, tr("Champs requis"),
-                             tr("Le mot de passe est obligatoire pour un nouvel employé."));
+    // On explicit submit, mark all fields as touched so full feedback is shown.
+    ui->nomLineEdit->setProperty("touched", true);
+    ui->prNomLineEdit->setProperty("touched", true);
+    ui->emailLineEdit->setProperty("touched", true);
+    ui->roleComboBox->setProperty("touched", true);
+    ui->mdpLineEdit->setProperty("touched", true);
+
+    // ── Input validation with live green/red feedback ──────────────────────
+    if (!validateEmployeeForm(true)) {
+        QMessageBox::warning(this, tr("Validation"),
+                             tr("Veuillez corriger les champs en rouge avant de continuer."));
         return;
     }
 
@@ -301,9 +315,6 @@ void MainWindow::on_ajouterEmpBtn_clicked()
         if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
             faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
 
-        qDebug() << "[ajouterEmp] faceBlob size:" << faceBlob.size()
-                 << "| capturedBlob size:" << m_capturedFaceBlob.size();
-
         Employe emp(0, nom, prenom, email, role, mdp, QDate(),
                     m_selectedPhoto, QByteArray(), faceBlob);
         if (!emp.ajouter()) {
@@ -326,6 +337,7 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     m_capturedFaceBlob.clear();
     ui->faceStatusLabel->setText(tr("Aucun visage capturé"));
     ui->faceStatusLabel->setStyleSheet("");
+    validateEmployeeForm(false);
 }
 
 void MainWindow::on_parcourirPhotoBtn_clicked()
@@ -349,9 +361,9 @@ void MainWindow::on_parcourirPhotoBtn_clicked()
     ui->photoPathLineEdit->setText(path);
 
     // If no live capture done yet, try to encode the face from the chosen photo
-    // so the status label gives instant feedback
-    if (m_capturedFaceBlob.isEmpty() && m_faceDetector && m_faceRecognizer) {
-        QByteArray blob = encodeFaceFromFile(path);
+    // so the status label gives instant feedback.
+    if (m_capturedFaceBlob.isEmpty() && m_faceService && m_faceService->isAvailable()) {
+        const QByteArray blob = encodeFaceFromFile(path);
         if (!blob.isEmpty()) {
             m_capturedFaceBlob = blob;
             ui->faceStatusLabel->setText(tr("✔ Visage détecté depuis la photo"));
@@ -362,140 +374,20 @@ void MainWindow::on_parcourirPhotoBtn_clicked()
 
 void MainWindow::on_captureFaceBtn_clicked()
 {
-    if (!m_faceDetector || !m_faceRecognizer) {
+    if (!m_faceService || !m_faceService->isAvailable()) {
         QMessageBox::warning(this, tr("Indisponible"),
-            tr("Les modèles de reconnaissance faciale ne sont pas chargés."));
+            tr("Les modèles de reconnaissance faciale n'ont pas pu être chargés.\n"
+               "Vérifiez que les fichiers .onnx sont présents à côté de l'exécutable."));
         return;
     }
 
-    // ── Build live-capture dialog ────────────────────────────────────────────
-    QDialog dlg(this);
-    dlg.setWindowTitle(tr("Capture du visage"));
-    dlg.resize(680, 540);
+    FaceCaptureDialog dlg(m_faceService, this);
+    const QByteArray blob = dlg.execAndGetEmbeddingBlob();
+    if (blob.isEmpty()) return;
 
-    auto* root = new QVBoxLayout(&dlg);
-    root->setContentsMargins(10, 10, 10, 10);
-    root->setSpacing(8);
-
-    auto* camLbl = new QLabel(&dlg);
-    camLbl->setAlignment(Qt::AlignCenter);
-    camLbl->setMinimumSize(640, 460);
-    camLbl->setStyleSheet("background:#111; border-radius:6px;");
-    root->addWidget(camLbl, 1);
-
-    auto* infoLbl = new QLabel(
-        tr("Regardez la caméra puis cliquez sur  « Capturer »"), &dlg);
-    infoLbl->setAlignment(Qt::AlignCenter);
-    root->addWidget(infoLbl);
-
-    auto* btnRow   = new QHBoxLayout();
-    auto* btnCap   = new QPushButton(tr("📸  Capturer"), &dlg);
-    auto* btnClose = new QPushButton(tr("Annuler"), &dlg);
-    btnCap->setEnabled(false);   // enabled once a face is visible
-    btnRow->addStretch();
-    btnRow->addWidget(btnCap);
-    btnRow->addWidget(btnClose);
-    root->addLayout(btnRow);
-
-    QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::reject);
-
-    // ── Open webcam ──────────────────────────────────────────────────────────
-    cv::VideoCapture cap(0);
-    if (!cap.isOpened()) {
-        QMessageBox::critical(this, tr("Erreur"),
-            tr("Impossible d'ouvrir la webcam (index 0)."));
-        return;
-    }
-
-    // Shared state between timer lambda and capture button
-    cv::Mat lastFrame;      // most recent raw frame
-    bool faceVisible = false;
-
-    auto* frameTimer = new QTimer(&dlg);
-    QObject::connect(frameTimer, &QTimer::timeout, &dlg,
-        [&, camLbl, infoLbl, btnCap]() {
-            cv::Mat frame;
-            cap >> frame;
-            if (frame.empty()) return;
-
-            m_faceDetector->setInputSize(frame.size());
-            cv::Mat faces;
-            m_faceDetector->detect(frame, faces);
-            faceVisible = (faces.rows > 0);
-            btnCap->setEnabled(faceVisible);
-
-            // Draw bounding box
-            for (int i = 0; i < faces.rows; ++i) {
-                int fx = static_cast<int>(faces.at<float>(i, 0));
-                int fy = static_cast<int>(faces.at<float>(i, 1));
-                int fw = static_cast<int>(faces.at<float>(i, 2));
-                int fh = static_cast<int>(faces.at<float>(i, 3));
-                cv::rectangle(frame, cv::Rect(fx, fy, fw, fh),
-                              cv::Scalar(0, 220, 80), 2);
-            }
-            infoLbl->setText(faceVisible
-                ? tr("✔ Visage détecté — cliquez sur « Capturer »")
-                : tr("Aucun visage détecté — repositionnez-vous"));
-
-            // Show in label
-            cv::Mat rgb;
-            cv::cvtColor(frame, rgb, cv::COLOR_BGR2RGB);
-            QImage img(rgb.data, rgb.cols, rgb.rows,
-                       static_cast<int>(rgb.step), QImage::Format_RGB888);
-            camLbl->setPixmap(
-                QPixmap::fromImage(img.copy())
-                    .scaled(camLbl->size(), Qt::KeepAspectRatio,
-                            Qt::SmoothTransformation));
-
-            lastFrame = frame.clone(); // keep most recent for capture
-        }
-    );
-    frameTimer->start(30);
-
-    // ── Capture button: encode from the current frame ────────────────────────
-    QObject::connect(btnCap, &QPushButton::clicked, &dlg,
-        [&]() {
-            if (lastFrame.empty()) return;
-
-            m_faceDetector->setInputSize(lastFrame.size());
-            cv::Mat faces;
-            m_faceDetector->detect(lastFrame, faces);
-            if (faces.rows == 0) {
-                QMessageBox::warning(&dlg, tr("Aucun visage"),
-                    tr("Aucun visage n'a été détecté sur la frame courante.\n"
-                       "Réessayez."));
-                return;
-            }
-
-            cv::Mat aligned, embedding;
-            m_faceRecognizer->alignCrop(lastFrame, faces.row(0), aligned);
-            m_faceRecognizer->feature(aligned, embedding); // 1×128 float32
-
-            QByteArray blob(
-                reinterpret_cast<const char*>(embedding.data),
-                static_cast<int>(embedding.total() * sizeof(float)));
-
-            frameTimer->stop();
-            cap.release();
-
-            // Store result and close dialog
-            m_capturedFaceBlob = blob;
-            dlg.accept();
-        }
-    );
-
-    dlg.exec();
-    frameTimer->stop();
-    if (cap.isOpened()) cap.release();
-
-    // ── Update status label on the form ─────────────────────────────────────
-    if (!m_capturedFaceBlob.isEmpty()) {
-        ui->faceStatusLabel->setText(tr("✔ Visage capturé avec succès"));
-        ui->faceStatusLabel->setStyleSheet("color: #2e7d32; font-weight: bold;");
-    } else {
-        ui->faceStatusLabel->setText(tr("Aucun visage capturé"));
-        ui->faceStatusLabel->setStyleSheet("");
-    }
+    m_capturedFaceBlob = blob;
+    ui->faceStatusLabel->setText(tr("✔ Visage capturé avec succès"));
+    ui->faceStatusLabel->setStyleSheet("color: #2e7d32; font-weight: bold;");
 }
 
 void MainWindow::on_btnConsulterEmp_clicked()
@@ -915,38 +807,6 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
 
     // Show target page beneath overlays to avoid a blank gap
     stack->setCurrentIndex(newIndex);
-    stack->setEnabled(false); // temporarily block input during transition
-
-    // Safety timer: unconditionally re-enable the stack after the animation
-    // duration (+ a small buffer) so a failed/skipped animation never leaves
-    // the stack permanently disabled and unresponsive to user input.
-    QTimer::singleShot(400, stack, [stack]() {
-        stack->setEnabled(true);
-    });
-
-    // Parallel fade animations
-    auto* outAnim = new QPropertyAnimation(currEff, "opacity", currentOverlay);
-    outAnim->setDuration(220);
-    outAnim->setStartValue(1.0);
-    outAnim->setEndValue(0.0);
-    outAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    auto* inAnim = new QPropertyAnimation(nextEff, "opacity", nextOverlay);
-    inAnim->setDuration(220);
-    inAnim->setStartValue(0.0);
-    inAnim->setEndValue(1.0);
-    inAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    auto* group = new QParallelAnimationGroup(stack);
-    group->addAnimation(outAnim);
-    group->addAnimation(inAnim);
-    QObject::connect(group, &QParallelAnimationGroup::finished, this, [stack, currentOverlay, nextOverlay]() {
-        stack->setEnabled(true);
-        // Clean up overlays
-        currentOverlay->deleteLater();
-        nextOverlay->deleteLater();
-    });
-    group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void MainWindow::animateSidebarToggle(bool collapse)
@@ -972,7 +832,7 @@ void MainWindow::setupInteractiveHooks()
     if (auto* headerLayout = ui->centralwidget->findChild<QHBoxLayout*>(QStringLiteral("logoandnamesidebar"))) {
         auto* toggleBtn = new QToolButton(ui->sidebar);
         toggleBtn->setAutoRaise(true);
-        toggleBtn->setToolTip(tr("Collapse/Expand sidebar"));
+    toggleBtn->setToolTip(tr("Réduire / étendre la barre latérale"));
         toggleBtn->setIcon(QIcon(QStringLiteral(":/img/menu.svg")));
         toggleBtn->setIconSize(QSize(18, 18));
         headerLayout->addStretch();
@@ -986,6 +846,291 @@ void MainWindow::setupInteractiveHooks()
         QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, [this](const QString&) { filterPersonnelTable(); });
         QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this, [this](const QString&) { filterPersonnelTable(); });
     }
+
+    // Live remaining-slots info for affectation form
+    if (ui->affEmpCombo) {
+        QObject::connect(ui->affEmpCombo, &QComboBox::currentIndexChanged, this,
+            [this](int){ updateAffectationRemainingInfo(); });
+    }
+}
+
+void MainWindow::setupEmployeeFormValidation()
+{
+    if (!ui->formLayout || !ui->formLayoutWidget)
+        return;
+
+    // Keep the form compact enough so the submit row is visible without excessive clipping.
+    ui->formLayout->setVerticalSpacing(22);
+
+    // Prevent placeholder/text clipping on dense DPI/font setups.
+    const int fieldMinH = 34;
+    ui->nomLineEdit->setMinimumHeight(fieldMinH);
+    ui->prNomLineEdit->setMinimumHeight(fieldMinH);
+    ui->emailLineEdit->setMinimumHeight(fieldMinH);
+    ui->mdpLineEdit->setMinimumHeight(fieldMinH);
+    ui->roleComboBox->setMinimumHeight(fieldMinH);
+    ui->dateDEmbaucheDateEdit->setMinimumHeight(fieldMinH);
+    if (ui->ajouterEmpBtn) {
+        ui->ajouterEmpBtn->setMinimumHeight(36);
+        ui->ajouterEmpBtn->show();
+        ui->ajouterEmpBtn->raise();
+    }
+
+    QWidget* validationHost = ui->module1 ? static_cast<QWidget*>(ui->module1)
+                                          : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
+                                                                : ui->formLayoutWidget->parentWidget());
+    if (!validationHost)
+        validationHost = ui->formLayoutWidget;
+
+    QLabel* feedback = validationHost->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"));
+    if (!feedback) {
+        feedback = new QLabel(validationHost);
+        feedback->setObjectName(QStringLiteral("employeeValidationLabel"));
+        feedback->setWordWrap(true);
+    }
+
+    // Keep validation text in the right-side free space of the employee page.
+    feedback->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    feedback->setTextFormat(Qt::PlainText);
+    feedback->setMargin(0);
+    feedback->setMinimumHeight(36);
+    feedback->setMinimumWidth(160);
+    feedback->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    if (validationHost && ui->formLayoutWidget) {
+        const QPoint formTopLeft = ui->formLayoutWidget->mapTo(validationHost, QPoint(0, 0));
+        const QRect formRect(formTopLeft, ui->formLayoutWidget->size());
+        const int margin = 16;
+    const int desiredRightW = 200;
+        const int availableRightW = validationHost->width() - (formRect.right() + margin) - margin;
+
+        if (availableRightW >= 120) {
+            const int sideX = formRect.right() + margin;
+            const int sideY = formRect.y() + 8;
+            const int sideW = qMin(qMax(120, availableRightW), desiredRightW);
+            const int sideH = qMax(120, validationHost->height() - sideY - margin);
+            feedback->setGeometry(sideX, sideY, sideW, sideH);
+        } else {
+            // Not enough right-side room: place feedback below form to keep it fully visible.
+            const int belowX = formRect.x();
+            const int belowY = formRect.bottom() + 12;
+            const int belowW = qMax(320, qMin(formRect.width(), validationHost->width() - (2 * margin)));
+            const int belowH = qMax(96, validationHost->height() - belowY - margin);
+            feedback->setGeometry(belowX, belowY, belowW, belowH);
+        }
+    }
+    auto refreshFeedbackVisibility = [this]() {
+        QWidget* host = ui->module1 ? static_cast<QWidget*>(ui->module1)
+                                    : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
+                                                          : ui->formLayoutWidget->parentWidget());
+        if (!host) return;
+        QLabel* fb = host->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"));
+        if (!fb) return;
+
+        const bool onPersonnelAddPage =
+            ui->MainStacked && ui->MainStacked->currentIndex() == 1
+            && ui->modules && ui->metierspersonnel
+            && ui->modules->currentWidget() == ui->module1
+            && ui->metierspersonnel->currentIndex() == 0;
+        fb->setVisible(onPersonnelAddPage);
+    };
+    refreshFeedbackVisibility();
+
+    feedback->setText(tr("Remplissez le formulaire pour vérifier la validité des champs."));
+    feedback->setStyleSheet(QStringLiteral("color: #546e7a;"));
+
+    // The form container is absolute-positioned in the UI; keep enough room for all rows.
+    if (QLayout* fl = ui->formLayoutWidget->layout()) {
+        fl->activate();
+        const QSize needed = fl->sizeHint() + QSize(24, 24);
+        if (needed.height() > ui->formLayoutWidget->minimumHeight()) {
+            ui->formLayoutWidget->setMinimumHeight(needed.height());
+        }
+        if (needed.width() > ui->formLayoutWidget->minimumWidth()) {
+            ui->formLayoutWidget->setMinimumWidth(needed.width());
+        }
+        ui->formLayoutWidget->resize(
+            qMax(ui->formLayoutWidget->width(), needed.width()),
+            qMax(ui->formLayoutWidget->height(), needed.height()));
+
+        // Also refresh parent page minimum size so the wrapping QScrollArea can actually scroll to it.
+        if (QWidget* page = ui->formLayoutWidget->parentWidget()) {
+            QRect bounds;
+            const auto children = page->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+            for (QWidget* child : children) {
+                if (!child) continue;
+                bounds = bounds.united(child->geometry());
+            }
+            if (!bounds.isNull()) {
+                const QSize pageMin(bounds.right() + 1 + 24, bounds.bottom() + 1 + 32);
+                page->setMinimumSize(pageMin);
+                page->resize(qMax(page->width(), pageMin.width()), qMax(page->height(), pageMin.height()));
+            }
+        }
+    }
+
+    // Touched-state starts false; colors appear only after focus/interaction.
+    ui->nomLineEdit->setProperty("touched", false);
+    ui->prNomLineEdit->setProperty("touched", false);
+    ui->emailLineEdit->setProperty("touched", false);
+    ui->roleComboBox->setProperty("touched", false);
+    ui->mdpLineEdit->setProperty("touched", false);
+
+    ui->nomLineEdit->installEventFilter(this);
+    ui->prNomLineEdit->installEventFilter(this);
+    ui->emailLineEdit->installEventFilter(this);
+    ui->roleComboBox->installEventFilter(this);
+    ui->mdpLineEdit->installEventFilter(this);
+
+    auto liveValidate = [this]() { validateEmployeeForm(true); };
+    QObject::connect(ui->nomLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
+    QObject::connect(ui->prNomLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
+    QObject::connect(ui->emailLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
+    QObject::connect(ui->mdpLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
+    QObject::connect(ui->roleComboBox, &QComboBox::currentTextChanged, this, [liveValidate](const QString&) { liveValidate(); });
+
+    // Keep helper text visible only on Personnel > Ajouter, even when navigating via toolbar/sidebar.
+    if (ui->modules) {
+        QObject::connect(ui->modules, &QStackedWidget::currentChanged, this,
+            [refreshFeedbackVisibility](int) { refreshFeedbackVisibility(); });
+    }
+    if (ui->metierspersonnel) {
+        QObject::connect(ui->metierspersonnel, &QStackedWidget::currentChanged, this,
+            [refreshFeedbackVisibility](int) { refreshFeedbackVisibility(); });
+    }
+    if (ui->MainStacked) {
+        QObject::connect(ui->MainStacked, &QStackedWidget::currentChanged, this,
+            [refreshFeedbackVisibility](int) { refreshFeedbackVisibility(); });
+    }
+
+    validateEmployeeForm(false);
+}
+
+bool MainWindow::validateEmployeeForm(bool showFeedbackText)
+{
+    const QString nom    = ui->nomLineEdit->text().trimmed();
+    const QString prenom = ui->prNomLineEdit->text().trimmed();
+    const QString email  = ui->emailLineEdit->text().trimmed();
+    const QString role   = ui->roleComboBox->currentText().trimmed();
+    const QString mdp    = ui->mdpLineEdit->text();
+
+    const QVariant editingIdVar = ui->ajouterEmpBtn->property("editingId");
+    const bool isEditing = editingIdVar.isValid() && editingIdVar.toInt() > 0;
+
+    static const QRegularExpression nameRegex(QStringLiteral("^[A-Za-zÀ-ÖØ-öø-ÿ'\\- ]{2,}$"));
+    static const QRegularExpression emailRegex(
+        QStringLiteral("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$"),
+        QRegularExpression::CaseInsensitiveOption);
+
+    const bool nomValid = nameRegex.match(nom).hasMatch();
+    const bool prenomValid = nameRegex.match(prenom).hasMatch();
+    const bool emailValid = emailRegex.match(email).hasMatch();
+    const bool roleValid = !role.isEmpty();
+    const bool mdpValid = isEditing ? (mdp.isEmpty() || mdp.size() >= 6) : (mdp.size() >= 6);
+
+    const bool nomTouched = ui->nomLineEdit->property("touched").toBool();
+    const bool prenomTouched = ui->prNomLineEdit->property("touched").toBool();
+    const bool emailTouched = ui->emailLineEdit->property("touched").toBool();
+    const bool roleTouched = ui->roleComboBox->property("touched").toBool();
+    const bool mdpTouched = ui->mdpLineEdit->property("touched").toBool();
+
+    const auto applyState = [](QWidget* w, bool ok) {
+        if (!w) return;
+        w->setStyleSheet(ok
+            ? QStringLiteral("background-color:#ffffff; color:#2b2d2f; border: 1px solid #2e7d32; border-radius: 8px; padding: 6px 10px;")
+            : QStringLiteral("background-color:#ffffff; color:#2b2d2f; border: 1px solid #c62828; border-radius: 8px; padding: 6px 10px;"));
+    };
+
+    if (showFeedbackText) {
+        if (nomTouched) applyState(ui->nomLineEdit, nomValid); else ui->nomLineEdit->setStyleSheet(QString());
+        if (prenomTouched) applyState(ui->prNomLineEdit, prenomValid); else ui->prNomLineEdit->setStyleSheet(QString());
+        if (emailTouched) applyState(ui->emailLineEdit, emailValid); else ui->emailLineEdit->setStyleSheet(QString());
+        if (roleTouched) applyState(ui->roleComboBox, roleValid); else ui->roleComboBox->setStyleSheet(QString());
+        if (mdpTouched) applyState(ui->mdpLineEdit, mdpValid); else ui->mdpLineEdit->setStyleSheet(QString());
+    } else {
+        ui->nomLineEdit->setStyleSheet(QString());
+        ui->prNomLineEdit->setStyleSheet(QString());
+        ui->emailLineEdit->setStyleSheet(QString());
+        ui->roleComboBox->setStyleSheet(QString());
+        ui->mdpLineEdit->setStyleSheet(QString());
+
+        ui->nomLineEdit->setProperty("touched", false);
+        ui->prNomLineEdit->setProperty("touched", false);
+        ui->emailLineEdit->setProperty("touched", false);
+        ui->roleComboBox->setProperty("touched", false);
+        ui->mdpLineEdit->setProperty("touched", false);
+    }
+
+    QStringList errors;
+    if (nomTouched && !nomValid)
+        errors << tr("Nom invalide (min. 2 caractères, lettres uniquement).");
+    if (prenomTouched && !prenomValid)
+        errors << tr("Prénom invalide (min. 2 caractères, lettres uniquement).");
+    if (emailTouched && !emailValid)
+        errors << tr("Email invalide (format attendu: nom@domaine.com).");
+    if (roleTouched && !roleValid)
+        errors << tr("Rôle obligatoire.");
+    if (mdpTouched && !mdpValid) {
+        errors << (isEditing
+            ? tr("Mot de passe: laissez vide ou utilisez au moins 6 caractères.")
+            : tr("Mot de passe obligatoire (au moins 6 caractères)."));
+    }
+
+    QWidget* validationHost = ui->module1 ? static_cast<QWidget*>(ui->module1)
+                                          : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
+                                                                : ui->formLayoutWidget->parentWidget());
+    QLabel* feedback = validationHost
+        ? validationHost->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"))
+        : nullptr;
+    if (feedback) {
+        const bool onPersonnelAddPage =
+            ui->modules && ui->metierspersonnel
+            && ui->modules->currentWidget() == ui->module1
+            && ui->metierspersonnel->currentIndex() == 0;
+        if (!onPersonnelAddPage) {
+            feedback->hide();
+            return errors.isEmpty();
+        }
+        feedback->show();
+
+        if (validationHost && ui->formLayoutWidget) {
+            const QPoint formTopLeft = ui->formLayoutWidget->mapTo(validationHost, QPoint(0, 0));
+            const QRect formRect(formTopLeft, ui->formLayoutWidget->size());
+            const int margin = 16;
+            const int desiredRightW = 200;
+            const int availableRightW = validationHost->width() - (formRect.right() + margin) - margin;
+
+            if (availableRightW >= 120) {
+                const int sideX = formRect.right() + margin;
+                const int sideY = formRect.y() + 8;
+                const int sideW = qMin(qMax(120, availableRightW), desiredRightW);
+                const int sideH = qMax(120, validationHost->height() - sideY - margin);
+                feedback->setGeometry(sideX, sideY, sideW, sideH);
+            } else {
+                const int belowX = formRect.x();
+                const int belowY = formRect.bottom() + 12;
+                const int belowW = qMax(320, qMin(formRect.width(), validationHost->width() - (2 * margin)));
+                const int belowH = qMax(96, validationHost->height() - belowY - margin);
+                feedback->setGeometry(belowX, belowY, belowW, belowH);
+            }
+        }
+
+        if (!showFeedbackText) {
+            feedback->setText(tr("Remplissez le formulaire pour vérifier la validité des champs."));
+            feedback->setStyleSheet(QStringLiteral("color: #546e7a;"));
+        } else if (!nomTouched && !prenomTouched && !emailTouched && !roleTouched && !mdpTouched) {
+            feedback->setText(tr("Cliquez sur un champ pour commencer la validation."));
+            feedback->setStyleSheet(QStringLiteral("color: #546e7a;"));
+        } else if (errors.isEmpty()) {
+            feedback->setText(tr("✔ Formulaire valide. Vous pouvez enregistrer cet employé."));
+            feedback->setStyleSheet(QStringLiteral("color: #2e7d32; font-weight: 600;"));
+        } else {
+            feedback->setText(QStringLiteral("✘ ") + errors.join(QStringLiteral("\n✘ ")));
+            feedback->setStyleSheet(QStringLiteral("color: #c62828; font-weight: 600;"));
+        }
+    }
+
+    return errors.isEmpty();
 }
 
 void MainWindow::filterPersonnelTable()
@@ -1139,12 +1284,12 @@ void MainWindow::loadEmployeeTable()
             table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
         // Actions column: fixed
         table->horizontalHeader()->setSectionResizeMode(dataCols, QHeaderView::Fixed);
-        table->setColumnWidth(dataCols, 72);
+    table->setColumnWidth(dataCols, 96);
     }
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     if (table->verticalHeader())
-        table->verticalHeader()->setDefaultSectionSize(30);
+    table->verticalHeader()->setDefaultSectionSize(34);
 }
 
 void MainWindow::setupPersonnelTable()
@@ -1193,7 +1338,7 @@ void MainWindow::setupPersonnelTable()
         for (int c = 0; c < last; ++c)
             table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
         table->horizontalHeader()->setSectionResizeMode(last, QHeaderView::ResizeToContents);
-        table->setColumnWidth(last, 68);
+        table->setColumnWidth(last, 96);
     }
 }
 
@@ -1372,43 +1517,15 @@ void MainWindow::loadFaceEmbeddings()
     if (!m_faceRecognizer) return;
 
     QSqlQuery q;
-    if (!q.exec("SELECT id_emp, modele_faciale FROM EMPLOYE "
-                "WHERE modele_faciale IS NOT NULL")) {
-        qWarning() << "[FaceRecog] loadFaceEmbeddings query failed:"
-                   << q.lastError().text();
-        return;
+    q.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
+    q.bindValue(":id", matchedId);
+    if (q.exec() && q.next()) {
+        const QString fullName = q.value(0).toString() + " " + q.value(1).toString();
+        if (ui->userNameLabel)
+            ui->userNameLabel->setText(fullName);
     }
 
-    constexpr int expectedBytes = 128 * static_cast<int>(sizeof(float));
-    while (q.next()) {
-        int id           = q.value(0).toInt();
-        QByteArray blob  = q.value(1).toByteArray();
-        if (blob.size() != expectedBytes) {
-            qWarning() << "[FaceRecog] Skipping id" << id
-                       << "— blob size" << blob.size()
-                       << "(expected" << expectedBytes << ")";
-            continue;
-        }
-        cv::Mat embedding(1, 128, CV_32F);
-        std::memcpy(embedding.data, blob.constData(), blob.size());
-        m_faceEmbeddings.insert(id, embedding);
-    }
-    qDebug() << "[FaceRecog] Loaded" << m_faceEmbeddings.size()
-             << "face embedding(s) from DB";
-}
-
-int MainWindow::matchFaceEmbedding(const cv::Mat& embedding)
-{
-    if (!m_faceRecognizer || m_faceEmbeddings.isEmpty()) return -1;
-
-    for (auto it = m_faceEmbeddings.cbegin(); it != m_faceEmbeddings.cend(); ++it) {
-        double score = m_faceRecognizer->match(
-            embedding, it.value(), cv::FaceRecognizerSF::FR_COSINE);
-        qDebug() << "[FaceRecog] id" << it.key() << "cosine score:" << score;
-        if (score > 0.363) // official SFace cosine threshold
-            return it.key();
-    }
-    return -1;
+    ui->MainStacked->setCurrentIndex(1);
 }
 // ════════════════════════════════════════════════════════════════════════════
 //  HUILE — BOUTONS ACTION (séparé du module Personnel)

@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QObject>
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QLabel>                        // ← AJOUTER CETTE LIGNE
@@ -43,6 +44,7 @@ public:
     ~MainWindow();
 
 private slots:
+    void on_toolButton_clicked();
     void on_loginbtn_clicked();
     void on_btnAjouterEmp_clicked();   // toolbar button → navigate to form page
     void on_ajouterEmpBtn_clicked();   // form submit button → INSERT employee
@@ -87,6 +89,7 @@ private slots:
     void on_btnConsulterstc_clicked();
     void on_btnStatstc_clicked();
     void on_toolButton_5_clicked();
+    void on_ajouterqtoliveBtn_clicked();
 
 // ===== Gestion des machines =====
 void on_btnConsulterMachines_clicked();
@@ -118,7 +121,6 @@ void on_ajouterlineseriemachine_2_clicked();
     void on_btnStatAgr_clicked();
     void on_btnAvanceAgr_clicked();
 
-    void on_toolButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -197,6 +199,17 @@ private:
     void setupInteractiveHooks();
     void setupToolbarsTweaks();
     void filterPersonnelTable();
+    void setupEmployeeFormValidation();
+    bool validateEmployeeForm(bool showFeedbackText = true);
+    void loadAffectationSettings();
+    bool saveAffectationSettings();
+    void setupSettingsAutoAssignOption();
+    void setupAffectationStatusFilter();
+    void setupAffectationOpenEndedOption();
+    void ensureStockSerieSelector();
+    void refreshStockSerieChoices();
+    bool tryAutoAssignForSerie(int serieId, QString& detailMessage);
+    void loadStocksTable();
 
 // ===== Module machines =====
 QComboBox* cbSerieMachine = nullptr;
@@ -303,18 +316,25 @@ void openStocksWindow(int pageIndex = -1);
     // Composite PK tracking for EMP_MACH edit mode
     int  m_editingAffIdEmp   = -1;     // id_emp being edited (-1 = insert mode)
     int  m_editingAffIdSerie = -1;     // id_serie being edited (-1 = insert mode)
+    int  m_maxAffectationsPerEmployee = 3;
+    bool m_autoAssignFromStock = false;
+    QCheckBox* m_settingsAutoAssignCheck = nullptr;
+    QComboBox* m_affStatusFilterCombo = nullptr;
+    QCheckBox* m_affOpenEndedCheck = nullptr;
+    QComboBox* m_stockSerieCombo = nullptr;
 
     // ── Affectation helpers ──────────────────────────────────────────────────
     void loadAffectationTable();
     void populateAffCombos();
     void filterAffTable();
+    void updateAffectationRemainingInfo();
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
     QLabel* m_clockLabel = nullptr;
     QWidget* m_clockLeftSpacer = nullptr;
     QWidget* m_clockRightSpacer = nullptr;
     class QTimer* m_clockTimer = nullptr;
-         HoverShadowFilter* m_hoverShadowFilter = nullptr;
+    HoverShadowFilter* m_hoverShadowFilter = nullptr;
 };
 
 #endif // MAINWINDOW_H
