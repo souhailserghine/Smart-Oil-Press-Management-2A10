@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QObject>
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QTableWidget>
@@ -8,14 +9,13 @@
 #include <QByteArray>
 #include <QMap>
 
-// OpenCV — facial recognition
-#include <opencv2/core.hpp>
-#include <opencv2/objdetect.hpp>
-#include <opencv2/dnn.hpp>
+class FaceRecognitionService;
 
 class QLabel;
 class QWidget;
 class QTimer;
+class QCheckBox;
+class QComboBox;
 class HoverShadowFilter; // Forward declaration for HoverShadowFilter
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +33,7 @@ public:
     ~MainWindow();
 
 private slots:
+    void on_toolButton_clicked();
     void on_loginbtn_clicked();
     void on_btnAjouterEmp_clicked();   // toolbar button → navigate to form page
     void on_ajouterEmpBtn_clicked();   // form submit button → INSERT employee
@@ -59,11 +60,15 @@ private slots:
     void on_btnmod5_clicked(); // Module 5
     void on_btnmod6_clicked(); // Module 6
 
+    void on_btnSettings_clicked(); // Settings (module7)
+    void on_settingsSaveBtn_clicked();
+
     // Module 2 (Stocks) toolbar actions
     void on_btnConsulterstc_clicked();
     void on_btnAjouterstc_clicked();
     void on_btnStatstc_clicked();
     void on_toolButton_5_clicked();
+    void on_ajouterqtoliveBtn_clicked();
 
     // Module 3 (Citernes) toolbar actions
     void on_AjoutCiterne_clicked();
@@ -89,7 +94,6 @@ private slots:
     void on_btnStatAgr_clicked();
     void on_btnAvanceAgr_clicked();
 
-    void on_toolButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -117,6 +121,17 @@ private:
     void setupInteractiveHooks();
     void setupToolbarsTweaks();
     void filterPersonnelTable();
+    void setupEmployeeFormValidation();
+    bool validateEmployeeForm(bool showFeedbackText = true);
+    void loadAffectationSettings();
+    bool saveAffectationSettings();
+    void setupSettingsAutoAssignOption();
+    void setupAffectationStatusFilter();
+    void setupAffectationOpenEndedOption();
+    void ensureStockSerieSelector();
+    void refreshStockSerieChoices();
+    bool tryAutoAssignForSerie(int serieId, QString& detailMessage);
+    void loadStocksTable();
 
     // Top-right user info positioning
     void repositionUserInfo();
@@ -132,18 +147,11 @@ private:
     // System clock update
     void updateClock();
 
-    // ── Facial recognition ────────────────────────────────────────────────
-    // Encode the largest face in 'imagePath' → 128-float blob, empty on failure
+    // ── Facial recognition (moved out to a service) ───────────────────────
     QByteArray encodeFaceFromFile(const QString& imagePath);
-    // Load all stored embeddings from DB into m_faceEmbeddings cache
     void loadFaceEmbeddings();
-    // Attempt to match 'embedding' against cache; returns id_emp or -1
-    int matchFaceEmbedding(const cv::Mat& embedding);
-    // Shared model handles (created once, reused)
-    cv::Ptr<cv::FaceDetectorYN>     m_faceDetector;
-    cv::Ptr<cv::FaceRecognizerSF>   m_faceRecognizer;
-    // id_emp → 128-float Mat loaded from EMPLOYE.modele_faciale
-    QMap<int, cv::Mat> m_faceEmbeddings;
+    int matchFaceEmbedding(const QByteArray& embeddingBlob);
+    FaceRecognitionService* m_faceService = nullptr;
 
     bool m_sidebarCollapsed = false;
     int  m_loggedInId = -1;            // id_emp of the currently authenticated user
@@ -152,18 +160,24 @@ private:
     // Composite PK tracking for EMP_MACH edit mode
     int  m_editingAffIdEmp   = -1;     // id_emp being edited (-1 = insert mode)
     int  m_editingAffIdSerie = -1;     // id_serie being edited (-1 = insert mode)
+    int  m_maxAffectationsPerEmployee = 3;
+    bool m_autoAssignFromStock = false;
+    QCheckBox* m_settingsAutoAssignCheck = nullptr;
+    QComboBox* m_affStatusFilterCombo = nullptr;
+    QCheckBox* m_affOpenEndedCheck = nullptr;
+    QComboBox* m_stockSerieCombo = nullptr;
 
     // ── Affectation helpers ──────────────────────────────────────────────────
     void loadAffectationTable();
     void populateAffCombos();
     void filterAffTable();
+    void updateAffectationRemainingInfo();
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
     QLabel* m_clockLabel = nullptr;
     QWidget* m_clockLeftSpacer = nullptr;
     QWidget* m_clockRightSpacer = nullptr;
     class QTimer* m_clockTimer = nullptr;
-         HoverShadowFilter* m_hoverShadowFilter = nullptr;
+    HoverShadowFilter* m_hoverShadowFilter = nullptr;
 };
-    class HoverShadowFilter;
 #endif // MAINWINDOW_H

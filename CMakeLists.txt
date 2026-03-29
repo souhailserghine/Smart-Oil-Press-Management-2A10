@@ -27,6 +27,12 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+    face_recognition_service.h
+    face_recognition_service.cpp
+    face_recognition_dialog.h
+    face_recognition_dialog.cpp
+    face_capture_dialog.h
+    face_capture_dialog.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

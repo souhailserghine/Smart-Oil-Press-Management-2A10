@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Smart Oil Press Management</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -36,7 +36,7 @@
          </font>
         </property>
         <property name="text">
-         <string>LOG IN</string>
+         <string>CONNEXION</string>
         </property>
        </widget>
        <widget class="QLabel" name="loginarea">
@@ -65,6 +65,9 @@ border-bottom-right-radius : 50px;</string>
           <height>40</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Saisissez votre mot de passe</string>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color : rgba(0,0,0,0);
 border : none;
@@ -79,7 +82,7 @@ padding-bottom: 7px;</string>
          <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
-         <string>Password</string>
+         <string>Mot de passe</string>
         </property>
        </widget>
        <widget class="QPushButton" name="loginbtn">
@@ -91,11 +94,14 @@ padding-bottom: 7px;</string>
           <height>51</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Se connecter à l'application</string>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Login</string>
+         <string>&amp;Connexion</string>
         </property>
         <property name="icon">
          <iconset resource="img.qrc">
@@ -121,10 +127,10 @@ padding-bottom: 7px;</string>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Open facial recognition interface</string>
+         <string>Ouvrir la reconnaissance faciale</string>
         </property>
         <property name="text">
-         <string>Facial Recognition</string>
+         <string>&amp;Reconnaissance faciale</string>
         </property>
         <property name="icon">
          <iconset resource="img.qrc">
@@ -146,6 +152,9 @@ padding-bottom: 7px;</string>
           <height>40</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Saisissez votre email</string>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color : rgba(0,0,0,0);
 border : none;
@@ -154,7 +163,7 @@ color : rgba(0,0,0,240);
 padding-bottom: 7px;</string>
         </property>
         <property name="placeholderText">
-         <string>Username</string>
+         <string>Email</string>
         </property>
        </widget>
        <widget class="QLabel" name="loginpic">
@@ -310,7 +319,7 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <property name="text">
-                 <string>Operateur</string>
+                 <string>Opérateur</string>
                 </property>
                </item>
                <item>
@@ -382,8 +391,11 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <widget class="QPushButton" name="parcourirPhotoBtn">
+                 <property name="toolTip">
+                  <string>Choisir une photo depuis l'ordinateur</string>
+                 </property>
                  <property name="text">
-                  <string>Parcourir…</string>
+                  <string>&amp;Parcourir…</string>
                  </property>
                  <property name="icon">
                   <iconset resource="img.qrc">
@@ -420,8 +432,11 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <widget class="QPushButton" name="captureFaceBtn">
+                 <property name="toolTip">
+                  <string>Capturer le visage via la caméra</string>
+                 </property>
                  <property name="text">
-                  <string>Capturer</string>
+                  <string>&amp;Capturer</string>
                  </property>
                  <property name="icon">
                   <iconset resource="img.qrc">
@@ -457,8 +472,11 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <widget class="QPushButton" name="ajouterEmpBtn">
+                 <property name="toolTip">
+                  <string>Ajouter cet employé</string>
+                 </property>
                  <property name="text">
-                  <string>Ajouter</string>
+                  <string>&amp;Ajouter</string>
                  </property>
                  <property name="icon">
                   <iconset resource="img.qrc">
@@ -484,7 +502,7 @@ border-top-left-radius : 50px;</string>
               <item>
                <widget class="QLineEdit" name="lineEdit">
                 <property name="placeholderText">
-                 <string>Rechercher...</string>
+                 <string>Rechercher…</string>
                 </property>
                </widget>
               </item>
@@ -814,6 +832,26 @@ border-top-left-radius : 50px;</string>
                  </layout>
                 </item>
                 <item>
+                 <widget class="QLabel" name="affLimitInfoLabel">
+                  <property name="styleSheet">
+                   <string>color:#1e88e5; font-weight:600;</string>
+                  </property>
+                  <property name="text">
+                   <string>Limite actuelle : 3 affectation(s) max par employé.</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="affRemainingInfoLabel">
+                  <property name="styleSheet">
+                   <string>color:#2e7d32; font-weight:600;</string>
+                  </property>
+                  <property name="text">
+                   <string>Sélectionnez un employé pour voir les places restantes.</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <layout class="QHBoxLayout" name="affFormBtnRow">
                   <item>
                    <spacer name="affFormSpacer">
@@ -830,8 +868,11 @@ border-top-left-radius : 50px;</string>
                   </item>
                   <item>
                    <widget class="QPushButton" name="affSaveBtn">
+                    <property name="toolTip">
+                     <string>Enregistrer l'affectation</string>
+                    </property>
                     <property name="text">
-                     <string>Affecter</string>
+                     <string>&amp;Affecter</string>
                     </property>
                     <property name="icon">
                      <iconset resource="img.qrc">
@@ -847,8 +888,11 @@ border-top-left-radius : 50px;</string>
                   </item>
                   <item>
                    <widget class="QPushButton" name="affCancelBtn">
+                    <property name="toolTip">
+                     <string>Annuler la saisie d'affectation</string>
+                    </property>
                     <property name="text">
-                     <string>Annuler</string>
+                     <string>&amp;Annuler</string>
                     </property>
                    </widget>
                   </item>
@@ -1135,6 +1179,140 @@ border-top-left-radius : 50px;</string>
           </property>
          </widget>
         </widget>
+        <widget class="QWidget" name="module7">
+         <widget class="QLabel" name="label_settings_title">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>30</y>
+            <width>351</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>PARAMÈTRES</string>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="module7Icon">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>20</y>
+            <width>51</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Paramètres</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="img.qrc">
+            <normaloff>:/img/settings.svg</normaloff>:/img/settings.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QGroupBox" name="settingsGroup">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>90</y>
+            <width>961</width>
+            <height>351</height>
+           </rect>
+          </property>
+          <property name="title">
+           <string>Général</string>
+          </property>
+          <layout class="QFormLayout" name="settingsForm">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_theme">
+             <property name="text">
+              <string>Thème</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="settingsThemeCombo">
+             <item>
+              <property name="text">
+               <string>Clair</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sombre</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_db">
+             <property name="text">
+              <string>Connexion BD</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="settingsDbDsnEdit">
+             <property name="placeholderText">
+              <string>DSN (ex: XE)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_max_aff">
+             <property name="text">
+              <string>Max affectations / employé</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="settingsMaxAffectationsSpin">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>3</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QPushButton" name="settingsSaveBtn">
+             <property name="toolTip">
+              <string>Enregistrer les paramètres</string>
+             </property>
+             <property name="text">
+              <string>&amp;Enregistrer</string>
+             </property>
+             <property name="icon">
+              <iconset resource="img.qrc">
+               <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
         <widget class="QWidget" name="module3">
          <widget class="QWidget" name="horizontalLayoutWidget_5">
           <property name="geometry">
@@ -1272,35 +1450,35 @@ border-top-left-radius : 50px;</string>
              <item row="0" column="0">
               <widget class="QLabel" name="CapaciteMaximale">
                <property name="text">
-                <string>Capacite Maximale</string>
+                <string>Capacité maximale</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
               <widget class="QLineEdit" name="SaiCapa">
                <property name="placeholderText">
-                <string>Capacite Maximale</string>
+                <string>Capacité maximale</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="NiveauActuel">
                <property name="text">
-                <string>Niveau Actuel</string>
+                <string>Niveau actuel</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
               <widget class="QLineEdit" name="SaiNiv">
                <property name="placeholderText">
-                <string>Niveau Actuel</string>
+                <string>Niveau actuel</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="TypeHuile">
                <property name="text">
-                <string>Type Huile</string>
+                <string>Type d'huile</string>
                </property>
               </widget>
              </item>
@@ -1343,7 +1521,7 @@ border-top-left-radius : 50px;</string>
              <item row="4" column="0">
               <widget class="QLabel" name="Etat">
                <property name="text">
-                <string>Etat</string>
+                <string>État</string>
                </property>
               </widget>
              </item>
@@ -1366,7 +1544,7 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <property name="text">
-                 <string>En remplissage </string>
+                 <string>En remplissage</string>
                 </property>
                </item>
                <item>
@@ -1376,7 +1554,7 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <property name="text">
-                 <string>Bloquee</string>
+                 <string>Bloquée</string>
                 </property>
                </item>
               </widget>
@@ -1446,27 +1624,27 @@ border-top-left-radius : 50px;</string>
                <widget class="QComboBox" name="Trier">
                 <item>
                  <property name="text">
-                  <string>TRIER</string>
+                  <string>Trier</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Etat</string>
+                  <string>État</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Niveau Actuel</string>
+                  <string>Niveau actuel</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Type Huile</string>
+                  <string>Type d'huile</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Capacite Maximale</string>
+                  <string>Capacité maximale</string>
                  </property>
                 </item>
                 <item>
@@ -1476,7 +1654,7 @@ border-top-left-radius : 50px;</string>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Etat</string>
+                  <string>État</string>
                  </property>
                 </item>
                </widget>
@@ -1508,17 +1686,17 @@ border-top-left-radius : 50px;</string>
               </column>
               <column>
                <property name="text">
-                <string>Capacite Maximale</string>
+                <string>Capacité maximale</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>Niveau Actuel</string>
+                <string>Niveau actuel</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>Type Huile</string>
+                <string>Type d'huile</string>
                </property>
               </column>
               <column>
@@ -1528,7 +1706,7 @@ border-top-left-radius : 50px;</string>
               </column>
               <column>
                <property name="text">
-                <string>Etat</string>
+                <string>État</string>
                </property>
               </column>
               <column>
@@ -1553,7 +1731,7 @@ border-top-left-radius : 50px;</string>
               </item>
               <item row="0" column="3">
                <property name="text">
-                <string>olive</string>
+                <string>Olive</string>
                </property>
               </item>
               <item row="0" column="4">
@@ -1563,7 +1741,7 @@ border-top-left-radius : 50px;</string>
               </item>
               <item row="0" column="5">
                <property name="text">
-                <string>ACTIF</string>
+                <string>Actif</string>
                </property>
               </item>
              </widget>
@@ -1630,7 +1808,7 @@ border-top-left-radius : 50px;</string>
                 </rect>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Faire les statistiques  de &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Faire les statistiques de &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
               <widget class="QComboBox" name="X">
@@ -1649,22 +1827,22 @@ border-top-left-radius : 50px;</string>
                </item>
                <item>
                 <property name="text">
-                 <string>Etat</string>
+                 <string>État</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Niveau Actuel</string>
+                 <string>Niveau actuel</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Type Huile</string>
+                 <string>Type d'huile</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Capacite Maximale</string>
+                 <string>Capacité maximale</string>
                 </property>
                </item>
                <item>
@@ -1683,7 +1861,7 @@ border-top-left-radius : 50px;</string>
                 </rect>
                </property>
                <property name="text">
-                <string>CONFIRMER</string>
+                <string>Confirmer</string>
                </property>
               </widget>
              </widget>
@@ -2305,12 +2483,12 @@ border-top-left-radius : 50px;</string>
               </column>
               <column>
                <property name="text">
-                <string>Nom  responsable</string>
+                <string>Nom responsable</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>Date  production</string>
+                <string>Date production</string>
                </property>
               </column>
               <column>
@@ -2535,7 +2713,7 @@ color: rgb(0, 0, 0);</string>
            </rect>
           </property>
           <property name="text">
-           <string>GESTION DE QUALITE</string>
+           <string>GESTION DE LA QUALITÉ</string>
           </property>
          </widget>
          <widget class="QToolButton" name="module4Icon">
@@ -2744,7 +2922,7 @@ color: rgb(0, 0, 0);</string>
              <item row="0" column="0">
               <widget class="QLabel" name="nommachinelabel">
                <property name="text">
-                <string>Nom du machine</string>
+                <string>Nom de la machine</string>
                </property>
               </widget>
              </item>
@@ -2789,7 +2967,7 @@ color: rgb(0, 0, 0);</string>
              <item row="3" column="0">
               <widget class="QLabel" name="statusmachineLabel">
                <property name="text">
-                <string>Status</string>
+                <string>Statut</string>
                </property>
               </widget>
              </item>
@@ -2860,12 +3038,12 @@ color: rgb(0, 0, 0);</string>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Name</string>
+                  <string>Nom</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Status</string>
+                  <string>Statut</string>
                  </property>
                 </item>
                </widget>
@@ -2970,7 +3148,7 @@ color: rgb(0, 0, 0);</string>
               </column>
               <column>
                <property name="text">
-                <string>Status</string>
+                <string>Statut</string>
                </property>
               </column>
               <item row="0" column="0">
@@ -3076,17 +3254,17 @@ color: rgb(0, 0, 0);</string>
                 </item>
                 <item>
                  <property name="text">
-                  <string>datefonctionnement</string>
+                  <string>Date fonctionnement</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>etat</string>
+                  <string>État</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>type</string>
+                  <string>Type</string>
                  </property>
                 </item>
                </widget>
@@ -3100,7 +3278,7 @@ color: rgb(0, 0, 0);</string>
                  </rect>
                 </property>
                 <property name="text">
-                 <string>Ok</string>
+                 <string>OK</string>
                 </property>
                </widget>
               </widget>
@@ -3628,7 +3806,7 @@ color: rgb(0, 0, 0);</string>
               </item>
               <item row="0" column="6">
                <property name="text">
-                <string>olive</string>
+                <string>Olive</string>
                </property>
               </item>
               <item row="0" column="7">
@@ -3693,7 +3871,7 @@ color: rgb(0, 0, 0);</string>
                 </rect>
                </property>
                <property name="title">
-                <string>STATISTIQUE</string>
+                <string>Statistiques</string>
                </property>
                <widget class="QComboBox" name="choixtri">
                 <property name="geometry">
@@ -3725,7 +3903,7 @@ color: rgb(0, 0, 0);</string>
                  </rect>
                 </property>
                 <property name="text">
-                 <string>Faire la statistique selon :</string>
+                 <string>Faire les statistiques selon :</string>
                 </property>
                </widget>
                <widget class="QPushButton" name="btnok">
@@ -3738,7 +3916,7 @@ color: rgb(0, 0, 0);</string>
                  </rect>
                 </property>
                 <property name="text">
-                 <string>ok</string>
+                 <string>OK</string>
                 </property>
                </widget>
               </widget>
@@ -4030,12 +4208,12 @@ color: rgb(0, 0, 0);</string>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Name</string>
+                  <string>Nom</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Status</string>
+                  <string>Statut</string>
                  </property>
                 </item>
                </widget>
@@ -4547,7 +4725,7 @@ color: rgb(0, 0, 0);</string>
           <item>
            <widget class="QPushButton" name="btnmod1">
             <property name="toolTip">
-             <string>Go to Personnel module</string>
+             <string>Aller au module Personnel</string>
             </property>
             <property name="text">
              <string>Personnel</string>
@@ -4567,7 +4745,7 @@ color: rgb(0, 0, 0);</string>
           <item>
            <widget class="QPushButton" name="btnmod2">
             <property name="toolTip">
-             <string>Go to Module 2</string>
+             <string>Aller au module Stock</string>
             </property>
             <property name="text">
              <string>Stock</string>
@@ -4587,7 +4765,7 @@ color: rgb(0, 0, 0);</string>
           <item>
            <widget class="QPushButton" name="btnmod3">
             <property name="toolTip">
-             <string>Go to Module 3</string>
+             <string>Aller au module Citernes</string>
             </property>
             <property name="text">
              <string>Citernes</string>
@@ -4607,7 +4785,7 @@ color: rgb(0, 0, 0);</string>
           <item>
            <widget class="QPushButton" name="btnmod4">
             <property name="toolTip">
-             <string>Go to Module 4</string>
+             <string>Aller au module Huile</string>
             </property>
             <property name="text">
              <string>Huile</string>
@@ -4627,7 +4805,7 @@ color: rgb(0, 0, 0);</string>
           <item>
            <widget class="QPushButton" name="btnmod5">
             <property name="toolTip">
-             <string>Go to Module 5</string>
+             <string>Aller au module Machine</string>
             </property>
             <property name="text">
              <string>Machine</string>
@@ -4647,7 +4825,7 @@ color: rgb(0, 0, 0);</string>
           <item>
            <widget class="QPushButton" name="btnmod6">
             <property name="toolTip">
-             <string>Go to Module 6</string>
+             <string>Aller au module Agriculteurs</string>
             </property>
             <property name="text">
              <string>Agriculteurs</string>
@@ -4655,6 +4833,26 @@ color: rgb(0, 0, 0);</string>
             <property name="icon">
              <iconset resource="img.qrc">
               <normaloff>:/img/farmer.svg</normaloff>:/img/farmer.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnSettings">
+            <property name="toolTip">
+             <string>Paramètres</string>
+            </property>
+            <property name="text">
+             <string>Paramètres</string>
+            </property>
+            <property name="icon">
+             <iconset resource="img.qrc">
+              <normaloff>:/img/settings.svg</normaloff>:/img/settings.svg</iconset>
             </property>
             <property name="iconSize">
              <size>

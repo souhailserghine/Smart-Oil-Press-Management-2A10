@@ -74,6 +74,22 @@ public:
 
     int authenticate(const QString& email, const QString& mdp);
 
+    // --- Additional DB helpers used by MainWindow (UI stays in MainWindow) ---
+    /** Returns {"Nom Prénom", true} for an existing id_emp, otherwise {"", false}. */
+    static bool getFullNameById(int id_emp, QString* outFullName, QSqlError* outError = nullptr);
+
+    /** Returns counts by role: role -> count. */
+    static bool getCountByRole(QMap<QString, int>* outRoleCounts, int* outTotal = nullptr, QSqlError* outError = nullptr);
+
+    /** Returns all stored face embeddings: id_emp -> raw blob (128 floats). */
+    static bool getAllFaceModels(QMap<int, QByteArray>* outModels, QSqlError* outError = nullptr);
+
+    /**
+     * @brief List employees as (id_emp, "Nom Prénom") for combo boxes.
+     * @return A heap-allocated model. Caller takes ownership.
+     */
+    static QSqlQueryModel* modelIdFullName(QSqlError* outError = nullptr);
+
 
     QSqlError lastError() const;
 
