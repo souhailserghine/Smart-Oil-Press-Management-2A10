@@ -1,23 +1,13 @@
 #include "connection.h"
+#include <QSqlDatabase>
 
-Connection::Connection()
+bool Connection::create()
 {
+    // DSN QODBC اللي عاملها في ODBC Data Sources
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("Source_Projet2A");   // <-- بدّلها لاسم DSN عندك
+    db.setUserName("ayoubbouzidi");            // <-- user oracle
+    db.setPassword("99533203");        // <-- password
 
-}
-
-bool Connection::createconnect()
-{bool test=false;
-QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-db.setDatabaseName("Source_Projet2A");//inserer le nom de la source de données
-db.setUserName("souhail");//inserer nom de l'utilisateur
-db.setPassword("0000");//inserer mot de passe de cet utilisateur
-
-if (db.open())
-test=true;
-
-
-
-
-
-    return  test;
+    return db.open();
 }

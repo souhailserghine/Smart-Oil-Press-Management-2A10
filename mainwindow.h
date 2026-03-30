@@ -1,183 +1,123 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QObject>
 #include <QMainWindow>
-#include <QStackedWidget>
-#include <QTableWidget>
-#include <QToolButton>
-#include <QByteArray>
-#include <QMap>
-
-class FaceRecognitionService;
-
-class QLabel;
-class QWidget;
-class QTimer;
-class QCheckBox;
-class QComboBox;
-class HoverShadowFilter; // Forward declaration for HoverShadowFilter
+#include <QString>
+#include <QVariantList>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+#include <QtCharts/QChartView>
+
+class QComboBox;
+class QTableWidget;
+class QPushButton;
+class QLineEdit;
+class QDateEdit;
+class QWidget;
+class QLabel;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
-    void on_toolButton_clicked();
-    void on_loginbtn_clicked();
-    void on_btnAjouterEmp_clicked();   // toolbar button → navigate to form page
-    void on_ajouterEmpBtn_clicked();   // form submit button → INSERT employee
-    void on_parcourirPhotoBtn_clicked(); // photo browse button
-    void on_captureFaceBtn_clicked();    // webcam capture for face model
-    void on_btnConsulterEmp_clicked();
-    void on_btnStatEmp_clicked();
-    void on_btnAdvEmp_clicked();
-    void on_faceBtn_clicked();
-    void on_exportEmpBtn_clicked();     // export employee list → PDF or Excel
-
-    // ── Affectation slots ────────────────────────────────────────────────────
-    void on_affNewBtn_clicked();        // show the affectation form (affStack → 0)
-    void on_affSaveBtn_clicked();       // INSERT affectation into EMP_MACH
-    void on_affCancelBtn_clicked();     // back to table (affStack → 1)
-    void on_affRefreshBtn_clicked();    // reload affectation table
-    void on_affSearchEdit_textChanged(const QString& text);
-
-    // Sidebar module navigation
-    void on_btnmod1_clicked(); // Personnel (module1)
-    void on_btnmod2_clicked(); // Module 2
-    void on_btnmod3_clicked(); // Module 3
-    void on_btnmod4_clicked(); // Module 4
-    void on_btnmod5_clicked(); // Module 5
-    void on_btnmod6_clicked(); // Module 6
-
-    void on_btnSettings_clicked(); // Settings (module7)
-    void on_settingsSaveBtn_clicked();
-
-    // Module 2 (Stocks) toolbar actions
-    void on_btnConsulterstc_clicked();
-    void on_btnAjouterstc_clicked();
-    void on_btnStatstc_clicked();
-    void on_toolButton_5_clicked();
-    void on_ajouterqtoliveBtn_clicked();
-
-    // Module 3 (Citernes) toolbar actions
-    void on_AjoutCiterne_clicked();
-    void on_ConsulterCiterne_clicked();
-    void on_StatistiqueCiterne_clicked();
-    void on_MetierAvanceCiterne_clicked();
-
-    // Module 4 (Qualité) toolbar actions
-    void on_btnConsulterQualite_clicked();
-    void on_btnAjouterQualite_clicked();
-    void on_btnStatQualite_clicked();
-    void on_btnAdvEmp_2_clicked();
-
-    // Module 5 (Machines) toolbar actions
+    // ===== Module 5 navigation (objectNames in UI) =====
     void on_btnConsulterMachines_clicked();
     void on_btnAjouterMachines_clicked();
     void on_btnStatMachines_clicked();
     void on_btnAvanceMachines_clicked();
 
-    // Module 6 (Agriculteurs) toolbar actions
-    void on_btnConsulterAgr_clicked();
-    void on_btnAjouterAgr_clicked();
-    void on_btnStatAgr_clicked();
-    void on_btnAvanceAgr_clicked();
+    // ===== Module 5 actions (objectNames in UI) =====
+    void on_ajoutermachine_clicked();
+    void on_rechrchemahine_clicked();
+    void on_filtrer_clicked();
+    void on_oktrie_clicked();
+    void on_exportmachine_clicked();
+    void on_exportermachinne_clicked();
 
+    // Ajout série machine (bouton موجود في UI: ajouterlineseriemachine_2)
+    void on_ajouterlineseriemachine_2_clicked();
 
 private:
     Ui::MainWindow *ui;
-    
-    // Helper methods
-    void setupPersonnelChart();
-    void setupPersonnelTable();
-    void loadEmployeeTable();          // populate tableWidget from DB
-    void loadEmployeeStats();          // populate stats charts from DB
-    void exportEmployeesToPdf(const QString& filePath);
-    void exportEmployeesToCsv(const QString& filePath);
-    void setupCiterneChart();
-    void setupStocksChart();
-    void setupQualiteChart();
-    void addActionButtonsToRow(QTableWidget* table, int row);
-    void addActionsColumnTo(QTableWidget* table);
-    int findRowForButton(QTableWidget* table, QObject* button) const;
-    QTableWidget* findOwningTable(QObject* child) const;
-    void setupActionsForAllTables();
-    void setActiveModuleButton(int index);
 
-    // UX enhancements
-    void crossFadeToIndex(QStackedWidget* stack, int newIndex);
-    void animateSidebarToggle(bool collapse);
-    void setupInteractiveHooks();
-    void setupToolbarsTweaks();
-    void filterPersonnelTable();
-    void setupEmployeeFormValidation();
-    bool validateEmployeeForm(bool showFeedbackText = true);
-    void loadAffectationSettings();
-    bool saveAffectationSettings();
-    void setupSettingsAutoAssignOption();
-    void setupAffectationStatusFilter();
-    void setupAffectationOpenEndedOption();
-    void ensureStockSerieSelector();
-    void refreshStockSerieChoices();
-    bool tryAutoAssignForSerie(int serieId, QString& detailMessage);
-    void loadStocksTable();
+    // runtime combo added to machine form
+    QComboBox* cbSerieMachine = nullptr; // objectName: cbSerieMachine
 
-    // Top-right user info positioning
-    void repositionUserInfo();
-    void resizeEvent(QResizeEvent* event) override;
-    bool eventFilter(QObject* obj, QEvent* event) override;
+    // edit mode
+    int editMachineId = -1;
+    bool busyMachine = false;
+    bool busySerie   = false;
+    QString orderByMachine = "m.id_machine";
 
-    // Avatar rendering
-    void makeAvatarCircular();
+    // Série UI created runtime in metieravancee_4
+    QLineEdit* serieNom = nullptr;
+    QLineEdit* serieCap = nullptr;
+    QDateEdit* serieDate = nullptr;
+    QComboBox* serieEtat = nullptr;
+    QLineEdit* serieResp = nullptr;
+    QLineEdit* serieDesc = nullptr;
+    QPushButton* btnAddSerie = nullptr;
 
-    // Chat launcher positioning
-    void repositionChatLauncher();
+    // advanced analytics UI (metieravancee_4)
+    QLabel* advTotalValue = nullptr;
+    QLabel* advActiveValue = nullptr;
+    QLabel* advCriticalValue = nullptr;
+    QLabel* advAvgPerfValue = nullptr;
+    QTableWidget* advMachineTable = nullptr;
+    QPushButton* btnRefreshAdvanced = nullptr;
+    QPushButton* btnExportAdvanced = nullptr;
 
-    // System clock update
-    void updateClock();
+    // chart view on Stat page
+    QChartView* chartStatusView = nullptr;
 
-    // ── Facial recognition (moved out to a service) ───────────────────────
-    QByteArray encodeFaceFromFile(const QString& imagePath);
-    void loadFaceEmbeddings();
-    int matchFaceEmbedding(const QByteArray& embeddingBlob);
-    FaceRecognitionService* m_faceService = nullptr;
+private:
+    // setup
+    void setupModule5();
+    void ensureSerieComboInMachineForm();
+    void ensureSerieUiInAdvanced();
+    void ensureMachineTopBarVisible();
+    void ensureMachineTableColumns();
+    void refreshAdvancedAnalytics();
 
-    bool m_sidebarCollapsed = false;
-    int  m_loggedInId = -1;            // id_emp of the currently authenticated user
-    QByteArray m_selectedPhoto;
-    QByteArray m_capturedFaceBlob;     // face embedding captured via webcam for new employee
-    // Composite PK tracking for EMP_MACH edit mode
-    int  m_editingAffIdEmp   = -1;     // id_emp being edited (-1 = insert mode)
-    int  m_editingAffIdSerie = -1;     // id_serie being edited (-1 = insert mode)
-    int  m_maxAffectationsPerEmployee = 3;
-    bool m_autoAssignFromStock = false;
-    QCheckBox* m_settingsAutoAssignCheck = nullptr;
-    QComboBox* m_affStatusFilterCombo = nullptr;
-    QCheckBox* m_affOpenEndedCheck = nullptr;
-    QComboBox* m_stockSerieCombo = nullptr;
+    // DB helpers
+    bool dbOpen() const;
+    int nextId(const QString& table, const QString& col) const;
+    QString mapMachineEtatToDb(const QString& uiText) const;
 
-    // ── Affectation helpers ──────────────────────────────────────────────────
-    void loadAffectationTable();
-    void populateAffCombos();
-    void filterAffTable();
-    void updateAffectationRemainingInfo();
-    QToolButton* m_chatLauncher = nullptr;
-    // Bottom-center clock in status bar
-    QLabel* m_clockLabel = nullptr;
-    QWidget* m_clockLeftSpacer = nullptr;
-    QWidget* m_clockRightSpacer = nullptr;
-    class QTimer* m_clockTimer = nullptr;
-    HoverShadowFilter* m_hoverShadowFilter = nullptr;
+    // find helpers (robust against UI name changes)
+    QDateEdit* findMachineDateEdit() const;
+    QLineEdit* findMachineNameEdit() const;
+    QComboBox* findMachineTypeCombo() const;
+    QComboBox* findMachineEtatCombo() const;
+
+    // load/refresh
+    void fillSeriesCombo();
+    void loadMachines(const QString& whereSql = QString(), const QVariantList& binds = {});
+    void addActionsToMachineRow(int row, int idMachine);
+    void updateMachineCharts();
+
+    // machine CRUD
+    void saveMachineFromForm();             // insert/update
+    void handleEditMachine(int idMachine);  // fill form
+    void handleDeleteMachine(int idMachine);
+
+    // series
+    void addSerieFromForm();
+    void addSerieFromAddPage();
+
+    // validators / UI fixes
+    void setupValidatorsModule5();
+
+    // export
+    void exportTableToCsv(QTableWidget* t, const QString& defaultName) const;
 };
+
 #endif // MAINWINDOW_H

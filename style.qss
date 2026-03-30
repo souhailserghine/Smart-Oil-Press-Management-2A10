@@ -16,18 +16,18 @@ Primary Colors:
   - Dark Olive:         #6d7a40  (darker variant)
   - Light Olive:        #a8b77f  (lighter variant)
   - Pale Green:         #e8f0dc  (subtle backgrounds)
-  
+
 Light Colors:
   - White:              #ffffff  (main background)
   - Off-White:          #fafafa  (secondary backgrounds)
   - Light Gray:         #f5f5f5  (panels, cards)
   - Subtle Gray:        #e8e8e8  (borders, dividers)
-  
+
 Text Colors:
   - Dark Text:          #2b2d2f  (primary text)
   - Medium Text:        #5a5d60  (secondary text)
   - Light Text:         #8a8d90  (disabled, hints)
-  
+
 Accent Colors:
   - Success Green:      #16a34a  (success states)
   - Warning Orange:     #d97706  (warnings)
@@ -1138,7 +1138,6 @@ QLineEdit {
     border: 1px solid #e8e8e8;
     border-radius: 8px;
     padding: 6px 10px;
-    min-height: 22px;
 }
 
 QLineEdit:focus {
