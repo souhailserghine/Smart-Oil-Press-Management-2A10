@@ -1,12 +1,14 @@
 #include "mainwindow.h"
+#include "connection.h"          // ← ajoute cet include
 
 #include <QApplication>
 #include <QFile>
+#include <QMessageBox>           // ← ajoute cet include
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    
+
     // Load and apply stylesheet
     QFile styleFile(":/style.qss");
     if (styleFile.open(QFile::ReadOnly)) {
@@ -14,7 +16,16 @@ int main(int argc, char *argv[])
         a.setStyleSheet(style);
         styleFile.close();
     }
-    
+
+    // ── Connexion à la base de données ──────────────────────────
+    if (!Connection::createInstance().createConnection()) {
+        QMessageBox::critical(nullptr, "Erreur de connexion",
+                              "Impossible de se connecter à la base de données.\n"
+                              "Vérifiez votre DSN ODBC et vos identifiants.");
+        return -1;
+    }
+    // ────────────────────────────────────────────────────────────
+
     MainWindow w;
     w.show();
     return a.exec();

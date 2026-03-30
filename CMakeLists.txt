@@ -28,6 +28,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         style.qrc
         img.qrc
+        qualite.h qualite.cpp qualite.ui
+        connection.h
+        connection.cpp
+
+
+
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -74,3 +80,7 @@ install(TARGETS smartoil
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(smartoil)
 endif()
+
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql)
+target_link_libraries(smartoil PRIVATE Qt6::Widgets Qt6::Sql)

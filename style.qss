@@ -968,3 +968,29 @@ QWidget#facePreview {
 END OF STYLESHEET
 ==============================================================================
 */
+/* Boutons Huile - Modifier et Supprimer */
+QPushButton#huileModifyBtn {
+    background-color: #e6a817;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 4px;
+    min-height: 22px;
+    min-width: 85px;
+    max-width: 90px;
+}
+
+QPushButton#huileDeleteBtn {
+    background-color: #e53935;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 4px;
+    min-height: 22px;
+    min-width: 85px;
+    max-width: 90px;
+}
