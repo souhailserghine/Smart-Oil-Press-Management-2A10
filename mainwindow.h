@@ -1,8 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include "agriculteur.h"
+#include <QVector>
 #include <QMainWindow>
-#include <QStackedWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,39 +17,18 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-private slots:
-    void on_loginbtn_clicked();
-    void on_btnAjouterEmp_clicked();
-    void on_btnConsulterEmp_clicked();
-    void on_btnStatEmp_clicked();
-    void on_btnAdvEmp_clicked();
-    void on_faceBtn_clicked();
-
-    // Sidebar module navigation
-    void on_btnmod1_clicked(); // Personnel (module1)
-    void on_btnmod2_clicked(); // Module 2
-    void on_btnmod3_clicked(); // Module 3
-    void on_btnmod4_clicked(); // Module 4
-    void on_btnmod5_clicked(); // Module 5
-    void on_btnmod6_clicked(); // Module 6
+    int idSelectionne = -1;
 
 private:
     Ui::MainWindow *ui;
-    
-    // Helper methods
-    void setupPersonnelChart();
-    void setupPersonnelTable();
-    void addActionButtonsToRow(int row);
-    int findRowForButton(QObject* button) const;
-    void setActiveModuleButton(int index);
 
-    // UX enhancements
-    void crossFadeToIndex(QStackedWidget* stack, int newIndex);
-    void animateSidebarToggle(bool collapse);
-    void setupInteractiveHooks();
-    void filterPersonnelTable();
+private slots:
+    void on_ajouterEmpBtn_clicked();
+    void afficherTableau();
+    void on_btn_valider_modif_clicked();
+    void on_quitter_clicked();
+    void on_btn_retour_clicked();
 
-    bool m_sidebarCollapsed = false;
+
 };
 #endif // MAINWINDOW_H

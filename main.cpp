@@ -1,21 +1,26 @@
 #include "mainwindow.h"
-
 #include <QApplication>
-#include <QFile>
+#include <QDebug>
+#include <QSqlDatabase>
+#include <QSqlError>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    
-    // Load and apply stylesheet
-    QFile styleFile(":/style.qss");
-    if (styleFile.open(QFile::ReadOnly)) {
-        QString style = QLatin1String(styleFile.readAll());
-        a.setStyleSheet(style);
-        styleFile.close();
-    }
-    
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("source_projet2A");
+    db.setUserName("abdelmajid");
+    db.setPassword("123");
+
+    if(db.open())
+        qDebug() << "Connected to Oracle";
+    else
+        qDebug() << db.lastError().text();
+    qDebug() << QSqlDatabase::drivers();
+
     MainWindow w;
     w.show();
+
     return a.exec();
 }
