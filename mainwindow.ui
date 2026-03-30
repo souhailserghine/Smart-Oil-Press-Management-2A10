@@ -93,7 +93,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+          <iconset>
            <normaloff>:/img/search.svg</normaloff>:/img/search.svg</iconset>
          </property>
         </widget>
@@ -107,7 +107,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+          <iconset>
            <normaloff>:/img/add.svg</normaloff>:/img/add.svg</iconset>
          </property>
         </widget>
@@ -121,13 +121,13 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+          <iconset>
            <normaloff>:/img/chart.svg</normaloff>:/img/chart.svg</iconset>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButton_5">
+        <widget class="QToolButton" name="btnmetieravance">
          <property name="toolTip">
           <string>Avancé</string>
          </property>
@@ -135,7 +135,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+          <iconset>
            <normaloff>:/img/settings.svg</normaloff>:/img/settings.svg</iconset>
          </property>
         </widget>
@@ -279,7 +279,7 @@
               <string>Ajouter</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+              <iconset>
                <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
              </property>
              <property name="iconSize">
@@ -293,22 +293,6 @@
           </layout>
          </item>
         </layout>
-       </widget>
-       <widget class="QLabel" name="label_3">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>-80</y>
-          <width>191</width>
-          <height>191</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-image: url(:/images (3).png);</string>
-        </property>
-        <property name="text">
-         <string>jbjh</string>
-        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="consulterqtolives">
@@ -355,12 +339,12 @@
            </spacer>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_2">
+           <widget class="QToolButton" name="modifierButton">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+             <iconset>
               <normaloff>:/img/refresh.svg</normaloff>:/img/refresh.svg</iconset>
             </property>
             <property name="autoRaise">
@@ -369,12 +353,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_4">
+           <widget class="QToolButton" name="supprimerButton">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+             <iconset>
               <normaloff>:/img/filter.svg</normaloff>:/img/filter.svg</iconset>
             </property>
             <property name="autoRaise">
@@ -388,7 +372,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+             <iconset>
               <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
             </property>
             <property name="autoRaise">
@@ -397,12 +381,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton">
+           <widget class="QToolButton" name="RechercheButton">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+             <iconset>
               <normaloff>:/img/search.svg</normaloff>:/img/search.svg</iconset>
             </property>
             <property name="autoRaise">
@@ -496,7 +480,7 @@
              <string>Exporter</string>
             </property>
             <property name="icon">
-             <iconset resource="../../../../Downloads/Smart-Oil-Press-Management-2A10/img.qrc">
+             <iconset>
               <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
             </property>
             <property name="iconSize">
