@@ -1,0 +1,2039 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      The system is: Windows - 10.0.19045 - AMD64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      1
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: --c++ 
+      
+      The output was:
+      1
+      g++.exe: error: unrecognized command-line option '--c++'
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: --ec++ 
+      
+      The output was:
+      1
+      g++.exe: error: unrecognized command-line option '--ec++'; did you mean '-Weffc++'?
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+      
+      The output was:
+      1
+      g++.exe: warning: '-mcpu=' is deprecated; use '-mtune=' or '-march=' instead
+      g++.exe: error: unrecognized command-line option '--target=arm-arm-none-eabi'
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: -c;-I__does_not_exist__ 
+      
+      The output was:
+      1
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      1
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: --c++ 
+      
+      The output was:
+      1
+      g++.exe: error: unrecognized command-line option '--c++'
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: --ec++ 
+      
+      The output was:
+      1
+      g++.exe: error: unrecognized command-line option '--ec++'; did you mean '-Weffc++'?
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+      
+      The output was:
+      1
+      g++.exe: warning: '-mcpu=' is deprecated; use '-mtune=' or '-march=' instead
+      g++.exe: error: unrecognized command-line option '--target=arm-arm-none-eabi'
+      
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe 
+      Build flags: 
+      Id flags: -c;-I__does_not_exist__ 
+      
+      The output was:
+      1
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:1303 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:86 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+      g++.exe: fatal error: no input files
+      compilation terminated.
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:1303 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:86 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+      g++.exe: fatal error: no input files
+      compilation terminated.
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ar"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/ar.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/ar.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_RANLIB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ranlib"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/ranlib.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/ranlib.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "strip"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/strip.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/strip.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ld"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/ld.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/ld.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_NM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nm"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/nm.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/nm.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objdump"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/objdump.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/objdump.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objcopy"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/objcopy.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/objcopy.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "readelf"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/readelf.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/readelf.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "dlltool"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/dlltool.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/dlltool.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "addr2line"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/addr2line.com"
+    found: "C:/Qt/Tools/mingw1120_64/bin/addr2line.exe"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "tapi"
+    candidate_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/"
+      - "C:/Python314/Scripts/"
+      - "C:/Python314/"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Calibre2/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/xampp/php/"
+      - "C:/ProgramData/ComposerSetup/bin/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/IncrediBuild/"
+      - "C:/Users/Administrator/.local/bin/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/npm/"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "C:/Qt/Tools/mingw1120_64/bin/tapi.com"
+      - "C:/Qt/Tools/mingw1120_64/bin/tapi.exe"
+      - "C:/Qt/Tools/mingw1120_64/bin/tapi"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/tapi.com"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/tapi.exe"
+      - "C:/oraclexe/app/oracle/product/11.2.0/server/bin/tapi"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/tapi.com"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/tapi.exe"
+      - "C:/Program Files (x86)/VMware/VMware Workstation/bin/tapi"
+      - "C:/Python314/Scripts/tapi.com"
+      - "C:/Python314/Scripts/tapi.exe"
+      - "C:/Python314/Scripts/tapi"
+      - "C:/Python314/tapi.com"
+      - "C:/Python314/tapi.exe"
+      - "C:/Python314/tapi"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/tapi.com"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/tapi.exe"
+      - "D:/app/Administrator/product/11.2.0/client_1/BIN/tapi"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/tapi.com"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/tapi.exe"
+      - "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler/tapi"
+      - "C:/Windows/System32/tapi.com"
+      - "C:/Windows/System32/tapi.exe"
+      - "C:/Windows/System32/tapi"
+      - "C:/Windows/tapi.com"
+      - "C:/Windows/tapi.exe"
+      - "C:/Windows/tapi"
+      - "C:/Windows/System32/wbem/tapi.com"
+      - "C:/Windows/System32/wbem/tapi.exe"
+      - "C:/Windows/System32/wbem/tapi"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/tapi.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/tapi.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/tapi"
+      - "C:/Windows/System32/OpenSSH/tapi.com"
+      - "C:/Windows/System32/OpenSSH/tapi.exe"
+      - "C:/Windows/System32/OpenSSH/tapi"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/tapi.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/tapi.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/tapi"
+      - "C:/Program Files/Calibre2/tapi.com"
+      - "C:/Program Files/Calibre2/tapi.exe"
+      - "C:/Program Files/Calibre2/tapi"
+      - "C:/Program Files/Git/cmd/tapi.com"
+      - "C:/Program Files/Git/cmd/tapi.exe"
+      - "C:/Program Files/Git/cmd/tapi"
+      - "C:/xampp/php/tapi.com"
+      - "C:/xampp/php/tapi.exe"
+      - "C:/xampp/php/tapi"
+      - "C:/ProgramData/ComposerSetup/bin/tapi.com"
+      - "C:/ProgramData/ComposerSetup/bin/tapi.exe"
+      - "C:/ProgramData/ComposerSetup/bin/tapi"
+      - "C:/Program Files/nodejs/tapi.com"
+      - "C:/Program Files/nodejs/tapi.exe"
+      - "C:/Program Files/nodejs/tapi"
+      - "C:/ProgramData/chocolatey/bin/tapi.com"
+      - "C:/ProgramData/chocolatey/bin/tapi.exe"
+      - "C:/ProgramData/chocolatey/bin/tapi"
+      - "C:/Program Files/CMake/bin/tapi.com"
+      - "C:/Program Files/CMake/bin/tapi.exe"
+      - "C:/Program Files/CMake/bin/tapi"
+      - "C:/Program Files (x86)/IncrediBuild/tapi.com"
+      - "C:/Program Files (x86)/IncrediBuild/tapi.exe"
+      - "C:/Program Files (x86)/IncrediBuild/tapi"
+      - "C:/Users/Administrator/.local/bin/tapi.com"
+      - "C:/Users/Administrator/.local/bin/tapi.exe"
+      - "C:/Users/Administrator/.local/bin/tapi"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/tapi.com"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/tapi.exe"
+      - "C:/Users/Administrator/AppData/Local/Programs/Python/Launcher/tapi"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/tapi.com"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/tapi.exe"
+      - "C:/Users/Administrator/AppData/Local/Microsoft/WindowsApps/tapi"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/tapi.com"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/tapi.exe"
+      - "C:/Users/Administrator/AppData/Local/Programs/Microsoft VS Code/bin/tapi"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/tapi.com"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/tapi.exe"
+      - "C:/Users/Administrator/AppData/Roaming/Composer/vendor/bin/tapi"
+      - "C:/Users/Administrator/AppData/Roaming/npm/tapi.com"
+      - "C:/Users/Administrator/AppData/Roaming/npm/tapi.exe"
+      - "C:/Users/Administrator/AppData/Roaming/npm/tapi"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/tapi.com"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/tapi.exe"
+      - "C:/Users/Administrator/AppData/Local/GitHubDesktop/bin/tapi"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/tapi.com"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/tapi.exe"
+      - "C:/Users/Administrator/AppData/Local/Python/bin/tapi"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi.com"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi.exe"
+      - "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Qt/6.7.3/mingw_64/lib/cmake"
+      ENV{PATH}:
+        - "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server\\bin"
+        - "C:\\Program Files (x86)\\VMware\\VMware Workstation\\bin\\"
+        - "C:\\Python314\\Scripts\\"
+        - "C:\\Python314\\"
+        - "D:\\app\\Administrator\\product\\11.2.0\\client_1\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Intel\\Shared Libraries\\redist\\intel64\\compiler"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Calibre2\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\xampp\\php"
+        - "C:\\ProgramData\\ComposerSetup\\bin"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\IncrediBuild"
+        - "C:\\Users\\Administrator\\.local\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\Composer\\vendor\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Administrator\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Administrator\\AppData\\Local\\Python\\bin"
+        - "c:\\Users\\Administrator\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:13 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-93z1so"
+      binary: "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-93z1so"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: ""
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-93z1so'
+        
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe -f Makefile cmTC_d9dc4/fast
+        C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_d9dc4.dir\\build.make CMakeFiles/cmTC_d9dc4.dir/build
+        mingw32-make.exe[1]: Entering directory 'C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-93z1so'
+        Building CXX object CMakeFiles/cmTC_d9dc4.dir/CMakeCXXCompilerABI.cpp.obj
+        C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe    -o CMakeFiles\\cmTC_d9dc4.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+        mingw32-make.exe[1]: *** [CMakeFiles\\cmTC_d9dc4.dir\\build.make:80: CMakeFiles/cmTC_d9dc4.dir/CMakeCXXCompilerABI.cpp.obj] Error 1
+        mingw32-make.exe[1]: Leaving directory 'C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-93z1so'
+        mingw32-make.exe: *** [Makefile:133: cmTC_d9dc4/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:56 (try_compile)"
+      - "CMakeLists.txt:13 (project)"
+    checks:
+      - "Check for working CXX compiler: C:/Qt/Tools/mingw1120_64/bin/g++.exe"
+    directories:
+      source: "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-xritms"
+      binary: "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-xritms"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: ""
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CXX_COMPILER_WORKS"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-xritms'
+        
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe -f Makefile cmTC_5b721/fast
+        C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_5b721.dir\\build.make CMakeFiles/cmTC_5b721.dir/build
+        mingw32-make.exe[1]: Entering directory 'C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-xritms'
+        Building CXX object CMakeFiles/cmTC_5b721.dir/testCXXCompiler.cxx.obj
+        C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe    -o CMakeFiles\\cmTC_5b721.dir\\testCXXCompiler.cxx.obj -c "C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\qt-mingw-make-debug\\CMakeFiles\\CMakeScratch\\TryCompile-xritms\\testCXXCompiler.cxx"
+        mingw32-make.exe[1]: *** [CMakeFiles\\cmTC_5b721.dir\\build.make:80: CMakeFiles/cmTC_5b721.dir/testCXXCompiler.cxx.obj] Error 1
+        mingw32-make.exe[1]: Leaving directory 'C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/qt-mingw-make-debug/CMakeFiles/CMakeScratch/TryCompile-xritms'
+        mingw32-make.exe: *** [Makefile:133: cmTC_5b721/fast] Error 2
+        
+      exitCode: 2
+...

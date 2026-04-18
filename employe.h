@@ -8,6 +8,7 @@
 #include <QString>
 #include <QDate>
 #include <QByteArray>
+// SerialPort module (qmake: QT += serialport) must be linked in CMake via Qt6::SerialPort (or Qt5::SerialPort).
 
 class Employe
 {
@@ -19,7 +20,8 @@ public:
             const QDate& dateEmbauche      = QDate(),
             const QByteArray& photo        = QByteArray(),
             const QByteArray& empreinte    = QByteArray(),
-            const QByteArray& modeleFaciale = QByteArray());
+            const QByteArray& modeleFaciale = QByteArray(),
+            const QString& fingerid        = QString());
 
     // --- Getters ---
     int        getIdEmp()         const;
@@ -32,6 +34,7 @@ public:
     QByteArray getPhoto()         const;
     QByteArray getEmpreinte()     const;
     QByteArray getModeleFaciale() const;
+    QString    getFingerId()      const;
 
     // --- Setters ---
     void setIdEmp(int id);
@@ -44,6 +47,7 @@ public:
     void setPhoto(const QByteArray& photo);
     void setEmpreinte(const QByteArray& empreinte);
     void setModeleFaciale(const QByteArray& modele);
+    void setFingerId(const QString& fingerId);
 
     // --- CRUD operations ---
 
@@ -74,22 +78,20 @@ public:
 
     int authenticate(const QString& email, const QString& mdp);
 
-    // --- Additional DB helpers used by MainWindow (UI stays in MainWindow) ---
-    /** Returns {"Nom Prénom", true} for an existing id_emp, otherwise {"", false}. */
-    static bool getFullNameById(int id_emp, QString* outFullName, QSqlError* outError = nullptr);
-
-    /** Returns counts by role: role -> count. */
-    static bool getCountByRole(QMap<QString, int>* outRoleCounts, int* outTotal = nullptr, QSqlError* outError = nullptr);
-
-    /** Returns all stored face embeddings: id_emp -> raw blob (128 floats). */
-    static bool getAllFaceModels(QMap<int, QByteArray>* outModels, QSqlError* outError = nullptr);
 
     /**
-     * @brief List employees as (id_emp, "Nom Prénom") for combo boxes.
-     * @return A heap-allocated model. Caller takes ownership.
+     * @brief Checks whether a fingerprint ID exists in EMPLOYE table.
+     * @param fingerId Fingerprint ID returned by sensor.
+     * @return true if at least one employee has this finger_id.
      */
-    static QSqlQueryModel* modelIdFullName(QSqlError* outError = nullptr);
+    bool existsByFingerId(const QString& fingerId);
 
+    /**
+     * @brief Returns "prenom nom" for a given fingerprint ID.
+     * @param fingerId Fingerprint ID returned by sensor.
+     * @return Full name if found, empty string otherwise.
+     */
+    QString fullNameByFingerId(const QString& fingerId);
 
     QSqlError lastError() const;
 
@@ -104,6 +106,7 @@ private:
     QByteArray m_photo;
     QByteArray m_empreinte;
     QByteArray m_modeleFaciale;
+    QString    m_fingerId;
 
     mutable QSqlError m_lastError;
 };
