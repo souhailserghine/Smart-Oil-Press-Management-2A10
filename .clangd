@@ -1,0 +1,4 @@
+CompileFlags:
+  CompilationDatabase: out/build/Debug
+  Add:
+    - -std=gnu++17

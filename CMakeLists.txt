@@ -1,6 +1,9 @@
 # Enable verbose build and AutoUIC trace to surface the exact uic command and errors
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_AUTOUIC_TRACE ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
+set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
 
 # Ensure Qt's automatic processing is enabled and avoid compiler predefines step that fails on some environments
 set(CMAKE_AUTOMOC ON)
@@ -20,7 +23,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Charts)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts)
-find_package(Qt6 REQUIRED COMPONENTS Widgets Sql)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql SerialPort)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -68,7 +71,7 @@ else()
 endif()
 
 target_link_libraries(smartoil PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Charts)
-target_link_libraries(smartoil PRIVATE Qt6::Core Qt6::Sql)
+target_link_libraries(smartoil PRIVATE Qt6::Core Qt6::Sql Qt6::SerialPort)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
