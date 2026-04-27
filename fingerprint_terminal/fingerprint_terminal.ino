@@ -223,7 +223,7 @@ void enrollFingerprint(int id) {
   lcd.setCursor(0, 1);
   lcd.print("Place finger");
   
-  if (!waitForImage(15000)) {
+  if (!waitForImage(5000)) {
     Serial.println("ENROLL_FAIL:TIMEOUT_1");
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -240,17 +240,17 @@ void enrollFingerprint(int id) {
     return;
   }
   
-  // Remove finger and wait
+  // Remove finger and wait (1 second is plenty)
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Remove finger");
   
   uint32_t start = millis();
-  while (millis() - start < 3000) {
+  while (millis() - start < 1000) {
     if (finger.getImage() == FINGERPRINT_NOFINGER) {
       break;
     }
-    delay(100);
+    delay(50);
   }
   
   // Second capture
@@ -258,7 +258,7 @@ void enrollFingerprint(int id) {
   lcd.setCursor(0, 0);
   lcd.print("Place again");
   
-  if (!waitForImage(15000)) {
+  if (!waitForImage(5000)) {
     Serial.println("ENROLL_FAIL:TIMEOUT_2");
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -311,7 +311,7 @@ bool waitForImage(uint32_t timeoutMs) {
     if (finger.getImage() == FINGERPRINT_OK) {
       return true;
     }
-    delay(50);
+    delay(10);  // Check every 10ms instead of 50ms
   }
   return false;
 }
