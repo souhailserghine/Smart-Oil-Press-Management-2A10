@@ -66,6 +66,7 @@
 #include <QDataStream>
 #include <QCoreApplication>
 #include <QStandardPaths>
+#include <QSqlRecord>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -77,65 +78,51 @@ MainWindow::MainWindow(QWidget *parent)
     // Facial recognition moved out of MainWindow (keeps UI file cleaner)
     m_faceService = new FaceRecognitionService();
     m_faceService->ensureModelsLoaded();
+    initFingerprintTerminal();
 
     // Ensure the avatar image is rendered as a circle
     makeAvatarCircular();
     
     // Layout the sidebar and modules side-by-side to avoid overlap
     {
-        auto mainLayout = new QHBoxLayout(ui->mainprogram);
-        mainLayout->setContentsMargins(0, 0, 0, 0);
-        mainLayout->setSpacing(0);
-    // Respect intended sidebar width constraints and prevent layout from squashing it
-    ui->sidebar->setMinimumWidth(200);
-    ui->sidebar->setMaximumWidth(220);
-    ui->sidebar->setMinimumHeight(0);
-    ui->sidebar->setMaximumHeight(QWIDGETSIZE_MAX);
-    ui->sidebar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        auto* mainLayout = ui->mainprogramLayout;
+        auto* contentArea = ui->contentArea;
+        auto* contentLayout = ui->contentLayout;
+        if (!mainLayout || !contentArea || !contentLayout) {
+            qWarning() << "mainprogram/content layouts are missing in UI";
+        } else {
+            if (ui->sidebar && mainLayout->indexOf(ui->sidebar) < 0) {
+                mainLayout->addWidget(ui->sidebar);
+            }
+            // Place the user info bar above modules within the content area so it's layout-managed
+            if (ui->userInfoContainer && contentLayout->indexOf(ui->userInfoContainer) < 0) {
+                contentLayout->addWidget(ui->userInfoContainer);
+            }
 
-        // Sidebar internals were designed with fixed geometry in the .ui; make them resize-friendly.
-        if (auto* sidebarContent = ui->sidebar->findChild<QWidget*>(QStringLiteral("verticalLayoutWidget"))) {
-            sidebarContent->setMinimumHeight(0);
-            sidebarContent->setMaximumHeight(QWIDGETSIZE_MAX);
-            sidebarContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            // Modules sit below the user info bar
+            if (ui->modules && contentLayout->indexOf(ui->modules) < 0) {
+                contentLayout->addWidget(ui->modules);
+            }
+            if (mainLayout->indexOf(contentArea) < 0) {
+                mainLayout->addWidget(contentArea);
+            }
         }
-
-        mainLayout->addWidget(ui->sidebar);
-        // Ensure button text is never elided: compute required width per button via style and set minimums
-        // Wrap the modules in a content area that applies offsets (drop + right shift)
-        auto* contentArea = new QWidget(ui->mainprogram);
-        auto* contentLayout = new QVBoxLayout(contentArea);
-        // Keep margins simple and predictable; no need for DPI-based mm conversion here.
-        contentLayout->setContentsMargins(16, 8, 0, 0);
-        contentLayout->setSpacing(8); // small gap between user info and content
-
-        // Place the user info bar above modules within the content area so it's layout-managed
-        if (ui->userInfoContainer) {
-            ui->userInfoContainer->setProperty("role", "panel");
-            ui->userInfoContainer->setMinimumHeight(56);
-            ui->userInfoContainer->setMaximumHeight(56);
-            ui->userInfoContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-            contentLayout->addWidget(ui->userInfoContainer);
-        }
-
-        // Modules sit below the user info bar
-        contentLayout->addWidget(ui->modules);
-        mainLayout->addWidget(contentArea);
     }
 
-    // Create floating chat launcher button (lower-most right of the main window content)
-    if (ui->centralwidget && !m_chatLauncher) {
-        m_chatLauncher = new QToolButton(ui->centralwidget);
-        m_chatLauncher->setObjectName(QStringLiteral("chatLauncher"));
+    // Floating chat launcher is owned by .ui.
+    if (!m_chatLauncher && ui->chatLauncher) {
+        m_chatLauncher = ui->chatLauncher;
+
         m_chatLauncher->setIcon(QIcon(QStringLiteral(":/img/chat.svg")));
         m_chatLauncher->setIconSize(QSize(24,24));
-    m_chatLauncher->setToolTip(tr("Ouvrir le chat"));
+        m_chatLauncher->setToolTip(tr("Ouvrir le chat"));
         m_chatLauncher->setAutoRaise(false);
         m_chatLauncher->setFixedSize(48, 48);
         m_chatLauncher->raise();
+
         QObject::connect(m_chatLauncher, &QToolButton::clicked, this, [this]() {
             QMessageBox::information(this, tr("Chat"),
-        tr("Le chat n'est pas encore implémenté dans cette version."));
+                                     tr("Le chat n'est pas encore implémenté dans cette version."));
         });
     }
 
@@ -148,17 +135,15 @@ MainWindow::MainWindow(QWidget *parent)
         ui->modules->setGraphicsEffect(shadow);
     }
 
-    // Centered system time/date at the bottom in the status bar
-    if (ui->statusbar && !m_clockLabel) {
-        m_clockLabel = new QLabel(this);
-        m_clockLabel->setObjectName(QStringLiteral("clockLabel"));
+    // Centered system time/date at the bottom in the status bar (.ui-owned widgets)
+    if (!m_clockLabel && ui->clockLabel && ui->clockLeftSpacer && ui->clockRightSpacer) {
+        m_clockLabel = ui->clockLabel;
+        m_clockLeftSpacer = ui->clockLeftSpacer;
+        m_clockRightSpacer = ui->clockRightSpacer;
+
         m_clockLabel->setMinimumWidth(140);
         m_clockLabel->setAlignment(Qt::AlignCenter);
         m_clockLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-        // Create left/right expanding spacers to center the label and keep it visible with messages
-        m_clockLeftSpacer = new QWidget(this);
-        m_clockRightSpacer = new QWidget(this);
         m_clockLeftSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         m_clockRightSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
@@ -168,21 +153,14 @@ MainWindow::MainWindow(QWidget *parent)
 
         // Update every second
         m_clockTimer = new QTimer(this);
-        QObject::connect(m_clockTimer, &QTimer::timeout, this, &MainWindow::updateClock);
+        QObject::connect(m_clockTimer, &QTimer::timeout, this, &MainWindow::updateClock,
+                         Qt::UniqueConnection);
         m_clockTimer->start(1000);
         updateClock();
     }
 
-    // Sidebar buttons: make checkable for active state highlight
-    if (ui->sidebar) {
-        ui->btnmod1->setCheckable(true);
-        ui->btnmod2->setCheckable(true);
-        ui->btnmod3->setCheckable(true);
-        ui->btnmod4->setCheckable(true);
-        ui->btnmod5->setCheckable(true);
-        ui->btnmod6->setCheckable(true);
-        setActiveModuleButton(0);
-    }
+    // Sidebar button checkable state now lives in .ui; keep initial selection in code.
+    setActiveModuleButton(0);
 
     // Toolbar rows are fixed and fit the available width; no runtime adjustments needed.
 
@@ -289,8 +267,8 @@ MainWindow::MainWindow(QWidget *parent)
                         // Preserve original visual offsets similar to Designer geometry (x≈30, y≈20)
                         v->setContentsMargins(30, 20, 16, 48);
                         v->setSpacing(12);
-                        // Prefer a specific child form container when present
-                        QWidget* form = page->findChild<QWidget*>(QStringLiteral("formLayoutWidget_7"));
+                        // Prefer the Designer-owned agriculteur form container.
+                        QWidget* form = ui->formLayoutWidget_7;
                         if (!form) {
                             // Fallback: pick the first direct child
                             const auto children = page->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
@@ -326,7 +304,6 @@ MainWindow::MainWindow(QWidget *parent)
     setupAffectationOpenEndedOption();
     setupEmployeeFormValidation();
     setupSettingsAutoAssignOption();
-    ensureStockSerieSelector();
     refreshStockSerieChoices();
     loadAffectationSettings();
 
@@ -337,33 +314,232 @@ MainWindow::MainWindow(QWidget *parent)
     repositionUserInfo();
 }
 
+// ── Lifecycle: destruction / resource cleanup ───────────────────────────────
+MainWindow::~MainWindow()
+{
+    // Always release serial port before UI teardown.
+    m_fingerprintTerminal.close_arduino();
+    delete ui;
+}
+
+// ── Face-recognition service adapters (thin wrappers over m_faceService) ───
+
 QByteArray MainWindow::encodeFaceFromFile(const QString& imagePath)
 {
     return m_faceService ? m_faceService->encodeFaceFromFile(imagePath) : QByteArray{};
 }
 
-void MainWindow::loadFaceEmbeddings()
+void MainWindow::setFingerprintStatus(const QString& text, const QString& style)
 {
-    if (m_faceService) m_faceService->loadFaceEmbeddings();
+    if (!ui || !ui->faceStatusLabel) return;
+    ui->faceStatusLabel->setText(text);
+    ui->faceStatusLabel->setStyleSheet(style);
 }
 
-int MainWindow::matchFaceEmbedding(const QByteArray& embeddingBlob)
+void MainWindow::initFingerprintTerminal()
 {
-    return m_faceService ? m_faceService->matchFaceEmbeddingBlob(embeddingBlob) : -1;
+    const int rc = m_fingerprintTerminal.connect_arduino();
+    if (rc != 0) {
+        setFingerprintStatus(tr("⚠ Terminal d'empreintes non détecté."), 
+                           QStringLiteral("color: #ef6c00; font-weight: bold;"));
+        return;
+    }
+
+    QObject::connect(m_fingerprintTerminal.getserial(), &QSerialPort::readyRead,
+                     this, &MainWindow::onFingerprintTerminalReadyRead);
+
+    // When user returns to login screen, re-enable fingerprint scanning
+    if (ui && ui->MainStacked) {
+        QObject::connect(ui->MainStacked, QOverload<int>::of(&QStackedWidget::currentChanged),
+                        this, [this](int index) {
+            if (index == 0) {  // 0 = login screen
+                sendFingerprintTerminalCommand("LOGIN_ON");
+            }
+        });
+    }
+
+    sendFingerprintTerminalCommand(QStringLiteral("LOGIN_ON"));
 }
 
-void MainWindow::on_toolButton_clicked()
+void MainWindow::sendFingerprintTerminalCommand(const QString& command)
 {
-    // Slot required by Qt auto-connect (on_<objectName>_clicked).
-    // If this button is not used anymore, remove/rename it in `mainwindow.ui`.
+    QByteArray payload = command.toUtf8() + "\n";
+    m_fingerprintTerminal.write_to_arduino(payload);
 }
 
-MainWindow::~MainWindow()
+void MainWindow::startFingerprintEnrollmentFromForm()
 {
-    delete ui;
+    if (!m_fingerprintTerminal.getserial() || !m_fingerprintTerminal.getserial()->isOpen()) {
+        QMessageBox::warning(this, tr("Erreur"), tr("Terminal non connecté."));
+        return;
+    }
+
+    setFingerprintStatus(tr("⏳ Enrôlement en cours..."), 
+                        QStringLiteral("color: #ef6c00; font-weight: bold;"));
+    sendFingerprintTerminalCommand(QStringLiteral("ENROLL"));
 }
 
+namespace {
+const QString kFingerprintColumn = QStringLiteral("FINGERID");
+}
 
+bool MainWindow::saveFingerprintIdForEmployee(int employeeId, int fingerprintId) const
+{
+    if (employeeId <= 0 || fingerprintId <= 0) return false;
+    if (!QSqlDatabase::database().isOpen()) return false;
+
+    QSqlQuery q;
+    q.prepare(QStringLiteral("UPDATE EMPLOYE SET %1 = :fp WHERE id_emp = :id").arg(kFingerprintColumn));
+    q.bindValue(":fp", QString::number(fingerprintId));
+    q.bindValue(":id", employeeId);
+    return q.exec();
+}
+
+void MainWindow::tryLinkPendingFingerprintForEmployee(int employeeId, const QString& contextPastPart)
+{
+    if (m_pendingFingerprintId <= 0) return;
+    saveFingerprintIdForEmployee(employeeId, m_pendingFingerprintId);
+}
+
+void MainWindow::onFingerprintTerminalReadyRead()
+{
+    m_fingerprintRxBuffer.append(m_fingerprintTerminal.read_from_arduino());
+
+    int eolIndex = -1;
+    while ((eolIndex = m_fingerprintRxBuffer.indexOf('\n')) >= 0) {
+        const QString line = QString::fromUtf8(m_fingerprintRxBuffer.left(eolIndex)).trimmed();
+        m_fingerprintRxBuffer.remove(0, eolIndex + 1);
+        if (!line.isEmpty()) processFingerprintTerminalLine(line);
+    }
+}
+
+bool MainWindow::resolveEmployeeByFingerprintId(int fingerprintId, int& employeeId, QString& fullName) const
+{
+    employeeId = -1;
+    fullName.clear();
+
+    if (!QSqlDatabase::database().isOpen()) return false;
+
+    QSqlQuery q;
+    q.prepare(QStringLiteral(
+        "SELECT ID_EMP, NOM_EMP || ' ' || PRENOM_EMP FROM EMPLOYE WHERE %1 = :fp")
+        .arg(kFingerprintColumn));
+    q.bindValue(":fp", QString::number(fingerprintId));
+
+    if (!q.exec() || !q.next()) return false;
+
+    employeeId = q.value(0).toInt();
+    fullName = q.value(1).toString().trimmed();
+    if (fullName.isEmpty()) fullName = QString("Emp. %1").arg(employeeId);
+    return employeeId > 0;
+}
+
+void MainWindow::processFingerprintTerminalLine(const QString& line)
+{
+    qDebug() << "Fingerprint:" << line;
+
+    const bool onLogin = ui->MainStacked && ui->MainStacked->currentIndex() == 0;
+
+    // Ignore boot/info lines
+    if (line == "READY" || line == "PONG" || line.startsWith("TEMPLATES:")) {
+        return;
+    }
+
+    // Ignore diagnostic output
+    if (line.startsWith("DBG:")) {
+        return;
+    }
+
+    // Error from Arduino
+    if (line.startsWith("ERR:")) {
+        if (onLogin) {
+            setFingerprintStatus(tr("⚠ Error: %1").arg(line),
+                                 QStringLiteral("color:#ef6c00; font-weight:bold;"));
+        }
+        return;
+    }
+
+    // Enrollment succeeded
+    if (line.startsWith("ENROLL_OK:")) {
+        bool ok = false;
+        int fpId = line.mid(10).toInt(&ok);
+        if (ok && fpId > 0) {
+            m_pendingFingerprintId = fpId;
+            setFingerprintStatus(QString("✔ Enrolled ID %1").arg(fpId),
+                               QStringLiteral("color:#2e7d32; font-weight:bold;"));
+        }
+        return;
+    }
+
+    // Enrollment failed
+    if (line.startsWith("ENROLL_FAIL")) {
+        setFingerprintStatus(tr("❌ Enrollment failed"),
+                           QStringLiteral("color:#c62828; font-weight:bold;"));
+        return;
+    }
+
+    // Fingerprint matched
+    if (line.startsWith("MATCH:")) {
+        // Parse: "MATCH:123" or "MATCH:123:456"
+        int colonPos = line.indexOf(':', 6);
+        QString idStr = (colonPos > 0) ? line.mid(6, colonPos - 6) : line.mid(6);
+        
+        bool ok = false;
+        int fpId = idStr.toInt(&ok);
+        if (!ok || fpId <= 0) {
+            sendFingerprintTerminalCommand("DENIED");
+            return;
+        }
+
+        // Look up employee by fingerprint ID
+        int empId = -1;
+        QString empName;
+        if (!resolveEmployeeByFingerprintId(fpId, empId, empName) || empId <= 0) {
+            sendFingerprintTerminalCommand("DENIED");
+            if (onLogin) {
+                setFingerprintStatus(tr("Unknown fingerprint"),
+                                   QStringLiteral("color:#c62828;"));
+            }
+            return;
+        }
+
+        // Send name to Arduino
+        sendFingerprintTerminalCommand("NAME:" + empName.left(16));
+        
+        // Log in
+        m_loggedInId = empId;
+        if (ui->userNameLabel) ui->userNameLabel->setText(empName);
+        if (ui->userinput) ui->userinput->clear();
+        if (ui->pwdinput) ui->pwdinput->clear();
+        if (onLogin) ui->MainStacked->setCurrentIndex(1);
+        
+        // After a short delay, re-enable scanning for next login attempt
+        // (in case user logs out and tries to login again)
+        QTimer::singleShot(2000, this, [this]() {
+            sendFingerprintTerminalCommand("LOGIN_ON");
+        });
+        
+        setFingerprintStatus(tr("✔ Login successful"),
+                           QStringLiteral("color:#2e7d32; font-weight:bold;"));
+        return;
+    }
+
+    // Deletion succeeded
+    if (line.startsWith("DELETE_OK:")) {
+        setFingerprintStatus(tr("✔ Deleted"),
+                           QStringLiteral("color:#2e7d32;"));
+        return;
+    }
+
+    // Deletion failed
+    if (line.startsWith("DELETE_FAIL")) {
+        setFingerprintStatus(tr("❌ Delete failed"),
+                           QStringLiteral("color:#c62828;"));
+        return;
+    }
+}
+
+// ── Authentication / personnel main entry points ────────────────────────────
 
 void MainWindow::on_loginbtn_clicked()
 {
@@ -458,12 +634,18 @@ void MainWindow::on_ajouterEmpBtn_clicked()
         return;
     }
 
+    const auto buildFaceBlob = [this]() {
+        QByteArray faceBlob = m_capturedFaceBlob;
+        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty()) {
+            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+        }
+        return faceBlob;
+    };
+
     if (isEditing) {
         // ── UPDATE mode ─────────────────────────────────────────────────────
         // Priority: live webcam capture > photo-file encoding > keep existing in DB
-        QByteArray faceBlob = m_capturedFaceBlob;
-        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
-            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+        QByteArray faceBlob = buildFaceBlob();
 
         Employe emp(editingId, nom, prenom, email, role, mdp, QDate(),
                     m_selectedPhoto, QByteArray(), faceBlob);
@@ -472,6 +654,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
                 tr("Impossible de modifier l'employé :\n%1").arg(emp.lastError().text()));
             return;
         }
+
+    tryLinkPendingFingerprintForEmployee(editingId, tr("modifié"));
+
         QMessageBox::information(this, tr("Succès"),
             tr("L'employé (ID : %1) a été modifié avec succès.").arg(editingId));
 
@@ -482,9 +667,7 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     } else {
         // ── INSERT mode ─────────────────────────────────────────────────────
         // Priority: live webcam capture > photo-file encoding
-        QByteArray faceBlob = m_capturedFaceBlob;
-        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
-            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+        QByteArray faceBlob = buildFaceBlob();
 
         Employe emp(0, nom, prenom, email, role, mdp, QDate(),
                     m_selectedPhoto, QByteArray(), faceBlob);
@@ -493,6 +676,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
                 tr("Impossible d'ajouter l'employé :\n%1").arg(emp.lastError().text()));
             return;
         }
+
+    tryLinkPendingFingerprintForEmployee(emp.getIdEmp(), tr("ajouté"));
+
         QMessageBox::information(this, tr("Succès"),
             tr("L'employé a été ajouté avec succès (ID : %1).").arg(emp.getIdEmp()));
     }
@@ -506,8 +692,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     ui->photoPathLineEdit->clear();
     m_selectedPhoto.clear();
     m_capturedFaceBlob.clear();
-    ui->faceStatusLabel->setText(tr("Aucun visage capturé"));
-    ui->faceStatusLabel->setStyleSheet("");
+    m_pendingFingerprintId = -1;
+    m_fingerprintEnrollInProgress = false;
+    setFingerprintStatus(tr("Aucun visage capturé"), QString());
     validateEmployeeForm(false);
 }
 
@@ -537,8 +724,8 @@ void MainWindow::on_parcourirPhotoBtn_clicked()
         const QByteArray blob = encodeFaceFromFile(path);
         if (!blob.isEmpty()) {
             m_capturedFaceBlob = blob;
-            ui->faceStatusLabel->setText(tr("✔ Visage détecté depuis la photo"));
-            ui->faceStatusLabel->setStyleSheet("color: #2e7d32;");
+            setFingerprintStatus(tr("✔ Visage détecté depuis la photo"),
+                                 QStringLiteral("color: #2e7d32;"));
         }
     }
 }
@@ -557,15 +744,13 @@ void MainWindow::on_captureFaceBtn_clicked()
     if (blob.isEmpty()) return;
 
     m_capturedFaceBlob = blob;
-    ui->faceStatusLabel->setText(tr("✔ Visage capturé avec succès"));
-    ui->faceStatusLabel->setStyleSheet("color: #2e7d32; font-weight: bold;");
+    setFingerprintStatus(tr("✔ Visage capturé avec succès"),
+                         QStringLiteral("color: #2e7d32; font-weight: bold;"));
 }
 
 void MainWindow::on_btnConsulterEmp_clicked()
 {
-    // Ensure we're on the personnel module first
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    ensureModuleIndex(0);
     // Load fresh data then switch to the consult page (index 1)
     loadEmployeeTable();
     crossFadeToIndex(ui->metierspersonnel, 1);
@@ -573,9 +758,7 @@ void MainWindow::on_btnConsulterEmp_clicked()
 
 void MainWindow::on_btnStatEmp_clicked()
 {
-    // Ensure we're on the personnel module first
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    ensureModuleIndex(0);
     // Switch to "Statistics" page (index 2)
     crossFadeToIndex(ui->metierspersonnel, 2);
     loadEmployeeStats();
@@ -583,9 +766,7 @@ void MainWindow::on_btnStatEmp_clicked()
 
 void MainWindow::on_btnAdvEmp_clicked()
 {
-    // Ensure we're on the personnel module first
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    ensureModuleIndex(0);
     // Switch to "Advanced" page (index 3) and refresh data
     crossFadeToIndex(ui->metierspersonnel, 3);
     populateAffCombos();
@@ -594,7 +775,7 @@ void MainWindow::on_btnAdvEmp_clicked()
     ui->affStack->setCurrentIndex(1);
 }
 
-// ── Affectation helpers ──────────────────────────────────────────────────────
+// ── Affectation: setup + data helpers ───────────────────────────────────────
 // Schema:
 //   EMP_MACH  (ID_EMP, ID_SERIE)          — composite PK, only 2 columns
 //   SERIE     (ID_SERIE, NOM_SERIE, ...)   — ID_SERIE is PK
@@ -602,6 +783,13 @@ void MainWindow::on_btnAdvEmp_clicked()
 
 void MainWindow::populateAffCombos()
 {
+    // Purpose:
+    //   Fill the form combo boxes used to create/edit an assignment:
+    //   - Employee selector (EMPLOYE)
+    //   - Series selector (SERIE_MACHINE + MACHINE display label)
+    // Side effect:
+    //   Recomputes remaining assignment capacity after repopulating selections.
+
     // ── Employees ────────────────────────────────────────────────────────────
     ui->affEmpCombo->clear();
     QSqlQuery qEmp(
@@ -628,47 +816,49 @@ void MainWindow::populateAffCombos()
 
 void MainWindow::setupAffectationStatusFilter()
 {
-    if (m_affStatusFilterCombo) return;
-    if (!ui->affSearchRow) return;
+    // The status filter combo is owned by .ui.
+    if (!ui->affStatusFilterCombo) return;
 
-    auto* combo = new QComboBox(ui->affTablePage);
-    combo->setObjectName(QStringLiteral("affStatusFilterCombo"));
-    combo->addItem(tr("Toutes"));
-    combo->addItem(tr("Actives"));
-    combo->addItem(tr("Terminées"));
-    combo->setToolTip(tr("Filtrer les affectations par état."));
-
-    ui->affSearchRow->addWidget(combo);
-    m_affStatusFilterCombo = combo;
-
-    QObject::connect(m_affStatusFilterCombo, &QComboBox::currentTextChanged,
-                     this, [this](const QString&) { filterAffTable(); });
+    if (!ui->affStatusFilterCombo->property("wiredCurrentTextChanged").toBool()) {
+        QObject::connect(ui->affStatusFilterCombo, &QComboBox::currentTextChanged,
+                         this, [this](const QString&) { filterAffTable(); });
+        ui->affStatusFilterCombo->setProperty("wiredCurrentTextChanged", true);
+    }
 }
 
 void MainWindow::setupAffectationOpenEndedOption()
 {
-    if (m_affOpenEndedCheck) return;
-    if (!ui->affFormGrid || !ui->affDateFinEdit) return;
+    // The open-ended checkbox is owned by .ui.
+    if (!ui->affDateFinEdit) return;
+    if (!ui->affOpenEndedCheck) return;
 
-    auto* check = new QCheckBox(tr("Affectation active (sans date fin)"), ui->affFormPage);
-    check->setObjectName(QStringLiteral("affOpenEndedCheck"));
-    check->setChecked(true);
-    ui->affFormGrid->addWidget(check, 5, 1);
-    m_affOpenEndedCheck = check;
-
-    ui->affDateFinEdit->setEnabled(false);
-    QObject::connect(m_affOpenEndedCheck, &QCheckBox::toggled, this, [this](bool checked) {
-        if (!ui->affDateFinEdit) return;
-        ui->affDateFinEdit->setEnabled(!checked);
-        if (!checked && !ui->affDateFinEdit->date().isValid()) {
-            ui->affDateFinEdit->setDate(QDate::currentDate().addMonths(1));
-        }
-    });
+    ui->affDateFinEdit->setEnabled(!ui->affOpenEndedCheck->isChecked());
+    if (!ui->affOpenEndedCheck->property("wiredToggled").toBool()) {
+        QObject::connect(ui->affOpenEndedCheck, &QCheckBox::toggled, this, [this](bool checked) {
+            if (!ui->affDateFinEdit) return;
+            ui->affDateFinEdit->setEnabled(!checked);
+            if (!checked && !ui->affDateFinEdit->date().isValid()) {
+                ui->affDateFinEdit->setDate(QDate::currentDate().addMonths(1));
+            }
+        });
+        ui->affOpenEndedCheck->setProperty("wiredToggled", true);
+    }
 }
 
+// Computes and displays remaining assignment slots for the selected employee,
+// and enables/disables the save action accordingly.
 void MainWindow::updateAffectationRemainingInfo()
 {
+    // Business rule:
+    //   A user-defined max number of active assignments per employee is enforced.
+    // This function computes current usage and updates:
+    //   1) informational label (remaining slots)
+    //   2) save button enabled state (block when limit reached)
+
     const bool hasRemainingLabel = (ui->affRemainingInfoLabel != nullptr);
+    const auto setSaveEnabled = [this](bool enabled) {
+        if (ui->affSaveBtn) ui->affSaveBtn->setEnabled(enabled);
+    };
     bool canSave = true;
 
     const int empId = ui->affEmpCombo ? ui->affEmpCombo->currentData().toInt() : -1;
@@ -679,7 +869,7 @@ void MainWindow::updateAffectationRemainingInfo()
                 tr("Sélectionnez un employé pour voir les places restantes."));
             ui->affRemainingInfoLabel->setStyleSheet("color:#546e7a; font-weight:600;");
         }
-        if (ui->affSaveBtn) ui->affSaveBtn->setEnabled(canSave);
+        setSaveEnabled(canSave);
         return;
     }
 
@@ -697,7 +887,7 @@ void MainWindow::updateAffectationRemainingInfo()
                 tr("Impossible de calculer les affectations restantes."));
             ui->affRemainingInfoLabel->setStyleSheet("color:#c62828; font-weight:600;");
         }
-        if (ui->affSaveBtn) ui->affSaveBtn->setEnabled(canSave);
+        setSaveEnabled(canSave);
         return;
     }
 
@@ -739,11 +929,48 @@ void MainWindow::updateAffectationRemainingInfo()
         }
     }
 
-    if (ui->affSaveBtn) ui->affSaveBtn->setEnabled(canSave);
+    setSaveEnabled(canSave);
 }
 
+bool MainWindow::hasDuplicateAffectation(int empId, int serieId) const
+{
+    QSqlQuery qCheck;
+    qCheck.prepare(
+        "SELECT COUNT(*) FROM EMP_MACH "
+        "WHERE id_emp = :id_emp AND id_serie = :id_serie");
+    qCheck.bindValue(":id_emp", empId);
+    qCheck.bindValue(":id_serie", serieId);
+    qCheck.exec();
+    return qCheck.next() && qCheck.value(0).toInt() > 0;
+}
+
+void MainWindow::prepareInsertAffectationQuery(QSqlQuery& query,
+                                               int empId,
+                                               int serieId,
+                                               const QString& poste,
+                                               const QDate& dateDeb,
+                                               const QVariant& dateFinValue) const
+{
+    query.prepare(
+        "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
+        "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)");
+    query.bindValue(":id_emp", empId);
+    query.bindValue(":id_serie", serieId);
+    query.bindValue(":poste", poste);
+    query.bindValue(":date_debut", dateDeb);
+    query.bindValue(":date_fin", dateFinValue);
+}
+
+// Loads affectation rows into the table and wires row-level edit/delete actions.
 void MainWindow::loadAffectationTable()
 {
+    // Purpose:
+    //   Hydrate the affectation table from DB with denormalized display columns
+    //   (employee full name, series name, machine name, dates, status).
+    // Notes:
+    //   - date_fin NULL => ACTIVE
+    //   - date_fin set  => TERMINEE
+
     QTableWidget* t = ui->affTable;
     t->setRowCount(0);
     t->setSortingEnabled(false);
@@ -799,7 +1026,8 @@ void MainWindow::loadAffectationTable()
             st->setForeground(active ? QColor("#2e7d32") : QColor("#c62828"));
         }
 
-        // ── Action buttons ────────────────────────────────────────────────
+    // ── Action buttons ────────────────────────────────────────────────
+    // Each row gets Edit/Delete controls bound to composite key (id_emp,id_serie).
         auto* cell  = new QWidget();
         auto* hlay  = new QHBoxLayout(cell);
         hlay->setContentsMargins(2, 2, 2, 2);
@@ -820,7 +1048,10 @@ void MainWindow::loadAffectationTable()
         hlay->addWidget(btnDel);
     t->setCellWidget(row, 8, cell);
 
-        // Edit: pre-fill form and switch to form page
+    // Edit flow:
+    //   1) load selected row values into the form
+    //   2) track original composite PK in m_editingAffId*
+    //   3) switch form to "Modifier" mode
         connect(btnEdit, &QToolButton::clicked, this, [this, idEmp, idSerie, row]() {
             // Pre-select employee
             int empIdx = ui->affEmpCombo->findData(idEmp);
@@ -842,8 +1073,8 @@ void MainWindow::loadAffectationTable()
                 sdeb.isEmpty() ? QDate::currentDate()
                                : QDate::fromString(sdeb, "dd/MM/yyyy"));
             const bool openEnded = sfin.isEmpty();
-            if (m_affOpenEndedCheck) {
-                m_affOpenEndedCheck->setChecked(openEnded);
+            if (ui->affOpenEndedCheck) {
+                ui->affOpenEndedCheck->setChecked(openEnded);
             }
             if (!openEnded) {
                 ui->affDateFinEdit->setDate(QDate::fromString(sfin, "dd/MM/yyyy"));
@@ -858,7 +1089,8 @@ void MainWindow::loadAffectationTable()
             ui->affStack->setCurrentIndex(0);
         });
 
-        // Delete: confirm then remove from EMP_MACH
+    // Delete flow:
+    //   confirm => DELETE by composite PK => remove row from UI on success
         connect(btnDel, &QToolButton::clicked, this, [this, idEmp, idSerie, row]() {
             if (QMessageBox::question(this, tr("Confirmer la suppression"),
                     tr("Supprimer l'affectation de cet employé à cette série ?"))
@@ -896,11 +1128,17 @@ void MainWindow::loadAffectationTable()
     filterAffTable();
 }
 
+// Applies text/state filters to the affectation table without re-querying the DB.
 void MainWindow::filterAffTable()
 {
+    // Filtering strategy:
+    //   - Text search across employee/series/machine/poste
+    //   - Optional state filter based on computed active state from date_fin
+    //     (empty date_fin in table => ACTIVE)
+
     QString search = ui->affSearchEdit->text().trimmed().toLower();
-    const QString stateFilter = m_affStatusFilterCombo
-        ? m_affStatusFilterCombo->currentText()
+    const QString stateFilter = ui->affStatusFilterCombo
+        ? ui->affStatusFilterCombo->currentText()
         : tr("Toutes");
     const bool wantActive = (stateFilter.compare(tr("Actives"), Qt::CaseInsensitive) == 0);
     const bool wantDone   = (stateFilter.compare(tr("Terminées"), Qt::CaseInsensitive) == 0);
@@ -931,15 +1169,14 @@ void MainWindow::filterAffTable()
 
 void MainWindow::on_affNewBtn_clicked()
 {
-    m_editingAffIdEmp   = -1;
-    m_editingAffIdSerie = -1;
-    ui->affSaveBtn->setText(tr("Affecter"));
+    // Prepare a clean form for INSERT mode.
+    resetAffectationEditState();
     ui->affEmpCombo->setCurrentIndex(0);
     ui->affSerieCombo->setCurrentIndex(0);
     ui->affPosteCombo->setCurrentIndex(0);
     ui->affDateDebEdit->setDate(QDate::currentDate());
     ui->affDateFinEdit->setDate(QDate::currentDate().addMonths(1));
-    if (m_affOpenEndedCheck) m_affOpenEndedCheck->setChecked(true);
+    if (ui->affOpenEndedCheck) ui->affOpenEndedCheck->setChecked(true);
     if (ui->affLimitInfoLabel) {
         ui->affLimitInfoLabel->setText(
             tr("Limite actuelle : %1 affectation(s) max par employé.")
@@ -951,32 +1188,39 @@ void MainWindow::on_affNewBtn_clicked()
 
 void MainWindow::on_affCancelBtn_clicked()
 {
-    m_editingAffIdEmp   = -1;
-    m_editingAffIdSerie = -1;
-    ui->affSaveBtn->setText(tr("Affecter"));
-    if (m_affOpenEndedCheck) m_affOpenEndedCheck->setChecked(true);
+    // Cancel editing/inserting and return to table page.
+    resetAffectationEditState();
+    if (ui->affOpenEndedCheck) ui->affOpenEndedCheck->setChecked(true);
     ui->affStack->setCurrentIndex(1);
 }
 
 void MainWindow::on_affRefreshBtn_clicked()
 {
+    // Full UI refresh from DB (table + limit label/button state).
     loadAffectationTable();
     updateAffectationRemainingInfo();
 }
 
 void MainWindow::on_affSearchEdit_textChanged(const QString&)
 {
+    // Lightweight client-side filtering (no SQL round-trip).
     filterAffTable();
 }
 
 void MainWindow::on_affSaveBtn_clicked()
 {
+    // Save contract:
+    //   - INSERT mode when m_editingAffId* are not set
+    //   - EDIT mode otherwise
+    // Composite PK handling:
+    //   EMP_MACH uses (id_emp, id_serie), so PK changes require re-insert logic.
+
     int     newEmpId   = ui->affEmpCombo->currentData().toInt();
     int     newSerieId = ui->affSerieCombo->currentData().toInt();
     QString poste      = ui->affPosteCombo->currentText();
     QDate   dateDeb    = ui->affDateDebEdit->date();
     QDate   dateFin    = ui->affDateFinEdit->date();
-    const bool openEnded = (m_affOpenEndedCheck && m_affOpenEndedCheck->isChecked());
+    const bool openEnded = (ui->affOpenEndedCheck && ui->affOpenEndedCheck->isChecked());
 
     if (newEmpId <= 0 || newSerieId <= 0) {
         QMessageBox::warning(this, tr("Champs requis"),
@@ -993,16 +1237,10 @@ void MainWindow::on_affSaveBtn_clicked()
         ? QVariant(QMetaType(QMetaType::QDate))
         : QVariant(dateFin);
 
-    // Enforce configurable max number of affectations per employee.
-    // We only block if this operation would increase the target employee's count.
-    bool increasesTargetEmployeeCount = false;
-    if (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0) {
-        // Edit mode: count increases only if reassigned to a different employee.
-        increasesTargetEmployeeCount = (newEmpId != m_editingAffIdEmp);
-    } else {
-        // Insert mode always increases count by one.
-        increasesTargetEmployeeCount = true;
-    }
+    // Enforce configurable max number of active assignments per employee.
+    // We only block if this operation increases active assignment count.
+    const bool isEditMode = (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0);
+    const bool increasesTargetEmployeeCount = !isEditMode || (newEmpId != m_editingAffIdEmp);
 
     if (increasesTargetEmployeeCount && m_maxAffectationsPerEmployee > 0) {
         QSqlQuery qCount;
@@ -1032,8 +1270,10 @@ void MainWindow::on_affSaveBtn_clicked()
 
     QSqlQuery q;
 
-    if (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0) {
-        // ── EDIT mode ────────────────────────────────────────────────────────
+    if (isEditMode) {
+    // ── EDIT mode ────────────────────────────────────────────────────────
+    // If PK unchanged => UPDATE non-key columns.
+    // If PK changed   => delete old row + insert new row.
         if (newEmpId == m_editingAffIdEmp && newSerieId == m_editingAffIdSerie) {
             // Same PK — just UPDATE the extra columns in place
             q.prepare(
@@ -1049,20 +1289,13 @@ void MainWindow::on_affSaveBtn_clicked()
             q.bindValue(":id_emp",     m_editingAffIdEmp);
             q.bindValue(":id_serie",   m_editingAffIdSerie);
         } else {
-            // PK changed — check duplicate first
-            QSqlQuery qCheck;
-            qCheck.prepare(
-                "SELECT COUNT(*) FROM EMP_MACH "
-                "WHERE id_emp = :id_emp AND id_serie = :id_serie");
-            qCheck.bindValue(":id_emp",   newEmpId);
-            qCheck.bindValue(":id_serie", newSerieId);
-            qCheck.exec();
-            if (qCheck.next() && qCheck.value(0).toInt() > 0) {
+            // PK changed — duplicate guard first (same employee + same series).
+            if (hasDuplicateAffectation(newEmpId, newSerieId)) {
                 QMessageBox::warning(this, tr("Doublon"),
                     tr("Cet employé est déjà affecté à cette série."));
                 return;
             }
-            // Delete old row
+            // Delete old PK row, then insert the new PK row.
             QSqlQuery qDel;
             qDel.prepare(
                 "DELETE FROM EMP_MACH "
@@ -1076,37 +1309,17 @@ void MainWindow::on_affSaveBtn_clicked()
                 return;
             }
             // Insert new row
-            q.prepare(
-                "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
-                "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)");
-            q.bindValue(":id_emp",     newEmpId);
-            q.bindValue(":id_serie",   newSerieId);
-            q.bindValue(":poste",      poste);
-            q.bindValue(":date_debut", dateDeb);
-            q.bindValue(":date_fin",   dateFinValue);
+            prepareInsertAffectationQuery(q, newEmpId, newSerieId, poste, dateDeb, dateFinValue);
         }
     } else {
-        // ── INSERT mode ───────────────────────────────────────────────────────
-        QSqlQuery qCheck;
-        qCheck.prepare(
-            "SELECT COUNT(*) FROM EMP_MACH "
-            "WHERE id_emp = :id_emp AND id_serie = :id_serie");
-        qCheck.bindValue(":id_emp",   newEmpId);
-        qCheck.bindValue(":id_serie", newSerieId);
-        qCheck.exec();
-        if (qCheck.next() && qCheck.value(0).toInt() > 0) {
+    // ── INSERT mode ───────────────────────────────────────────────────────
+    // Guard against duplicate composite key before insert.
+        if (hasDuplicateAffectation(newEmpId, newSerieId)) {
             QMessageBox::warning(this, tr("Doublon"),
                 tr("Cet employé est déjà affecté à cette série."));
             return;
         }
-        q.prepare(
-            "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
-            "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)");
-        q.bindValue(":id_emp",     newEmpId);
-        q.bindValue(":id_serie",   newSerieId);
-        q.bindValue(":poste",      poste);
-        q.bindValue(":date_debut", dateDeb);
-        q.bindValue(":date_fin",   dateFinValue);
+        prepareInsertAffectationQuery(q, newEmpId, newSerieId, poste, dateDeb, dateFinValue);
     }
 
     if (!q.exec()) {
@@ -1116,9 +1329,7 @@ void MainWindow::on_affSaveBtn_clicked()
     }
 
     bool wasEdit = (m_editingAffIdEmp > 0);
-    m_editingAffIdEmp   = -1;
-    m_editingAffIdSerie = -1;
-    ui->affSaveBtn->setText(tr("Affecter"));
+    resetAffectationEditState();
     loadAffectationTable();
     updateAffectationRemainingInfo();
     ui->affStack->setCurrentIndex(1);
@@ -1127,8 +1338,32 @@ void MainWindow::on_affSaveBtn_clicked()
                 : tr("Affectation enregistrée avec succès."));
 }
 
+void MainWindow::resetAffectationEditState()
+{
+    m_editingAffIdEmp = -1;
+    m_editingAffIdSerie = -1;
+    if (ui && ui->affSaveBtn) {
+        ui->affSaveBtn->setText(tr("Affecter"));
+    }
+}
+
+// ── Affectation settings + stock auto-assignment policy ────────────────────
+
+// Adds runtime settings controls related to affectation behavior.
+void MainWindow::setupSettingsAutoAssignOption()
+{
+    // The auto-assign toggle is now owned by .ui.
+    if (m_settingsAutoAssignCheck) return;
+    m_settingsAutoAssignCheck = ui->settingsAutoAssignCheck;
+}
+
 void MainWindow::loadAffectationSettings()
 {
+    // Loads persisted affectation policy from settings.dat:
+    //   - max active assignments per employee
+    //   - stock->auto-assign toggle
+    // Falls back to defaults when file is absent/unreadable.
+
     QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     if (baseDir.isEmpty())
         baseDir = QCoreApplication::applicationDirPath();
@@ -1195,53 +1430,66 @@ void MainWindow::loadAffectationSettings()
     updateAffectationRemainingInfo();
 }
 
-void MainWindow::setupSettingsAutoAssignOption()
+// Persists affectation-related settings to settings.dat.
+bool MainWindow::saveAffectationSettings()
 {
-    if (m_settingsAutoAssignCheck) return;
-    if (!ui->settingsForm) return;
+    // Persists policy to settings.dat (magic + versioned payload).
+    if (ui->settingsMaxAffectationsSpin)
+        m_maxAffectationsPerEmployee = ui->settingsMaxAffectationsSpin->value();
+    if (m_settingsAutoAssignCheck)
+        m_autoAssignFromStock = m_settingsAutoAssignCheck->isChecked();
 
-    // Add a new option in Settings at runtime to avoid heavy .ui migrations.
-    auto* label = new QLabel(tr("Auto affectation (Stock → Employé)"), ui->settingsGroup);
-    label->setObjectName(QStringLiteral("label_auto_aff_stock"));
+    QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (baseDir.isEmpty())
+        baseDir = QCoreApplication::applicationDirPath();
+    QDir().mkpath(baseDir);
 
-    m_settingsAutoAssignCheck = new QCheckBox(tr("Activer l'affectation automatique"), ui->settingsGroup);
-    m_settingsAutoAssignCheck->setObjectName(QStringLiteral("settingsAutoAssignCheck"));
-    m_settingsAutoAssignCheck->setToolTip(
-        tr("Si activé, chaque nouveau stock affecte automatiquement un employé disponible à la série associée."));
+    const QString path = QDir(baseDir).filePath(QStringLiteral("settings.dat"));
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
 
-    // Insert above the Save button row.
-    ui->settingsForm->insertRow(3, label, m_settingsAutoAssignCheck);
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_6_5);
+    out << quint32(0x534f504d) << qint32(2)
+        << qint32(m_maxAffectationsPerEmployee)
+        << bool(m_autoAssignFromStock);
+
+    return out.status() == QDataStream::Ok;
 }
 
-void MainWindow::ensureStockSerieSelector()
+// Applies settings form changes and refreshes affectation UI indicators.
+void MainWindow::on_settingsSaveBtn_clicked()
 {
-    if (m_stockSerieCombo) return;
-    if (!ui->formLayout_2) return;
+    // Commits settings changes and refreshes labels/limits immediately.
+    if (!saveAffectationSettings()) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'enregistrer les paramètres dans le fichier settings.dat."));
+        return;
+    }
 
-    // If Designer already has it, reuse it.
-    m_stockSerieCombo = ui->ajoutqtolives->findChild<QComboBox*>(QStringLiteral("stockSerieCombo"));
-    if (m_stockSerieCombo) return;
+    if (ui->affLimitInfoLabel) {
+        ui->affLimitInfoLabel->setText(
+            tr("Limite actuelle : %1 affectation(s) max par employé.")
+                .arg(m_maxAffectationsPerEmployee));
+    }
+    updateAffectationRemainingInfo();
 
-    auto* label = new QLabel(tr("Série associée"), ui->ajoutqtolives);
-    label->setObjectName(QStringLiteral("stockSerieLabel"));
-
-    auto* combo = new QComboBox(ui->ajoutqtolives);
-    combo->setObjectName(QStringLiteral("stockSerieCombo"));
-    combo->setToolTip(tr("Série machine liée à ce stock."));
-
-    // Place it right before the submit row.
-    ui->formLayout_2->insertRow(6, label, combo);
-    m_stockSerieCombo = combo;
+    QMessageBox::information(this, tr("Paramètres"),
+        tr("Paramètres enregistrés avec succès.\n"
+           "• Limite : %1 affectation(s) max par employé\n"
+           "• Auto affectation depuis stock : %2")
+            .arg(m_maxAffectationsPerEmployee)
+            .arg(m_autoAssignFromStock ? tr("Activée") : tr("Désactivée")));
 }
 
 void MainWindow::refreshStockSerieChoices()
 {
-    ensureStockSerieSelector();
-    if (!m_stockSerieCombo) return;
+    if (!ui->stockSerieCombo) return;
 
-    const QVariant previous = m_stockSerieCombo->currentData();
-    m_stockSerieCombo->clear();
-    m_stockSerieCombo->addItem(tr("Choisir une série..."), QVariant());
+    const QVariant previous = ui->stockSerieCombo->currentData();
+    ui->stockSerieCombo->clear();
+    ui->stockSerieCombo->addItem(tr("Choisir une série..."), QVariant());
 
     QSqlQuery q(
         "SELECT id_serie, nom_serie "
@@ -1249,24 +1497,31 @@ void MainWindow::refreshStockSerieChoices()
         "ORDER BY nom_serie, id_serie");
 
     if (q.lastError().isValid()) {
-        m_stockSerieCombo->addItem(tr("Erreur de chargement des séries"), QVariant());
+        ui->stockSerieCombo->addItem(tr("Erreur de chargement des séries"), QVariant());
         return;
     }
 
     while (q.next()) {
         const int id = q.value(0).toInt();
         const QString name = q.value(1).toString();
-        m_stockSerieCombo->addItem(QStringLiteral("%1 (ID %2)").arg(name).arg(id), id);
+        ui->stockSerieCombo->addItem(QStringLiteral("%1 (ID %2)").arg(name).arg(id), id);
     }
 
     if (previous.isValid()) {
-        const int idx = m_stockSerieCombo->findData(previous);
-        if (idx >= 0) m_stockSerieCombo->setCurrentIndex(idx);
+        const int idx = ui->stockSerieCombo->findData(previous);
+        if (idx >= 0) ui->stockSerieCombo->setCurrentIndex(idx);
     }
 }
 
+// Tries to create an automatic assignment for a series when stock is inserted.
 bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
 {
+    // Auto-assignment algorithm:
+    //   1) Choose one employee with the lowest current active assignment count
+    //      who is not already assigned to this series and still below max limit.
+    //   2) Insert EMP_MACH row (id_serie, id_emp).
+    //   3) Return human-readable detail message for UI feedback.
+
     detailMessage.clear();
     if (serieId <= 0) {
         detailMessage = tr("Série invalide pour l'affectation automatique.");
@@ -1295,7 +1550,7 @@ bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
         "  HAVING SUM(CASE WHEN em.id_emp IS NOT NULL AND em.date_fin IS NULL THEN 1 ELSE 0 END) < :max_aff "
         "  ORDER BY cnt ASC, e.id_emp ASC"
         ") "
-        "WHERE ROWNUM = 1");
+    );
     pick.bindValue(":serie", serieId);
     pick.bindValue(":max_aff", m_maxAffectationsPerEmployee);
 
@@ -1305,7 +1560,7 @@ bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
     }
 
     if (!pick.next()) {
-        detailMessage = tr("Aucun employé disponible pour cette série.");
+        detailMessage = tr("Aucun employé disponible pour auto affectation.");
         return false;
     }
 
@@ -1342,6 +1597,7 @@ bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
     return true;
 }
 
+// ── Stock module CRUD/navigation helpers ────────────────────────────────────
 void MainWindow::loadStocksTable()
 {
     if (!ui->tableWidget_2) return;
@@ -1373,85 +1629,32 @@ void MainWindow::loadStocksTable()
     }
 }
 
-bool MainWindow::saveAffectationSettings()
-{
-    if (ui->settingsMaxAffectationsSpin)
-        m_maxAffectationsPerEmployee = ui->settingsMaxAffectationsSpin->value();
-    if (m_settingsAutoAssignCheck)
-        m_autoAssignFromStock = m_settingsAutoAssignCheck->isChecked();
-
-    QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (baseDir.isEmpty())
-        baseDir = QCoreApplication::applicationDirPath();
-    QDir().mkpath(baseDir);
-
-    const QString path = QDir(baseDir).filePath(QStringLiteral("settings.dat"));
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        return false;
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_6_5);
-    out << quint32(0x534f504d) << qint32(2)
-        << qint32(m_maxAffectationsPerEmployee)
-        << bool(m_autoAssignFromStock);
-
-    return out.status() == QDataStream::Ok;
-}
-
-void MainWindow::on_settingsSaveBtn_clicked()
-{
-    if (!saveAffectationSettings()) {
-        QMessageBox::critical(this, tr("Erreur"),
-            tr("Impossible d'enregistrer les paramètres dans le fichier settings.dat."));
-        return;
-    }
-
-    if (ui->affLimitInfoLabel) {
-        ui->affLimitInfoLabel->setText(
-            tr("Limite actuelle : %1 affectation(s) max par employé.")
-                .arg(m_maxAffectationsPerEmployee));
-    }
-    updateAffectationRemainingInfo();
-
-    QMessageBox::information(this, tr("Paramètres"),
-        tr("Paramètres enregistrés avec succès.\n"
-           "• Limite : %1 affectation(s) max par employé\n"
-           "• Auto affectation depuis stock : %2")
-            .arg(m_maxAffectationsPerEmployee)
-            .arg(m_autoAssignFromStock ? tr("Activée") : tr("Désactivée")));
-}
-
 
 void MainWindow::on_btnConsulterstc_clicked()
 {
-    const int stockIdx = ui->modules->indexOf(ui->module2);
-    if (ui->modules->currentIndex() != stockIdx)
-        crossFadeToIndex(ui->modules, stockIdx);
+    const int stockIdx = moduleIndex(ui->module2);
+    ensureModuleIndex(stockIdx);
     loadStocksTable();
     crossFadeToIndex(ui->metiersstocks, 1); // consulterqtolives
 }
 
 void MainWindow::on_btnAjouterstc_clicked()
 {
-    const int stockIdx = ui->modules->indexOf(ui->module2);
-    if (ui->modules->currentIndex() != stockIdx)
-        crossFadeToIndex(ui->modules, stockIdx);
+    const int stockIdx = moduleIndex(ui->module2);
+    ensureModuleIndex(stockIdx);
     refreshStockSerieChoices();
     crossFadeToIndex(ui->metiersstocks, 0); // ajoutqtolives
 }
 
 void MainWindow::on_ajouterqtoliveBtn_clicked()
 {
-    ensureStockSerieSelector();
-
     const QString nomStock = ui->nomLineEdit_2 ? ui->nomLineEdit_2->text().trimmed() : QString();
     const QString prenomAgri = ui->prNomLineEdit_2 ? ui->prNomLineEdit_2->text().trimmed() : QString();
     const QString categorie = ui->Categchoix ? ui->Categchoix->currentText().trimmed() : QString();
     const QDate dateAjout = ui->dateDEmbaucheDateEdit_2 ? ui->dateDEmbaucheDateEdit_2->date() : QDate::currentDate();
     const QString qteText = ui->prNomLineEdit_3 ? ui->prNomLineEdit_3->text().trimmed() : QString();
     const QString desc = ui->description ? ui->description->text().trimmed() : QString();
-    const int serieId = (m_stockSerieCombo ? m_stockSerieCombo->currentData().toInt() : 0);
+    const int serieId = (ui->stockSerieCombo ? ui->stockSerieCombo->currentData().toInt() : 0);
 
     bool okQte = false;
     const double qte = qteText.toDouble(&okQte);
@@ -1516,7 +1719,7 @@ void MainWindow::on_ajouterqtoliveBtn_clicked()
     if (ui->description) ui->description->clear();
     if (ui->dateDEmbaucheDateEdit_2) ui->dateDEmbaucheDateEdit_2->setDate(QDate::currentDate());
     if (ui->Categchoix) ui->Categchoix->setCurrentIndex(0);
-    if (m_stockSerieCombo) m_stockSerieCombo->setCurrentIndex(0);
+    if (ui->stockSerieCombo) ui->stockSerieCombo->setCurrentIndex(0);
 
     loadStocksTable();
 
@@ -1526,231 +1729,212 @@ void MainWindow::on_ajouterqtoliveBtn_clicked()
 
 void MainWindow::on_btnStatstc_clicked()
 {
-    const int stockIdx = ui->modules->indexOf(ui->module2);
-    if (ui->modules->currentIndex() != stockIdx)
-        crossFadeToIndex(ui->modules, stockIdx);
+    const int stockIdx = moduleIndex(ui->module2);
+    ensureModuleIndex(stockIdx);
     crossFadeToIndex(ui->metiersstocks, 2); // statqtolives
 }
 
 void MainWindow::on_toolButton_5_clicked()
 {
-    const int stockIdx = ui->modules->indexOf(ui->module2);
-    if (ui->modules->currentIndex() != stockIdx)
-        crossFadeToIndex(ui->modules, stockIdx);
+    const int stockIdx = moduleIndex(ui->module2);
+    ensureModuleIndex(stockIdx);
     crossFadeToIndex(ui->metiersstocks, 3); // metieravancee_2
 }
 
+// ── Module toolbar navigation handlers (Citernes / Qualité / Machines / Agriculteurs)
 // Module 3 (Citernes) toolbar actions
 void MainWindow::on_AjoutCiterne_clicked()
 {
-    const int citerneIdx = ui->modules->indexOf(ui->module3);
-    if (ui->modules->currentIndex() != citerneIdx)
-        crossFadeToIndex(ui->modules, citerneIdx);
-    crossFadeToIndex(ui->metiersCiternes, 0); // ajoutCiternes
+    const int citerneIdx = moduleIndex(ui->module3);
+    openModulePage(ui->metiersCiternes, citerneIdx, 0); // ajoutCiternes
 }
 
 void MainWindow::on_ConsulterCiterne_clicked()
 {
-    const int citerneIdx = ui->modules->indexOf(ui->module3);
-    if (ui->modules->currentIndex() != citerneIdx)
-        crossFadeToIndex(ui->modules, citerneIdx);
-    crossFadeToIndex(ui->metiersCiternes, 1); // consulterciterne
+    const int citerneIdx = moduleIndex(ui->module3);
+    openModulePage(ui->metiersCiternes, citerneIdx, 1); // consulterciterne
 }
 
 void MainWindow::on_StatistiqueCiterne_clicked()
 {
-    const int citerneIdx = ui->modules->indexOf(ui->module3);
-    if (ui->modules->currentIndex() != citerneIdx)
-        crossFadeToIndex(ui->modules, citerneIdx);
-    crossFadeToIndex(ui->metiersCiternes, 2); // statCiterne
+    const int citerneIdx = moduleIndex(ui->module3);
+    openModulePage(ui->metiersCiternes, citerneIdx, 2); // statCiterne
 }
 
 void MainWindow::on_MetierAvanceCiterne_clicked()
 {
-    const int citerneIdx = ui->modules->indexOf(ui->module3);
-    if (ui->modules->currentIndex() != citerneIdx)
-        crossFadeToIndex(ui->modules, citerneIdx);
-    crossFadeToIndex(ui->metiersCiternes, 3); // AvCiterne
+    const int citerneIdx = moduleIndex(ui->module3);
+    openModulePage(ui->metiersCiternes, citerneIdx, 3); // AvCiterne
 }
 
 // Module 4 (Qualité) toolbar actions
 void MainWindow::on_btnConsulterQualite_clicked()
 {
-    const int qualiteIdx = ui->modules->indexOf(ui->module4);
-    if (ui->modules->currentIndex() != qualiteIdx)
-        crossFadeToIndex(ui->modules, qualiteIdx);
-    crossFadeToIndex(ui->metiersqualite, 1); // consulterpersonnel_2
+    const int qualiteIdx = moduleIndex(ui->module4);
+    openModulePage(ui->metiersqualite, qualiteIdx, 1); // consulterpersonnel_2
 }
 
 void MainWindow::on_btnAjouterQualite_clicked()
 {
-    const int qualiteIdx = ui->modules->indexOf(ui->module4);
-    if (ui->modules->currentIndex() != qualiteIdx)
-        crossFadeToIndex(ui->modules, qualiteIdx);
-    crossFadeToIndex(ui->metiersqualite, 0); // ajoutpersonnel_2
+    const int qualiteIdx = moduleIndex(ui->module4);
+    openModulePage(ui->metiersqualite, qualiteIdx, 0); // ajoutpersonnel_2
 }
 
 void MainWindow::on_btnStatQualite_clicked()
 {
-    const int qualiteIdx = ui->modules->indexOf(ui->module4);
-    if (ui->modules->currentIndex() != qualiteIdx)
-        crossFadeToIndex(ui->modules, qualiteIdx);
-    crossFadeToIndex(ui->metiersqualite, 2); // statPersonnel_2
+    const int qualiteIdx = moduleIndex(ui->module4);
+    openModulePage(ui->metiersqualite, qualiteIdx, 2); // statPersonnel_2
 }
 
 void MainWindow::on_btnAdvEmp_2_clicked()
 {
-    const int qualiteIdx = ui->modules->indexOf(ui->module4);
-    if (ui->modules->currentIndex() != qualiteIdx)
-        crossFadeToIndex(ui->modules, qualiteIdx);
-    crossFadeToIndex(ui->metiersqualite, 3); // metieravancee_3
+    const int qualiteIdx = moduleIndex(ui->module4);
+    openModulePage(ui->metiersqualite, qualiteIdx, 3); // metieravancee_3
 }
 
 // Module 5 (Machines) toolbar actions
 void MainWindow::on_btnConsulterMachines_clicked()
 {
-    const int machinesIdx = ui->modules->indexOf(ui->module5);
-    if (ui->modules->currentIndex() != machinesIdx)
-        ui->modules->setCurrentIndex(machinesIdx);
-    crossFadeToIndex(ui->metierspersonnel_2, 1); // consulterpersonnel_3
+    const int machinesIdx = moduleIndex(ui->module5);
+    openModulePage(ui->metierspersonnel_2, machinesIdx, 1); // consulterpersonnel_3
 }
 
 void MainWindow::on_btnAjouterMachines_clicked()
 {
-    const int machinesIdx = ui->modules->indexOf(ui->module5);
-    if (ui->modules->currentIndex() != machinesIdx)
-        ui->modules->setCurrentIndex(machinesIdx);
-    crossFadeToIndex(ui->metierspersonnel_2, 0); // ajoutpersonnel_3
+    const int machinesIdx = moduleIndex(ui->module5);
+    openModulePage(ui->metierspersonnel_2, machinesIdx, 0); // ajoutpersonnel_3
 }
 
 void MainWindow::on_btnStatMachines_clicked()
 {
-    const int machinesIdx = ui->modules->indexOf(ui->module5);
-    if (ui->modules->currentIndex() != machinesIdx)
-        ui->modules->setCurrentIndex(machinesIdx);
-    crossFadeToIndex(ui->metierspersonnel_2, 2); // statPersonnel_3
+    const int machinesIdx = moduleIndex(ui->module5);
+    openModulePage(ui->metierspersonnel_2, machinesIdx, 2); // statPersonnel_3
 }
 
 void MainWindow::on_btnAvanceMachines_clicked()
 {
-    const int machinesIdx = ui->modules->indexOf(ui->module5);
-    if (ui->modules->currentIndex() != machinesIdx)
-        ui->modules->setCurrentIndex(machinesIdx);
-    crossFadeToIndex(ui->metierspersonnel_2, 3); // metieravancee_4
+    const int machinesIdx = moduleIndex(ui->module5);
+    openModulePage(ui->metierspersonnel_2, machinesIdx, 3); // metieravancee_4
 }
 
 // Module 6 (Agriculteurs) toolbar actions
 void MainWindow::on_btnConsulterAgr_clicked()
 {
-    const int agriIdx = ui->modules->indexOf(ui->module6);
-    if (ui->modules->currentIndex() != agriIdx)
-        ui->modules->setCurrentIndex(agriIdx);
-    crossFadeToIndex(ui->metiersagriculteurs, 1); // consulteragriculteur
+    const int agriIdx = moduleIndex(ui->module6);
+    openModulePage(ui->metiersagriculteurs, agriIdx, 1); // consulteragriculteur
 }
 
 void MainWindow::on_btnAjouterAgr_clicked()
 {
-    const int agriIdx = ui->modules->indexOf(ui->module6);
-    if (ui->modules->currentIndex() != agriIdx)
-        ui->modules->setCurrentIndex(agriIdx);
-    crossFadeToIndex(ui->metiersagriculteurs, 0); // ajoutagriculteur
+    const int agriIdx = moduleIndex(ui->module6);
+    openModulePage(ui->metiersagriculteurs, agriIdx, 0); // ajoutagriculteur
 }
 
 void MainWindow::on_btnStatAgr_clicked()
 {
-    const int agriIdx = ui->modules->indexOf(ui->module6);
-    if (ui->modules->currentIndex() != agriIdx)
-        ui->modules->setCurrentIndex(agriIdx);
-    crossFadeToIndex(ui->metiersagriculteurs, 2); // statAGriculteur
+    const int agriIdx = moduleIndex(ui->module6);
+    openModulePage(ui->metiersagriculteurs, agriIdx, 2); // statAGriculteur
 }
 
 void MainWindow::on_btnAvanceAgr_clicked()
 {
-    const int agriIdx = ui->modules->indexOf(ui->module6);
-    if (ui->modules->currentIndex() != agriIdx)
-        ui->modules->setCurrentIndex(agriIdx);
-    crossFadeToIndex(ui->metiersagriculteurs, 3); // metieravancee_5
+    const int agriIdx = moduleIndex(ui->module6);
+    openModulePage(ui->metiersagriculteurs, agriIdx, 3); // metieravancee_5
 }
 
+// ── Sidebar navigation & active-button state ────────────────────────────────
 // Sidebar navigation: map buttons to modules indices
 // Order in UI: module1 (0), module3 (1), module4 (2), module5 (3), module6 (4), module2 (5)
 void MainWindow::on_btnmod1_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1); // ensure mainprogram
-    crossFadeToIndex(ui->modules, 0);
-    // Always reset to the first page in the module
-    crossFadeToIndex(ui->metierspersonnel, 0);
-    setActiveModuleButton(0);
+    openSidebarModule(0, ui->metierspersonnel, 0, 0);
 }
 
 void MainWindow::on_btnmod2_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    crossFadeToIndex(ui->modules, ui->modules->indexOf(ui->module2));
-    crossFadeToIndex(ui->metiersstocks, 0);
-    refreshStockSerieChoices();
-    setActiveModuleButton(5);
+    openSidebarModule(moduleIndex(ui->module2), ui->metiersstocks, 0, 5, true);
 }
 
 void MainWindow::on_btnmod3_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    crossFadeToIndex(ui->modules, ui->modules->indexOf(ui->module3));
-    crossFadeToIndex(ui->metiersCiternes, 0);
-    setActiveModuleButton(1);
+    openSidebarModule(moduleIndex(ui->module3), ui->metiersCiternes, 0, 1);
 }
 
 void MainWindow::on_btnmod4_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    crossFadeToIndex(ui->modules, ui->modules->indexOf(ui->module4));
-    crossFadeToIndex(ui->metiersqualite, 0);
-    setActiveModuleButton(2);
+    openSidebarModule(moduleIndex(ui->module4), ui->metiersqualite, 0, 2);
 }
 
 void MainWindow::on_btnmod5_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    crossFadeToIndex(ui->modules, ui->modules->indexOf(ui->module5));
-    crossFadeToIndex(ui->metierspersonnel_2, 0);
-    setActiveModuleButton(3);
+    openSidebarModule(moduleIndex(ui->module5), ui->metierspersonnel_2, 0, 3);
 }
 
 void MainWindow::on_btnmod6_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    crossFadeToIndex(ui->modules, ui->modules->indexOf(ui->module6));
-    crossFadeToIndex(ui->metiersagriculteurs, 0);
-    setActiveModuleButton(4);
+    openSidebarModule(moduleIndex(ui->module6), ui->metiersagriculteurs, 0, 4);
 }
 
 void MainWindow::on_btnSettings_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    crossFadeToIndex(ui->modules, ui->modules->indexOf(ui->module7));
-    setActiveModuleButton(6);
+    openSidebarModule(moduleIndex(ui->module7), nullptr, -1, 6);
 }
 
 // Helper to visually mark active module button
 void MainWindow::setActiveModuleButton(int index)
 {
-    // Map module index to button
-    // modules: 0=module1, 1=module3, 2=module4, 3=module5, 4=module6, 5=module2, 6=module7(settings)
-    // buttons: btnmod1..btnmod6 + btnSettings
-    QPushButton* buttons[7] = { ui->btnmod1, ui->btnmod2, ui->btnmod3, ui->btnmod4, ui->btnmod5, ui->btnmod6, ui->btnSettings };
-    for (auto* b : buttons) {
-        b->setChecked(false);
+    QPushButton* allButtons[] = {
+        ui->btnmod1, ui->btnmod2, ui->btnmod3, ui->btnmod4,
+        ui->btnmod5, ui->btnmod6, ui->btnSettings
+    };
+    for (QPushButton* b : allButtons) {
+        if (b) b->setChecked(false);
     }
-    switch (index) {
-    case 0: ui->btnmod1->setChecked(true); break; // module1
-    case 1: ui->btnmod3->setChecked(true); break; // module3
-    case 2: ui->btnmod4->setChecked(true); break; // module4
-    case 3: ui->btnmod5->setChecked(true); break; // module5
-    case 4: ui->btnmod6->setChecked(true); break; // module6
-    case 5: ui->btnmod2->setChecked(true); break; // module2
-    case 6: ui->btnSettings->setChecked(true); break; // module7
-    default: ui->btnmod1->setChecked(true); break;
-    }
+
+    // module index -> sidebar button mapping
+    QPushButton* mapped[] = {
+        ui->btnmod1,    // module1
+        ui->btnmod3,    // module3
+        ui->btnmod4,    // module4
+        ui->btnmod5,    // module5
+        ui->btnmod6,    // module6
+        ui->btnmod2,    // module2
+        ui->btnSettings // module7
+    };
+
+    const int clamped = (index >= 0 && index < 7) ? index : 0;
+    if (mapped[clamped]) mapped[clamped]->setChecked(true);
+}
+
+// ── Generic UI helpers (page switch / avatar / layout reactions) ───────────
+int MainWindow::moduleIndex(QWidget* moduleWidget) const
+{
+    if (!ui || !ui->modules || !moduleWidget) return -1;
+    return ui->modules->indexOf(moduleWidget);
+}
+
+void MainWindow::ensureModuleIndex(int moduleIndex)
+{
+    if (!ui || !ui->modules) return;
+    if (moduleIndex < 0 || moduleIndex >= ui->modules->count()) return;
+    if (ui->modules->currentIndex() == moduleIndex) return;
+    crossFadeToIndex(ui->modules, moduleIndex);
+}
+
+void MainWindow::openModulePage(QStackedWidget* modulePages, int moduleIndex, int pageIndex)
+{
+    ensureModuleIndex(moduleIndex);
+    crossFadeToIndex(modulePages, pageIndex);
+}
+
+void MainWindow::openSidebarModule(int moduleIndex, QStackedWidget* modulePages, int pageIndex,
+                                   int activeButtonIndex, bool refreshStockChoices)
+{
+    if (ui && ui->MainStacked) ui->MainStacked->setCurrentIndex(1);
+    ensureModuleIndex(moduleIndex);
+    if (modulePages && pageIndex >= 0) crossFadeToIndex(modulePages, pageIndex);
+    if (refreshStockChoices) refreshStockSerieChoices();
+    setActiveModuleButton(activeButtonIndex);
 }
 
 // Simplified: no transition animation; just switch pages.
@@ -1895,82 +2079,108 @@ void MainWindow::animateSidebarToggle(bool collapse)
 // Hook up interactive behaviors (toggle button, live search)
 void MainWindow::setupInteractiveHooks()
 {
-    // Sidebar toggle button injected into the header layout inside the sidebar
-    if (auto* headerLayout = ui->sidebar->findChild<QHBoxLayout*>(QStringLiteral("logoandnamesidebar"))) {
-        auto* toggleBtn = new QToolButton(ui->sidebar);
-        toggleBtn->setAutoRaise(true);
-    toggleBtn->setToolTip(tr("Réduire / étendre la barre latérale"));
-        toggleBtn->setIcon(QIcon(QStringLiteral(":/img/menu.svg")));
-        toggleBtn->setIconSize(QSize(18,18));
-        headerLayout->addStretch();
-        headerLayout->addWidget(toggleBtn);
-        QObject::connect(toggleBtn, &QToolButton::clicked, this, [this]() {
-            animateSidebarToggle(!m_sidebarCollapsed);
-        });
-    }
-
-    // Install event filter on sidebar to allow click-to-expand
     if (ui->sidebar) {
+        // Sidebar toggle button now lives in .ui.
+        if (ui->sidebarToggleBtn && !ui->sidebarToggleBtn->property("wiredClicked").toBool()) {
+            QObject::connect(ui->sidebarToggleBtn, &QToolButton::clicked, this, [this]() {
+                animateSidebarToggle(!m_sidebarCollapsed);
+            });
+            ui->sidebarToggleBtn->setProperty("wiredClicked", true);
+        }
+
+        // Install event filter on sidebar to allow click-to-expand.
         ui->sidebar->installEventFilter(this);
-        // Adjust cursor when collapsed
-        QObject::connect(this, &MainWindow::windowTitleChanged, this, [this](const QString&){
-            // Use an existing signal to update cursor opportunistically
+
+        // Adjust cursor when collapsed.
+        const auto updateSidebarCursor = [this]() {
+            if (!ui || !ui->sidebar) return;
             if (m_sidebarCollapsed || ui->sidebar->width() <= 60)
                 ui->sidebar->setCursor(Qt::PointingHandCursor);
             else
                 ui->sidebar->unsetCursor();
-        });
+        };
+
+        if (!this->property("sidebarCursorHooked").toBool()) {
+            QObject::connect(this, &MainWindow::windowTitleChanged, this,
+                             [updateSidebarCursor](const QString&) { updateSidebarCursor(); });
+            this->setProperty("sidebarCursorHooked", true);
+        }
+        updateSidebarCursor();
     }
 
     // (Simplified) No keyboard shortcut hook.
 
     // Live filter for personnel table
     if (ui->lineEdit && ui->comboBox && ui->tableEmp) {
-        QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, [this](const QString&){ filterPersonnelTable(); });
-        QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this, [this](const QString&){ filterPersonnelTable(); });
+        if (!ui->lineEdit->property("wiredTextChanged").toBool()) {
+            QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this,
+                             [this](const QString&) { filterPersonnelTable(); });
+            ui->lineEdit->setProperty("wiredTextChanged", true);
+        }
+        if (!ui->comboBox->property("wiredCurrentTextChanged").toBool()) {
+            QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this,
+                             [this](const QString&) { filterPersonnelTable(); });
+            ui->comboBox->setProperty("wiredCurrentTextChanged", true);
+        }
     }
 
     // Live remaining-slots info for affectation form
     if (ui->affEmpCombo) {
-        QObject::connect(ui->affEmpCombo, &QComboBox::currentIndexChanged, this,
-            [this](int){ updateAffectationRemainingInfo(); });
+        if (!ui->affEmpCombo->property("wiredCurrentIndexChanged").toBool()) {
+            QObject::connect(ui->affEmpCombo, &QComboBox::currentIndexChanged, this,
+                             [this](int) { updateAffectationRemainingInfo(); });
+            ui->affEmpCombo->setProperty("wiredCurrentIndexChanged", true);
+        }
     }
 }
 
+// ── Form validation and UX behavior setup ───────────────────────────────────
 void MainWindow::setupEmployeeFormValidation()
 {
     if (!ui->formLayout || !ui->formLayoutWidget)
         return;
+
+    const auto resolveValidationHost = [this]() -> QWidget* {
+        if (ui->module1) return static_cast<QWidget*>(ui->module1);
+        if (ui->ajoutpersonnel) return static_cast<QWidget*>(ui->ajoutpersonnel);
+        return ui->formLayoutWidget ? ui->formLayoutWidget->parentWidget() : nullptr;
+    };
 
     // Keep the form compact enough so the submit row is visible without excessive clipping.
     ui->formLayout->setVerticalSpacing(22);
 
     // Prevent placeholder/text clipping on dense DPI/font setups.
     const int fieldMinH = 34;
-    ui->nomLineEdit->setMinimumHeight(fieldMinH);
-    ui->prNomLineEdit->setMinimumHeight(fieldMinH);
-    ui->emailLineEdit->setMinimumHeight(fieldMinH);
-    ui->mdpLineEdit->setMinimumHeight(fieldMinH);
-    ui->roleComboBox->setMinimumHeight(fieldMinH);
-    ui->dateDEmbaucheDateEdit->setMinimumHeight(fieldMinH);
+    for (QWidget* field : { static_cast<QWidget*>(ui->nomLineEdit),
+                            static_cast<QWidget*>(ui->prNomLineEdit),
+                            static_cast<QWidget*>(ui->emailLineEdit),
+                            static_cast<QWidget*>(ui->mdpLineEdit),
+                            static_cast<QWidget*>(ui->roleComboBox),
+                            static_cast<QWidget*>(ui->dateDEmbaucheDateEdit) }) {
+        if (field) field->setMinimumHeight(fieldMinH);
+    }
     if (ui->ajouterEmpBtn) {
         ui->ajouterEmpBtn->setMinimumHeight(36);
         ui->ajouterEmpBtn->show();
         ui->ajouterEmpBtn->raise();
     }
 
-    QWidget* validationHost = ui->module1 ? static_cast<QWidget*>(ui->module1)
-                                          : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
-                                                                : ui->formLayoutWidget->parentWidget());
+    if (ui->enrollFingerprintBtn) {
+        ui->enrollFingerprintBtn->setMinimumHeight(34);
+        if (!ui->enrollFingerprintBtn->property("wiredClicked").toBool()) {
+            QObject::connect(ui->enrollFingerprintBtn, &QPushButton::clicked,
+                             this, [this]() { startFingerprintEnrollmentFromForm(); });
+            ui->enrollFingerprintBtn->setProperty("wiredClicked", true);
+        }
+    }
+
+    QWidget* validationHost = resolveValidationHost();
     if (!validationHost)
         validationHost = ui->formLayoutWidget;
 
-    QLabel* feedback = validationHost->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"));
-    if (!feedback) {
-        feedback = new QLabel(validationHost);
-        feedback->setObjectName(QStringLiteral("employeeValidationLabel"));
-        feedback->setWordWrap(true);
-    }
+    QLabel* feedback = ui->employeeValidationLabel;
+    if (!feedback)
+        return;
 
     // Keep validation text in the right-side free space of the employee page.
     feedback->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -1984,7 +2194,7 @@ void MainWindow::setupEmployeeFormValidation()
         const QPoint formTopLeft = ui->formLayoutWidget->mapTo(validationHost, QPoint(0, 0));
         const QRect formRect(formTopLeft, ui->formLayoutWidget->size());
         const int margin = 16;
-    const int desiredRightW = 200;
+        const int desiredRightW = 200;
         const int availableRightW = validationHost->width() - (formRect.right() + margin) - margin;
 
         if (availableRightW >= 120) {
@@ -2003,11 +2213,7 @@ void MainWindow::setupEmployeeFormValidation()
         }
     }
     auto refreshFeedbackVisibility = [this]() {
-        QWidget* host = ui->module1 ? static_cast<QWidget*>(ui->module1)
-                                    : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
-                                                          : ui->formLayoutWidget->parentWidget());
-        if (!host) return;
-        QLabel* fb = host->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"));
+        QLabel* fb = ui->employeeValidationLabel;
         if (!fb) return;
 
         const bool onPersonnelAddPage =
@@ -2053,24 +2259,35 @@ void MainWindow::setupEmployeeFormValidation()
     }
 
     // Touched-state starts false; colors appear only after focus/interaction.
-    ui->nomLineEdit->setProperty("touched", false);
-    ui->prNomLineEdit->setProperty("touched", false);
-    ui->emailLineEdit->setProperty("touched", false);
-    ui->roleComboBox->setProperty("touched", false);
-    ui->mdpLineEdit->setProperty("touched", false);
-
-    ui->nomLineEdit->installEventFilter(this);
-    ui->prNomLineEdit->installEventFilter(this);
-    ui->emailLineEdit->installEventFilter(this);
-    ui->roleComboBox->installEventFilter(this);
-    ui->mdpLineEdit->installEventFilter(this);
+    QWidget* touchFields[] = {
+        ui->nomLineEdit,
+        ui->prNomLineEdit,
+        ui->emailLineEdit,
+        ui->roleComboBox,
+        ui->mdpLineEdit
+    };
+    for (QWidget* field : touchFields) {
+        if (!field) continue;
+        field->setProperty("touched", false);
+        field->installEventFilter(this);
+    }
 
     auto liveValidate = [this]() { validateEmployeeForm(true); };
-    QObject::connect(ui->nomLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->prNomLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->emailLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->mdpLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->roleComboBox, &QComboBox::currentTextChanged, this, [liveValidate](const QString&) { liveValidate(); });
+    QLineEdit* liveLineEdits[] = {
+        ui->nomLineEdit,
+        ui->prNomLineEdit,
+        ui->emailLineEdit,
+        ui->mdpLineEdit
+    };
+    for (QLineEdit* edit : liveLineEdits) {
+        if (!edit) continue;
+        QObject::connect(edit, &QLineEdit::textChanged, this,
+                         [liveValidate](const QString&) { liveValidate(); });
+    }
+    if (ui->roleComboBox) {
+        QObject::connect(ui->roleComboBox, &QComboBox::currentTextChanged, this,
+                         [liveValidate](const QString&) { liveValidate(); });
+    }
 
     // Keep helper text visible only on Personnel > Ajouter, even when navigating via toolbar/sidebar.
     if (ui->modules) {
@@ -2089,6 +2306,7 @@ void MainWindow::setupEmployeeFormValidation()
     validateEmployeeForm(false);
 }
 
+// Validates employee form fields and updates inline visual feedback.
 bool MainWindow::validateEmployeeForm(bool showFeedbackText)
 {
     const QString nom    = ui->nomLineEdit->text().trimmed();
@@ -2162,9 +2380,7 @@ bool MainWindow::validateEmployeeForm(bool showFeedbackText)
     QWidget* validationHost = ui->module1 ? static_cast<QWidget*>(ui->module1)
                                           : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
                                                                 : ui->formLayoutWidget->parentWidget());
-    QLabel* feedback = validationHost
-        ? validationHost->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"))
-        : nullptr;
+    QLabel* feedback = ui->employeeValidationLabel;
     if (feedback) {
         const bool onPersonnelAddPage =
             ui->modules && ui->metierspersonnel
@@ -2304,143 +2520,113 @@ void MainWindow::filterPersonnelTable()
     }
 }
 
-void MainWindow::setupPersonnelChart()
+// ── Charts / analytics rendering ────────────────────────────────────────────
+namespace {
+void clearLayoutWidgets(QLayout* layout)
 {
-    // Create pie chart data
-    QPieSeries *series = new QPieSeries();
-    series->append("Actifs", 42);
-    series->append("En congé", 8);
-    series->append("Suspendus", 3);
+    if (!layout) return;
+    QLayoutItem* item = nullptr;
+    while ((item = layout->takeAt(0)) != nullptr) {
+        if (QWidget* w = item->widget()) w->deleteLater();
+        delete item;
+    }
+}
 
-    // Create and configure the chart
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("Répartition des employés");
-    chart->legend()->setAlignment(Qt::AlignRight);
-    
-    // Create chart view with antialiasing
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    
-    // Create grid layout if it doesn't exist and add charts side-by-side
-    QGridLayout *grid = qobject_cast<QGridLayout*>(ui->chartStatusContainer->layout());
-    if (!grid) {
-        grid = new QGridLayout(ui->chartStatusContainer);
-        grid->setContentsMargins(0, 0, 0, 0);
-        grid->setHorizontalSpacing(12);
-        grid->setVerticalSpacing(12);
+QGridLayout* ensureChartGrid(QWidget* container,
+                             const QMargins& margins = QMargins(0, 0, 0, 0),
+                             int hSpacing = 12,
+                             int vSpacing = 12)
+{
+    if (!container) return nullptr;
+    auto* grid = qobject_cast<QGridLayout*>(container->layout());
+    if (!grid) grid = new QGridLayout(container);
+    grid->setContentsMargins(margins);
+    grid->setHorizontalSpacing(hSpacing);
+    grid->setVerticalSpacing(vSpacing);
+    return grid;
+}
+
+QChart* createBaseChart(const QString& title,
+                        bool showLegend = true,
+                        Qt::Alignment legendAlignment = Qt::AlignRight)
+{
+    auto* chart = new QChart();
+    chart->setTitle(title);
+    chart->setTitleFont(QFont(QStringLiteral("Segoe UI"), 11, QFont::Bold));
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->setBackgroundVisible(false);
+    chart->setMargins(QMargins(6, 6, 6, 6));
+    if (chart->legend()) {
+        chart->legend()->setVisible(showLegend);
+        chart->legend()->setAlignment(legendAlignment);
+    }
+    return chart;
+}
+
+QChartView* makeChartView(QChart* chart, int minHeight = 260)
+{
+    auto* view = new QChartView(chart);
+    view->setRenderHint(QPainter::Antialiasing);
+    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    view->setMinimumHeight(minHeight);
+    return view;
+}
+
+QChartView* makePieChartView(const QString& title,
+                             const QList<QPair<QString, qreal>>& values,
+                             const QList<QColor>& palette = {},
+                             Qt::Alignment legendAlignment = Qt::AlignRight)
+{
+    auto* series = new QPieSeries();
+    qreal total = 0.0;
+    for (const auto& it : values) total += qMax<qreal>(0.0, it.second);
+
+    for (int i = 0; i < values.size(); ++i) {
+        const QString& label = values[i].first;
+        const qreal value = qMax<qreal>(0.0, values[i].second);
+        if (value <= 0.0) continue;
+
+        const qreal pct = (total > 0.0) ? (value * 100.0 / total) : 0.0;
+        auto* slice = series->append(QStringLiteral("%1 — %2 (%3%)")
+                                         .arg(label)
+                                         .arg(QString::number(value, 'f', 0))
+                                         .arg(QString::number(pct, 'f', 1)),
+                                     value);
+        slice->setLabelVisible(true);
+        slice->setLabelArmLengthFactor(0.10);
+        slice->setBorderColor(Qt::white);
+        if (i < palette.size()) slice->setColor(palette[i]);
     }
 
-    // Add a stacked bar chart: status distribution across categories
-    QBarSet *setActifs = new QBarSet("Actifs");
-    QBarSet *setConge  = new QBarSet("En congé");
-    QBarSet *setSusp   = new QBarSet("Suspendus");
-    // Example data for three departments
-    *setActifs << 18 << 15 << 9;
-    *setConge  << 3  << 2  << 3;
-    *setSusp   << 1  << 1  << 1;
+    auto* chart = createBaseChart(title, true, legendAlignment);
+    chart->addSeries(series);
+    return makeChartView(chart, 280);
+}
+}
 
-    QBarSeries *barSeries = new QBarSeries();
-    barSeries->append(setActifs);
-    barSeries->append(setConge);
-    barSeries->append(setSusp);
-
-    QChart *barChart = new QChart();
-    barChart->addSeries(barSeries);
-    barChart->setTitle("Statut par département");
-    barChart->setAnimationOptions(QChart::AllAnimations);
-    QStringList categories;
-    categories << "Production" << "Qualité" << "Support";
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    axisX->append(categories);
-    QValueAxis *axisY = new QValueAxis();
-    axisY->setRange(0, 20);
-    axisY->setTitleText("Employés");
-    barChart->addAxis(axisX, Qt::AlignBottom);
-    barChart->addAxis(axisY, Qt::AlignLeft);
-    barSeries->attachAxis(axisX);
-    barSeries->attachAxis(axisY);
-    barChart->legend()->setVisible(true);
-    barChart->legend()->setAlignment(Qt::AlignBottom);
-
-    QChartView *barView = new QChartView(barChart);
-    barView->setRenderHint(QPainter::Antialiasing);
-
-    // Add a line chart: headcount trend over months
-    QLineSeries *lineSeries = new QLineSeries();
-    lineSeries->setName("Effectif total");
-    // Example monthly totals
-    lineSeries->append(0, 38);
-    lineSeries->append(1, 39);
-    lineSeries->append(2, 40);
-    lineSeries->append(3, 41);
-    lineSeries->append(4, 43);
-    lineSeries->append(5, 45);
-
-    QChart *lineChart = new QChart();
-    lineChart->addSeries(lineSeries);
-    lineChart->setTitle("Tendance de l'effectif (semestre)");
-    lineChart->setAnimationOptions(QChart::AllAnimations);
-
-    QValueAxis *xAxis = new QValueAxis();
-    xAxis->setLabelFormat("%d");
-    xAxis->setTitleText("Mois");
-    xAxis->setTickCount(7);
-    xAxis->setRange(0, 5);
-    QValueAxis *yAxis = new QValueAxis();
-    yAxis->setTitleText("Employés");
-    yAxis->setRange(35, 50);
-    lineChart->addAxis(xAxis, Qt::AlignBottom);
-    lineChart->addAxis(yAxis, Qt::AlignLeft);
-    lineSeries->attachAxis(xAxis);
-    lineSeries->attachAxis(yAxis);
-    lineChart->legend()->setVisible(false);
-
-    QChartView *lineView = new QChartView(lineChart);
-    lineView->setRenderHint(QPainter::Antialiasing);
-
-    // Size policies and minimum heights for better presence
-    chartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    barView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    lineView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    chartView->setMinimumHeight(260);
-    barView->setMinimumHeight(260);
-    lineView->setMinimumHeight(260);
-
-    // Place pie and bar side-by-side, line spanning full width below
-    grid->addWidget(chartView, 0, 0);
-    grid->addWidget(barView,   0, 1);
-    grid->addWidget(lineView,  1, 0, 1, 2);
-    grid->setColumnStretch(0, 1);
-    grid->setColumnStretch(1, 1);
-    grid->setRowStretch(0, 1);
-    grid->setRowStretch(1, 1);
+void MainWindow::setupPersonnelChart()
+{
+    // Use live DB-backed stats rendering as the single personnel chart source.
+    loadEmployeeStats();
 }
 
 void MainWindow::loadEmployeeStats()
 {
     QWidget* container = ui->chartStatusContainer;
+    if (!container) return;
 
     // ── clear any previous charts ─────────────────────────────────────────
-    QLayout* oldLayout = container->layout();
-    if (oldLayout) {
-        QLayoutItem* item;
-        while ((item = oldLayout->takeAt(0)) != nullptr) {
-            if (item->widget()) item->widget()->deleteLater();
-            delete item;
-        }
-        delete oldLayout;
-    }
+    QGridLayout* grid = ensureChartGrid(container, QMargins(10, 10, 10, 10), 12, 12);
+    clearLayoutWidgets(grid);
 
     // ── query: COUNT per role ─────────────────────────────────────────────
     QSqlQuery q;
     q.prepare("SELECT role, COUNT(*) AS nb FROM EMPLOYE GROUP BY role ORDER BY role");
     if (!q.exec()) {
-        QVBoxLayout* lay = new QVBoxLayout(container);
         QLabel* err = new QLabel("Erreur DB: " + q.lastError().text(), container);
         err->setAlignment(Qt::AlignCenter);
         err->setStyleSheet("color: red; font-size: 12pt;");
-        lay->addWidget(err);
+        grid->addWidget(err, 0, 0);
         return;
     }
 
@@ -2452,19 +2638,16 @@ void MainWindow::loadEmployeeStats()
     }
 
     if (total == 0) {
-        QVBoxLayout* lay = new QVBoxLayout(container);
         QLabel* empty = new QLabel("Aucun employé dans la base de données.", container);
         empty->setAlignment(Qt::AlignCenter);
         empty->setStyleSheet("font-size: 12pt; color: gray;");
-        lay->addWidget(empty);
+        grid->addWidget(empty, 0, 0);
         return;
     }
 
-    // ── title label ───────────────────────────────────────────────────────
-    QLabel* title = new QLabel(
-        QString("Statistiques des employés  —  %1 employé(s) au total").arg(total));
+    QLabel* title = new QLabel(QString("Statistiques des employés  —  %1 employé(s) au total").arg(total));
     title->setAlignment(Qt::AlignCenter);
-    title->setStyleSheet("font-size: 14pt; font-weight: bold; padding: 8px;");
+    title->setStyleSheet("font-size: 14pt; font-weight: bold; padding: 6px;");
 
     // ── fixed colours per role ────────────────────────────────────────────
     QMap<QString, QColor> roleColors;
@@ -2473,30 +2656,13 @@ void MainWindow::loadEmployeeStats()
     roleColors["Technicien"]     = QColor("#50C878");
     roleColors["Operateur"]      = QColor("#F4A460");
 
-    // ══ CHART 1: Pie — répartition par rôle ══════════════════════════════
-    QPieSeries* pieSeries = new QPieSeries();
+    QList<QPair<QString, qreal>> pieData;
+    QList<QColor> piePalette;
     for (auto it = roleCount.constBegin(); it != roleCount.constEnd(); ++it) {
-        double pct = 100.0 * it.value() / total;
-        QPieSlice* slice = pieSeries->append(
-            QString("%1\n%2 (%3%)").arg(it.key()).arg(it.value())
-                .arg(QString::number(pct, 'f', 1)),
-            it.value());
-        if (roleColors.contains(it.key()))
-            slice->setColor(roleColors[it.key()]);
-        slice->setLabelVisible(true);
-        slice->setLabelColor(Qt::black);
+        pieData.append({it.key(), static_cast<qreal>(it.value())});
+        piePalette.append(roleColors.value(it.key(), QColor("#90a4ae")));
     }
-    QChart* pieChart = new QChart();
-    pieChart->addSeries(pieSeries);
-    pieChart->setTitle("Répartition par rôle");
-    pieChart->setTitleFont(QFont("Segoe UI", 11, QFont::Bold));
-    pieChart->legend()->setAlignment(Qt::AlignRight);
-    pieChart->setAnimationOptions(QChart::AllAnimations);
-    pieChart->setBackgroundVisible(false);
-    QChartView* pieView = new QChartView(pieChart);
-    pieView->setRenderHint(QPainter::Antialiasing);
-    pieView->setMinimumHeight(280);
-    pieView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QChartView* pieView = makePieChartView(tr("Répartition par rôle"), pieData, piePalette, Qt::AlignRight);
 
     // ══ CHART 2: Bar — nombre d'employés par rôle ════════════════════════
     QBarSet* barSet = new QBarSet("Employés");
@@ -2522,60 +2688,35 @@ void MainWindow::loadEmployeeStats()
     axisY->setLabelFormat("%d");
     axisY->setRange(0, total + 1);
 
-    QChart* barChart = new QChart();
+    QChart* barChart = createBaseChart(tr("Nombre d'employés par rôle"), false);
     barChart->addSeries(barSeries);
-    barChart->setTitle("Nombre d'employés par rôle");
-    barChart->setTitleFont(QFont("Segoe UI", 11, QFont::Bold));
     barChart->addAxis(axisX, Qt::AlignBottom);
     barChart->addAxis(axisY, Qt::AlignLeft);
     barSeries->attachAxis(axisX);
     barSeries->attachAxis(axisY);
-    barChart->legend()->setVisible(false);
-    barChart->setAnimationOptions(QChart::SeriesAnimations);
-    barChart->setBackgroundVisible(false);
-
-    QChartView* barView = new QChartView(barChart);
-    barView->setRenderHint(QPainter::Antialiasing);
-    barView->setMinimumHeight(280);
-    barView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QChartView* barView = makeChartView(barChart, 280);
 
     // ── assemble layout ───────────────────────────────────────────────────
-    QVBoxLayout* mainLay = new QVBoxLayout(container);
-    mainLay->setContentsMargins(10, 10, 10, 10);
-    mainLay->setSpacing(16);
-    mainLay->addWidget(title);
-
-    QHBoxLayout* chartsRow = new QHBoxLayout();
-    chartsRow->setSpacing(12);
-    chartsRow->addWidget(pieView, 1);
-    chartsRow->addWidget(barView, 1);
-    mainLay->addLayout(chartsRow, 1);
+    grid->addWidget(title, 0, 0, 1, 2);
+    grid->addWidget(pieView, 1, 0);
+    grid->addWidget(barView, 1, 1);
+    grid->setColumnStretch(0, 1);
+    grid->setColumnStretch(1, 1);
+    grid->setRowStretch(1, 1);
 }
 
 void MainWindow::setupCiterneChart()
 {
     if (!ui->chartStatusContainer_3) return;
-    QGridLayout *grid = qobject_cast<QGridLayout*>(ui->chartStatusContainer_3->layout());
-    if (!grid) {
-        grid = new QGridLayout(ui->chartStatusContainer_3);
-        grid->setContentsMargins(0, 0, 0, 0);
-        grid->setHorizontalSpacing(12);
-        grid->setVerticalSpacing(12);
-    } else if (grid->count() > 0) {
-        return; // already populated
-    }
+    QGridLayout *grid = ensureChartGrid(ui->chartStatusContainer_3, QMargins(0, 0, 0, 0), 12, 12);
+    if (!grid || grid->count() > 0) return;
 
     // Pie: Répartition de l'état des citernes
-    QPieSeries *etatSeries = new QPieSeries();
-    etatSeries->append("Opérationnel", 12);
-    etatSeries->append("Maintenance", 3);
-    etatSeries->append("Hors service", 1);
-    QChart *etatChart = new QChart();
-    etatChart->addSeries(etatSeries);
-    etatChart->setTitle("État des citernes");
-    etatChart->legend()->setAlignment(Qt::AlignRight);
-    QChartView *etatView = new QChartView(etatChart);
-    etatView->setRenderHint(QPainter::Antialiasing);
+    QChartView *etatView = makePieChartView(
+        tr("État des citernes"),
+        {{tr("Opérationnel"), 12}, {tr("Maintenance"), 3}, {tr("Hors service"), 1}},
+        {QColor("#50C878"), QColor("#F4A460"), QColor("#D9534F")},
+        Qt::AlignRight);
 
     // Bar: Capacités par type d'huile
     QBarSet *setOlive = new QBarSet("Olive");
@@ -2588,43 +2729,27 @@ void MainWindow::setupCiterneChart()
     capSeries->append(setOlive);
     capSeries->append(setTournesol);
     capSeries->append(setColza);
-    QChart *capChart = new QChart();
+    QChart *capChart = createBaseChart(tr("Capacité totale par type"), true, Qt::AlignBottom);
     capChart->addSeries(capSeries);
-    capChart->setTitle("Capacité totale par type");
-    capChart->setAnimationOptions(QChart::AllAnimations);
     QStringList cats; cats << "Nord" << "Centre" << "Sud";
     QBarCategoryAxis *axisX = new QBarCategoryAxis(); axisX->append(cats);
     QValueAxis *axisY = new QValueAxis(); axisY->setTitleText("m³"); axisY->setRange(0, 80);
     capChart->addAxis(axisX, Qt::AlignBottom); capChart->addAxis(axisY, Qt::AlignLeft);
     capSeries->attachAxis(axisX); capSeries->attachAxis(axisY);
-    capChart->legend()->setAlignment(Qt::AlignBottom);
-    QChartView *capView = new QChartView(capChart);
-    capView->setRenderHint(QPainter::Antialiasing);
+    QChartView *capView = makeChartView(capChart, 260);
 
     // Line: Température moyenne (semaine)
     QLineSeries *tempSeries = new QLineSeries();
     tempSeries->setName("Température moyenne");
     tempSeries->append(0, 18); tempSeries->append(1, 19); tempSeries->append(2, 20);
     tempSeries->append(3, 21); tempSeries->append(4, 20); tempSeries->append(5, 19);
-    QChart *tempChart = new QChart();
+    QChart *tempChart = createBaseChart(tr("Température (7 jours)"), false);
     tempChart->addSeries(tempSeries);
-    tempChart->setTitle("Température (7 jours)");
-    tempChart->setAnimationOptions(QChart::AllAnimations);
     QValueAxis *tx = new QValueAxis(); tx->setTitleText("Jour"); tx->setRange(0, 6);
     QValueAxis *ty = new QValueAxis(); ty->setTitleText("°C"); ty->setRange(16, 24);
     tempChart->addAxis(tx, Qt::AlignBottom); tempChart->addAxis(ty, Qt::AlignLeft);
     tempSeries->attachAxis(tx); tempSeries->attachAxis(ty);
-    tempChart->legend()->setVisible(false);
-    QChartView *tempView = new QChartView(tempChart);
-    tempView->setRenderHint(QPainter::Antialiasing);
-
-    // Size policies and minima
-    etatView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    capView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    tempView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    etatView->setMinimumHeight(260);
-    capView->setMinimumHeight(260);
-    tempView->setMinimumHeight(260);
+    QChartView *tempView = makeChartView(tempChart, 260);
 
     // Arrange: two charts side-by-side, one full width below
     grid->addWidget(etatView, 0, 0);
@@ -2639,29 +2764,15 @@ void MainWindow::setupCiterneChart()
 void MainWindow::setupStocksChart()
 {
     if (!ui->chartStatusContainer_2) return;
-    QGridLayout *grid2 = qobject_cast<QGridLayout*>(ui->chartStatusContainer_2->layout());
-    if (!grid2) {
-        grid2 = new QGridLayout(ui->chartStatusContainer_2);
-        // Keep charts comfortably below any top controls without large gaps
-        grid2->setContentsMargins(0, 12, 0, 0);
-        grid2->setHorizontalSpacing(12);
-        grid2->setVerticalSpacing(12);
-    } else if (grid2->count() > 0) {
-        return;
-    }
+    QGridLayout *grid2 = ensureChartGrid(ui->chartStatusContainer_2, QMargins(0, 12, 0, 0), 12, 12);
+    if (!grid2 || grid2->count() > 0) return;
 
     // Pie: Répartition des stocks par catégorie
-    QPieSeries *catSeries = new QPieSeries();
-    catSeries->append("Extra", 30);
-    catSeries->append("Fine", 25);
-    catSeries->append("Standard", 35);
-    catSeries->append("Déclassé", 10);
-    QChart *catChart = new QChart();
-    catChart->addSeries(catSeries);
-    catChart->setTitle("Stocks par catégorie");
-    catChart->legend()->setAlignment(Qt::AlignRight);
-    QChartView *catView = new QChartView(catChart);
-    catView->setRenderHint(QPainter::Antialiasing);
+    QChartView *catView = makePieChartView(
+        tr("Stocks par catégorie"),
+        {{tr("Extra"), 30}, {tr("Fine"), 25}, {tr("Standard"), 35}, {tr("Déclassé"), 10}},
+        {QColor("#43a047"), QColor("#66bb6a"), QColor("#90caf9"), QColor("#ef5350")},
+        Qt::AlignRight);
 
     // Bar: Entrées vs sorties (mois)
     QBarSet *entrees = new QBarSet("Entrées");
@@ -2670,23 +2781,14 @@ void MainWindow::setupStocksChart()
     *sorties << 100 << 140 << 120 << 150 << 130;
     QBarSeries *flowSeries = new QBarSeries();
     flowSeries->append(entrees); flowSeries->append(sorties);
-    QChart *flowChart = new QChart();
+    QChart *flowChart = createBaseChart(tr("Flux mensuels"), true, Qt::AlignBottom);
     flowChart->addSeries(flowSeries);
-    flowChart->setTitle("Flux mensuels");
-    flowChart->setAnimationOptions(QChart::AllAnimations);
     QStringList mois; mois << "Jan" << "Fév" << "Mar" << "Avr" << "Mai";
     QBarCategoryAxis *fx = new QBarCategoryAxis(); fx->append(mois);
     QValueAxis *fy = new QValueAxis(); fy->setTitleText("Qté"); fy->setRange(0, 200);
     flowChart->addAxis(fx, Qt::AlignBottom); flowChart->addAxis(fy, Qt::AlignLeft);
     flowSeries->attachAxis(fx); flowSeries->attachAxis(fy);
-    flowChart->legend()->setAlignment(Qt::AlignBottom);
-    QChartView *flowView = new QChartView(flowChart);
-    flowView->setRenderHint(QPainter::Antialiasing);
-
-    catView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    flowView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    catView->setMinimumHeight(280);
-    flowView->setMinimumHeight(280);
+    QChartView *flowView = makeChartView(flowChart, 280);
     // Arrange side-by-side in one row
     grid2->addWidget(catView,  0, 0);
     grid2->addWidget(flowView, 0, 1);
@@ -2698,51 +2800,28 @@ void MainWindow::setupStocksChart()
 void MainWindow::setupQualiteChart()
 {
     if (!ui->chartStatusContainer_4) return;
-    QGridLayout *grid4 = qobject_cast<QGridLayout*>(ui->chartStatusContainer_4->layout());
-    if (!grid4) {
-        grid4 = new QGridLayout(ui->chartStatusContainer_4);
-        // Leave minimal room for any top controls without introducing large top padding
-        grid4->setContentsMargins(0, 12, 0, 0);
-        grid4->setHorizontalSpacing(12);
-        grid4->setVerticalSpacing(12);
-    } else if (grid4->count() > 0) {
-        return;
-    }
+    QGridLayout *grid4 = ensureChartGrid(ui->chartStatusContainer_4, QMargins(0, 12, 0, 0), 12, 12);
+    if (!grid4 || grid4->count() > 0) return;
 
     // Pie: Notes qualité
-    QPieSeries *notes = new QPieSeries();
-    notes->append("A", 40);
-    notes->append("B", 35);
-    notes->append("C", 20);
-    notes->append("D", 5);
-    QChart *notesChart = new QChart();
-    notesChart->addSeries(notes);
-    notesChart->setTitle("Distribution des notes");
-    notesChart->legend()->setAlignment(Qt::AlignRight);
-    QChartView *notesView = new QChartView(notesChart);
-    notesView->setRenderHint(QPainter::Antialiasing);
+    QChartView *notesView = makePieChartView(
+        tr("Distribution des notes"),
+        {{QStringLiteral("A"), 40}, {QStringLiteral("B"), 35}, {QStringLiteral("C"), 20}, {QStringLiteral("D"), 5}},
+        {QColor("#2e7d32"), QColor("#66bb6a"), QColor("#ffa726"), QColor("#ef5350")},
+        Qt::AlignRight);
 
     // Line: Tendance de la qualité (mois)
     QLineSeries *qualTrend = new QLineSeries();
     qualTrend->setName("Indice qualité");
     qualTrend->append(0, 82); qualTrend->append(1, 84); qualTrend->append(2, 83);
     qualTrend->append(3, 85); qualTrend->append(4, 87); qualTrend->append(5, 88);
-    QChart *trendChart = new QChart();
+    QChart *trendChart = createBaseChart(tr("Tendance qualité (semestre)"), false);
     trendChart->addSeries(qualTrend);
-    trendChart->setTitle("Tendance qualité (semestre)");
-    trendChart->setAnimationOptions(QChart::AllAnimations);
     QValueAxis *qx = new QValueAxis(); qx->setTitleText("Mois"); qx->setRange(0, 5); qx->setTickCount(6);
     QValueAxis *qy = new QValueAxis(); qy->setTitleText("Indice"); qy->setRange(75, 95);
     trendChart->addAxis(qx, Qt::AlignBottom); trendChart->addAxis(qy, Qt::AlignLeft);
     qualTrend->attachAxis(qx); qualTrend->attachAxis(qy);
-    trendChart->legend()->setVisible(false);
-    QChartView *trendView = new QChartView(trendChart);
-    trendView->setRenderHint(QPainter::Antialiasing);
-
-    notesView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    trendView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    notesView->setMinimumHeight(280);
-    trendView->setMinimumHeight(280);
+    QChartView *trendView = makeChartView(trendChart, 280);
     // Arrange side-by-side in one row
     grid4->addWidget(notesView,  0, 0);
     grid4->addWidget(trendView, 0, 1);
@@ -2751,6 +2830,7 @@ void MainWindow::setupQualiteChart()
     grid4->setRowStretch(0, 1);
 }
 
+// ── Personnel table population + row action buttons ─────────────────────────
 void MainWindow::loadEmployeeTable()
 {
     QTableWidget* table = ui->tableEmp;
@@ -3041,6 +3121,7 @@ void MainWindow::addActionsColumnTo(QTableWidget* table)
     }
 }
 
+// ── Face-auth + employee export flows ───────────────────────────────────────
 void MainWindow::on_faceBtn_clicked()
 {
     if (!m_faceService || !m_faceService->isAvailable()) {

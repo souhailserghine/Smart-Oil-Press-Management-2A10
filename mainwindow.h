@@ -6,8 +6,10 @@
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QToolButton>
+#include <QPushButton>
 #include <QByteArray>
 #include <QMap>
+#include "arduino.h"
 
 class FaceRecognitionService;
 
@@ -16,6 +18,7 @@ class QWidget;
 class QTimer;
 class QCheckBox;
 class QComboBox;
+class QSqlQuery;
 class HoverShadowFilter; // Forward declaration for HoverShadowFilter
 
 QT_BEGIN_NAMESPACE
@@ -33,7 +36,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_toolButton_clicked();
     void on_loginbtn_clicked();
     void on_btnAjouterEmp_clicked();   // toolbar button → navigate to form page
     void on_ajouterEmpBtn_clicked();   // form submit button → INSERT employee
@@ -93,6 +95,7 @@ private slots:
     void on_btnAjouterAgr_clicked();
     void on_btnStatAgr_clicked();
     void on_btnAvanceAgr_clicked();
+    void onFingerprintTerminalReadyRead();
 
 
 private:
@@ -114,6 +117,11 @@ private:
     QTableWidget* findOwningTable(QObject* child) const;
     void setupActionsForAllTables();
     void setActiveModuleButton(int index);
+    int moduleIndex(QWidget* moduleWidget) const;
+    void ensureModuleIndex(int moduleIndex);
+    void openModulePage(QStackedWidget* modulePages, int moduleIndex, int pageIndex);
+    void openSidebarModule(int moduleIndex, QStackedWidget* modulePages, int pageIndex,
+                           int activeButtonIndex, bool refreshStockChoices = false);
 
     // UX enhancements
     void crossFadeToIndex(QStackedWidget* stack, int newIndex);
@@ -128,7 +136,6 @@ private:
     void setupSettingsAutoAssignOption();
     void setupAffectationStatusFilter();
     void setupAffectationOpenEndedOption();
-    void ensureStockSerieSelector();
     void refreshStockSerieChoices();
     bool tryAutoAssignForSerie(int serieId, QString& detailMessage);
     void loadStocksTable();
@@ -149,9 +156,19 @@ private:
 
     // ── Facial recognition (moved out to a service) ───────────────────────
     QByteArray encodeFaceFromFile(const QString& imagePath);
-    void loadFaceEmbeddings();
-    int matchFaceEmbedding(const QByteArray& embeddingBlob);
+    void initFingerprintTerminal();
+    void processFingerprintTerminalLine(const QString& line);
+    void sendFingerprintTerminalCommand(const QString& command);
+    bool resolveEmployeeByFingerprintId(int fingerprintId, int& employeeId, QString& fullName) const;
+    void setFingerprintStatus(const QString& text, const QString& style = QString());
+    bool saveFingerprintIdForEmployee(int employeeId, int fingerprintId) const;
+    void tryLinkPendingFingerprintForEmployee(int employeeId, const QString& contextPastPart);
+    void startFingerprintEnrollmentFromForm();
     FaceRecognitionService* m_faceService = nullptr;
+    Arduino m_fingerprintTerminal;
+    QByteArray m_fingerprintRxBuffer;
+    int m_pendingFingerprintId = -1;
+    bool m_fingerprintEnrollInProgress = false;
 
     bool m_sidebarCollapsed = false;
     int  m_loggedInId = -1;            // id_emp of the currently authenticated user
@@ -163,15 +180,20 @@ private:
     int  m_maxAffectationsPerEmployee = 3;
     bool m_autoAssignFromStock = false;
     QCheckBox* m_settingsAutoAssignCheck = nullptr;
-    QComboBox* m_affStatusFilterCombo = nullptr;
-    QCheckBox* m_affOpenEndedCheck = nullptr;
-    QComboBox* m_stockSerieCombo = nullptr;
 
     // ── Affectation helpers ──────────────────────────────────────────────────
     void loadAffectationTable();
     void populateAffCombos();
     void filterAffTable();
     void updateAffectationRemainingInfo();
+    bool hasDuplicateAffectation(int empId, int serieId) const;
+    void prepareInsertAffectationQuery(QSqlQuery& query,
+                                       int empId,
+                                       int serieId,
+                                       const QString& poste,
+                                       const QDate& dateDeb,
+                                       const QVariant& dateFinValue) const;
+    void resetAffectationEditState();
     QToolButton* m_chatLauncher = nullptr;
     // Bottom-center clock in status bar
     QLabel* m_clockLabel = nullptr;
