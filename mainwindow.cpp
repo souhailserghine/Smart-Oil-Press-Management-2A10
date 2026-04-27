@@ -207,28 +207,60 @@ void MainWindow::openCiternesWindow(int pageIndex)
     m_citernesWindow->activateWindow();
 }
 
+// ── Lifecycle: destruction / resource cleanup ───────────────────────────────
+MainWindow::~MainWindow()
+{
+    // Always release serial port before UI teardown.
+    m_fingerprintTerminal.close_arduino();
+    delete ui;
+}
+
+// ── Face-recognition service adapters (thin wrappers over m_faceService) ───
+
 QByteArray MainWindow::encodeFaceFromFile(const QString& imagePath)
 {
     return m_faceService ? m_faceService->encodeFaceFromFile(imagePath) : QByteArray{};
 }
 
-void MainWindow::loadFaceEmbeddings()
+void MainWindow::setFingerprintStatus(const QString& text, const QString& style)
 {
-    if (m_faceService) m_faceService->loadFaceEmbeddings();
+    if (!ui || !ui->faceStatusLabel) return;
+    ui->faceStatusLabel->setText(text);
+    ui->faceStatusLabel->setStyleSheet(style);
 }
 
-int MainWindow::matchFaceEmbedding(const QByteArray& embeddingBlob)
+void MainWindow::initFingerprintTerminal()
 {
-    return m_faceService ? m_faceService->matchFaceEmbeddingBlob(embeddingBlob) : -1;
+    const int rc = m_fingerprintTerminal.connect_arduino();
+    if (rc != 0) {
+        setFingerprintStatus(tr("⚠ Terminal d'empreintes non détecté."), 
+                           QStringLiteral("color: #ef6c00; font-weight: bold;"));
+        return;
+    }
+
+    QObject::connect(m_fingerprintTerminal.getserial(), &QSerialPort::readyRead,
+                     this, &MainWindow::onFingerprintTerminalReadyRead);
+
+    // When user returns to login screen, re-enable fingerprint scanning
+    if (ui && ui->MainStacked) {
+        QObject::connect(ui->MainStacked, QOverload<int>::of(&QStackedWidget::currentChanged),
+                        this, [this](int index) {
+            if (index == 0) {  // 0 = login screen
+                sendFingerprintTerminalCommand("LOGIN_ON");
+            }
+        });
+    }
+
+    sendFingerprintTerminalCommand(QStringLiteral("LOGIN_ON"));
 }
 
-void MainWindow::on_toolButton_clicked()
+void MainWindow::sendFingerprintTerminalCommand(const QString& command)
 {
-    // Slot required by Qt auto-connect (on_<objectName>_clicked).
-    // If this button is not used anymore, remove/rename it in `mainwindow.ui`.
+    QByteArray payload = command.toUtf8() + "\n";
+    m_fingerprintTerminal.write_to_arduino(payload);
 }
 
-MainWindow::~MainWindow()
+void MainWindow::startFingerprintEnrollmentFromForm()
 {
     if (machineSerial && machineSerial->isOpen())
         machineSerial->close();
@@ -287,12 +319,18 @@ void MainWindow::on_ajouterEmpBtn_clicked()
         return;
     }
 
+    const auto buildFaceBlob = [this]() {
+        QByteArray faceBlob = m_capturedFaceBlob;
+        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty()) {
+            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+        }
+        return faceBlob;
+    };
+
     if (isEditing) {
         // ── UPDATE mode ─────────────────────────────────────────────────────
         // Priority: live webcam capture > photo-file encoding > keep existing in DB
-        QByteArray faceBlob = m_capturedFaceBlob;
-        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
-            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+        QByteArray faceBlob = buildFaceBlob();
 
         Employe emp(editingId, nom, prenom, email, role, mdp, QDate(),
                     m_selectedPhoto, QByteArray(), faceBlob);
@@ -301,6 +339,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
                 tr("Impossible de modifier l'employé :\n%1").arg(emp.lastError().text()));
             return;
         }
+
+    tryLinkPendingFingerprintForEmployee(editingId, tr("modifié"));
+
         QMessageBox::information(this, tr("Succès"),
             tr("L'employé (ID : %1) a été modifié avec succès.").arg(editingId));
 
@@ -311,9 +352,7 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     } else {
         // ── INSERT mode ─────────────────────────────────────────────────────
         // Priority: live webcam capture > photo-file encoding
-        QByteArray faceBlob = m_capturedFaceBlob;
-        if (faceBlob.isEmpty() && !ui->photoPathLineEdit->text().isEmpty())
-            faceBlob = encodeFaceFromFile(ui->photoPathLineEdit->text());
+        QByteArray faceBlob = buildFaceBlob();
 
         Employe emp(0, nom, prenom, email, role, mdp, QDate(),
                     m_selectedPhoto, QByteArray(), faceBlob);
@@ -322,6 +361,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
                 tr("Impossible d'ajouter l'employé :\n%1").arg(emp.lastError().text()));
             return;
         }
+
+    tryLinkPendingFingerprintForEmployee(emp.getIdEmp(), tr("ajouté"));
+
         QMessageBox::information(this, tr("Succès"),
             tr("L'employé a été ajouté avec succès (ID : %1).").arg(emp.getIdEmp()));
     }
@@ -335,8 +377,9 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     ui->photoPathLineEdit->clear();
     m_selectedPhoto.clear();
     m_capturedFaceBlob.clear();
-    ui->faceStatusLabel->setText(tr("Aucun visage capturé"));
-    ui->faceStatusLabel->setStyleSheet("");
+    m_pendingFingerprintId = -1;
+    m_fingerprintEnrollInProgress = false;
+    setFingerprintStatus(tr("Aucun visage capturé"), QString());
     validateEmployeeForm(false);
 }
 
@@ -366,8 +409,8 @@ void MainWindow::on_parcourirPhotoBtn_clicked()
         const QByteArray blob = encodeFaceFromFile(path);
         if (!blob.isEmpty()) {
             m_capturedFaceBlob = blob;
-            ui->faceStatusLabel->setText(tr("✔ Visage détecté depuis la photo"));
-            ui->faceStatusLabel->setStyleSheet("color: #2e7d32;");
+            setFingerprintStatus(tr("✔ Visage détecté depuis la photo"),
+                                 QStringLiteral("color: #2e7d32;"));
         }
     }
 }
@@ -386,8 +429,8 @@ void MainWindow::on_captureFaceBtn_clicked()
     if (blob.isEmpty()) return;
 
     m_capturedFaceBlob = blob;
-    ui->faceStatusLabel->setText(tr("✔ Visage capturé avec succès"));
-    ui->faceStatusLabel->setStyleSheet("color: #2e7d32; font-weight: bold;");
+    setFingerprintStatus(tr("✔ Visage capturé avec succès"),
+                         QStringLiteral("color: #2e7d32; font-weight: bold;"));
 }
 
 void MainWindow::on_btnConsulterEmp_clicked()
@@ -755,6 +798,51 @@ void MainWindow::setActiveModuleButton(int index)
     case 5: ui->btnmod2->setChecked(true); break;
     default: ui->btnmod1->setChecked(true); break;
     }
+
+    // module index -> sidebar button mapping
+    QPushButton* mapped[] = {
+        ui->btnmod1,    // module1
+        ui->btnmod3,    // module3
+        ui->btnmod4,    // module4
+        ui->btnmod5,    // module5
+        ui->btnmod6,    // module6
+        ui->btnmod2,    // module2
+        ui->btnSettings // module7
+    };
+
+    const int clamped = (index >= 0 && index < 7) ? index : 0;
+    if (mapped[clamped]) mapped[clamped]->setChecked(true);
+}
+
+// ── Generic UI helpers (page switch / avatar / layout reactions) ───────────
+int MainWindow::moduleIndex(QWidget* moduleWidget) const
+{
+    if (!ui || !ui->modules || !moduleWidget) return -1;
+    return ui->modules->indexOf(moduleWidget);
+}
+
+void MainWindow::ensureModuleIndex(int moduleIndex)
+{
+    if (!ui || !ui->modules) return;
+    if (moduleIndex < 0 || moduleIndex >= ui->modules->count()) return;
+    if (ui->modules->currentIndex() == moduleIndex) return;
+    crossFadeToIndex(ui->modules, moduleIndex);
+}
+
+void MainWindow::openModulePage(QStackedWidget* modulePages, int moduleIndex, int pageIndex)
+{
+    ensureModuleIndex(moduleIndex);
+    crossFadeToIndex(modulePages, pageIndex);
+}
+
+void MainWindow::openSidebarModule(int moduleIndex, QStackedWidget* modulePages, int pageIndex,
+                                   int activeButtonIndex, bool refreshStockChoices)
+{
+    if (ui && ui->MainStacked) ui->MainStacked->setCurrentIndex(1);
+    ensureModuleIndex(moduleIndex);
+    if (modulePages && pageIndex >= 0) crossFadeToIndex(modulePages, pageIndex);
+    if (refreshStockChoices) refreshStockSerieChoices();
+    setActiveModuleButton(activeButtonIndex);
 }
 
 void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
@@ -849,45 +937,61 @@ void MainWindow::setupInteractiveHooks()
 
     // Live remaining-slots info for affectation form
     if (ui->affEmpCombo) {
-        QObject::connect(ui->affEmpCombo, &QComboBox::currentIndexChanged, this,
-            [this](int){ updateAffectationRemainingInfo(); });
+        if (!ui->affEmpCombo->property("wiredCurrentIndexChanged").toBool()) {
+            QObject::connect(ui->affEmpCombo, &QComboBox::currentIndexChanged, this,
+                             [this](int) { updateAffectationRemainingInfo(); });
+            ui->affEmpCombo->setProperty("wiredCurrentIndexChanged", true);
+        }
     }
 }
 
+// ── Form validation and UX behavior setup ───────────────────────────────────
 void MainWindow::setupEmployeeFormValidation()
 {
     if (!ui->formLayout || !ui->formLayoutWidget)
         return;
+
+    const auto resolveValidationHost = [this]() -> QWidget* {
+        if (ui->module1) return static_cast<QWidget*>(ui->module1);
+        if (ui->ajoutpersonnel) return static_cast<QWidget*>(ui->ajoutpersonnel);
+        return ui->formLayoutWidget ? ui->formLayoutWidget->parentWidget() : nullptr;
+    };
 
     // Keep the form compact enough so the submit row is visible without excessive clipping.
     ui->formLayout->setVerticalSpacing(22);
 
     // Prevent placeholder/text clipping on dense DPI/font setups.
     const int fieldMinH = 34;
-    ui->nomLineEdit->setMinimumHeight(fieldMinH);
-    ui->prNomLineEdit->setMinimumHeight(fieldMinH);
-    ui->emailLineEdit->setMinimumHeight(fieldMinH);
-    ui->mdpLineEdit->setMinimumHeight(fieldMinH);
-    ui->roleComboBox->setMinimumHeight(fieldMinH);
-    ui->dateDEmbaucheDateEdit->setMinimumHeight(fieldMinH);
+    for (QWidget* field : { static_cast<QWidget*>(ui->nomLineEdit),
+                            static_cast<QWidget*>(ui->prNomLineEdit),
+                            static_cast<QWidget*>(ui->emailLineEdit),
+                            static_cast<QWidget*>(ui->mdpLineEdit),
+                            static_cast<QWidget*>(ui->roleComboBox),
+                            static_cast<QWidget*>(ui->dateDEmbaucheDateEdit) }) {
+        if (field) field->setMinimumHeight(fieldMinH);
+    }
     if (ui->ajouterEmpBtn) {
         ui->ajouterEmpBtn->setMinimumHeight(36);
         ui->ajouterEmpBtn->show();
         ui->ajouterEmpBtn->raise();
     }
 
-    QWidget* validationHost = ui->module1 ? static_cast<QWidget*>(ui->module1)
-                                          : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
-                                                                : ui->formLayoutWidget->parentWidget());
+    if (ui->enrollFingerprintBtn) {
+        ui->enrollFingerprintBtn->setMinimumHeight(34);
+        if (!ui->enrollFingerprintBtn->property("wiredClicked").toBool()) {
+            QObject::connect(ui->enrollFingerprintBtn, &QPushButton::clicked,
+                             this, [this]() { startFingerprintEnrollmentFromForm(); });
+            ui->enrollFingerprintBtn->setProperty("wiredClicked", true);
+        }
+    }
+
+    QWidget* validationHost = resolveValidationHost();
     if (!validationHost)
         validationHost = ui->formLayoutWidget;
 
-    QLabel* feedback = validationHost->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"));
-    if (!feedback) {
-        feedback = new QLabel(validationHost);
-        feedback->setObjectName(QStringLiteral("employeeValidationLabel"));
-        feedback->setWordWrap(true);
-    }
+    QLabel* feedback = ui->employeeValidationLabel;
+    if (!feedback)
+        return;
 
     // Keep validation text in the right-side free space of the employee page.
     feedback->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -901,7 +1005,7 @@ void MainWindow::setupEmployeeFormValidation()
         const QPoint formTopLeft = ui->formLayoutWidget->mapTo(validationHost, QPoint(0, 0));
         const QRect formRect(formTopLeft, ui->formLayoutWidget->size());
         const int margin = 16;
-    const int desiredRightW = 200;
+        const int desiredRightW = 200;
         const int availableRightW = validationHost->width() - (formRect.right() + margin) - margin;
 
         if (availableRightW >= 120) {
@@ -920,11 +1024,7 @@ void MainWindow::setupEmployeeFormValidation()
         }
     }
     auto refreshFeedbackVisibility = [this]() {
-        QWidget* host = ui->module1 ? static_cast<QWidget*>(ui->module1)
-                                    : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
-                                                          : ui->formLayoutWidget->parentWidget());
-        if (!host) return;
-        QLabel* fb = host->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"));
+        QLabel* fb = ui->employeeValidationLabel;
         if (!fb) return;
 
         const bool onPersonnelAddPage =
@@ -970,24 +1070,35 @@ void MainWindow::setupEmployeeFormValidation()
     }
 
     // Touched-state starts false; colors appear only after focus/interaction.
-    ui->nomLineEdit->setProperty("touched", false);
-    ui->prNomLineEdit->setProperty("touched", false);
-    ui->emailLineEdit->setProperty("touched", false);
-    ui->roleComboBox->setProperty("touched", false);
-    ui->mdpLineEdit->setProperty("touched", false);
-
-    ui->nomLineEdit->installEventFilter(this);
-    ui->prNomLineEdit->installEventFilter(this);
-    ui->emailLineEdit->installEventFilter(this);
-    ui->roleComboBox->installEventFilter(this);
-    ui->mdpLineEdit->installEventFilter(this);
+    QWidget* touchFields[] = {
+        ui->nomLineEdit,
+        ui->prNomLineEdit,
+        ui->emailLineEdit,
+        ui->roleComboBox,
+        ui->mdpLineEdit
+    };
+    for (QWidget* field : touchFields) {
+        if (!field) continue;
+        field->setProperty("touched", false);
+        field->installEventFilter(this);
+    }
 
     auto liveValidate = [this]() { validateEmployeeForm(true); };
-    QObject::connect(ui->nomLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->prNomLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->emailLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->mdpLineEdit, &QLineEdit::textChanged, this, [liveValidate](const QString&) { liveValidate(); });
-    QObject::connect(ui->roleComboBox, &QComboBox::currentTextChanged, this, [liveValidate](const QString&) { liveValidate(); });
+    QLineEdit* liveLineEdits[] = {
+        ui->nomLineEdit,
+        ui->prNomLineEdit,
+        ui->emailLineEdit,
+        ui->mdpLineEdit
+    };
+    for (QLineEdit* edit : liveLineEdits) {
+        if (!edit) continue;
+        QObject::connect(edit, &QLineEdit::textChanged, this,
+                         [liveValidate](const QString&) { liveValidate(); });
+    }
+    if (ui->roleComboBox) {
+        QObject::connect(ui->roleComboBox, &QComboBox::currentTextChanged, this,
+                         [liveValidate](const QString&) { liveValidate(); });
+    }
 
     // Keep helper text visible only on Personnel > Ajouter, even when navigating via toolbar/sidebar.
     if (ui->modules) {
@@ -1006,6 +1117,7 @@ void MainWindow::setupEmployeeFormValidation()
     validateEmployeeForm(false);
 }
 
+// Validates employee form fields and updates inline visual feedback.
 bool MainWindow::validateEmployeeForm(bool showFeedbackText)
 {
     const QString nom    = ui->nomLineEdit->text().trimmed();
@@ -1079,9 +1191,7 @@ bool MainWindow::validateEmployeeForm(bool showFeedbackText)
     QWidget* validationHost = ui->module1 ? static_cast<QWidget*>(ui->module1)
                                           : (ui->ajoutpersonnel ? static_cast<QWidget*>(ui->ajoutpersonnel)
                                                                 : ui->formLayoutWidget->parentWidget());
-    QLabel* feedback = validationHost
-        ? validationHost->findChild<QLabel*>(QStringLiteral("employeeValidationLabel"))
-        : nullptr;
+    QLabel* feedback = ui->employeeValidationLabel;
     if (feedback) {
         const bool onPersonnelAddPage =
             ui->modules && ui->metierspersonnel
@@ -1151,7 +1261,9 @@ void MainWindow::filterPersonnelTable()
     }
 }
 
-void MainWindow::setupPersonnelChart()
+// ── Charts / analytics rendering ────────────────────────────────────────────
+namespace {
+void clearLayoutWidgets(QLayout* layout)
 {
     QPieSeries *series = new QPieSeries();
     series->append("Actifs", 42);
@@ -1241,6 +1353,7 @@ void MainWindow::setupPersonnelChart()
     layout->addWidget(lineView);
 }
 
+// ── Personnel table population + row action buttons ─────────────────────────
 void MainWindow::loadEmployeeTable()
 {
     QTableWidget* table = ui->tableEmp;
