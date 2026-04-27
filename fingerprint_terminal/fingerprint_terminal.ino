@@ -71,7 +71,8 @@ void loop() {
   // Scan for fingerprints if enabled
   if (!scanMode) return;
   
-  if (millis() - lastScanTime < 300) return;
+  // Scan frequently for fast recognition (50ms interval = 20 scans/sec)
+  if (millis() - lastScanTime < 50) return;
   lastScanTime = millis();
   
   scanFingerprint();
