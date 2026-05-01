@@ -469,3 +469,111 @@ bool Employe::updateFingerprintId(int employeeId, const QString &fingerprintId)
 
     return true;
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Additional Query Helpers (Refactored from MainWindow)
+// ══════════════════════════════════════════════════════════════════════════════
+
+QString Employe::getFullNameById(int employeeId)
+{
+    if (employeeId <= 0 || !QSqlDatabase::database().isOpen()) {
+        return QString();
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
+    query.bindValue(":id", employeeId);
+
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        return QString();
+    }
+
+    if (query.next()) {
+        const QString prenom = query.value(1).toString().trimmed();
+        const QString nom = query.value(0).toString().trimmed();
+        return (prenom + " " + nom).trimmed();
+    }
+
+    return QString();
+}
+
+int Employe::countAssignments(int employeeId)
+{
+    if (employeeId <= 0 || !QSqlDatabase::database().isOpen()) {
+        return -1;
+    }
+
+    QSqlQuery query;
+    query.prepare(
+        "SELECT COUNT(*) FROM EMP_MACH WHERE id_emp = :id_emp"
+    );
+    query.bindValue(":id_emp", employeeId);
+
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        qDebug() << "countAssignments() error:" << m_lastError.text();
+        return -1;
+    }
+
+    if (query.next()) {
+        return query.value(0).toInt();
+    }
+
+    return 0;
+}
+
+bool Employe::hasAffectationFor(int employeeId, int serieId)
+{
+    if (employeeId <= 0 || serieId <= 0 || !QSqlDatabase::database().isOpen()) {
+        return false;
+    }
+
+    QSqlQuery query;
+    query.prepare(
+        "SELECT COUNT(*) FROM EMP_MACH "
+        "WHERE id_emp = :id_emp AND id_serie = :id_serie"
+    );
+    query.bindValue(":id_emp", employeeId);
+    query.bindValue(":id_serie", serieId);
+
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        return false;
+    }
+
+    if (query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+
+    return false;
+}
+
+QList<QPair<int, QString>> Employe::getAllEmployeesWithNames()
+{
+    QList<QPair<int, QString>> result;
+
+    if (!QSqlDatabase::database().isOpen()) {
+        return result;
+    }
+
+    QSqlQuery query(
+        "SELECT id_emp, nom_emp || ' ' || prenom_emp "
+        "FROM EMPLOYE "
+        "ORDER BY nom_emp, prenom_emp"
+    );
+
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        qDebug() << "getAllEmployeesWithNames() error:" << m_lastError.text();
+        return result;
+    }
+
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString displayName = query.value(1).toString().trimmed();
+        result.append(qMakePair(id, displayName));
+    }
+
+    return result;
+}

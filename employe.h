@@ -110,6 +110,39 @@ public:
      */
     bool updateFingerprintId(int employeeId, const QString &fingerprintId);
 
+    // ────────────────────────────────────────────────────────────────────────
+    // Additional query helpers (refactored from MainWindow)
+    // ────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @brief Gets the full name (prenom + nom) of an employee by ID.
+     * @param employeeId Employee ID.
+     * @return "Prenom Nom" if found, empty string otherwise.
+     */
+    QString getFullNameById(int employeeId);
+
+    /**
+     * @brief Counts the number of assignments for an employee.
+     * @param employeeId Employee ID.
+     * @return Number of active/assigned machines, or -1 on error.
+     */
+    int countAssignments(int employeeId);
+
+    /**
+     * @brief Checks if an employee already has an assignment for a given series/machine.
+     * @param employeeId Employee ID.
+     * @param serieId Machine series ID.
+     * @return true if assignment exists, false otherwise.
+     */
+    bool hasAffectationFor(int employeeId, int serieId);
+
+    /**
+     * @brief Retrieves all employees as a list of (id, "prenom nom") pairs.
+     * Useful for populating combo boxes.
+     * @return List of QPair<int, QString> with ID and display name.
+     */
+    QList<QPair<int, QString>> getAllEmployeesWithNames();
+
     QSqlError lastError() const;
 
 private:
