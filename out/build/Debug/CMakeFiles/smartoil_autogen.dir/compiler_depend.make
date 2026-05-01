@@ -41,6 +41,7 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/Program\ Files/CMake/share/cmake-4.2/Modules/Platform/Windows.cmake \
   C:/Program\ Files/CMake/share/cmake-4.2/Modules/Platform/WindowsPaths.cmake \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QObject \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
@@ -88,6 +89,7 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qglobalstatic.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qhash.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qhashfunctions.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevicebase.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qitemselectionmodel.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qiterable.h \
@@ -114,6 +116,8 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qpair.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qpoint.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qprocessordetection.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qrect.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qrefcount.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
@@ -190,8 +194,15 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
   C:/Qt/6.7.3/mingw_64/include/QtGui/qwindowdefs.h \
   C:/Qt/6.7.3/mingw_64/include/QtGui/qwindowdefs_win.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMainWindow \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
@@ -204,6 +215,7 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmainwindow.h \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsizepolicy.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qslider.h \
@@ -599,6 +611,8 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/vadefs.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h \
   C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/CMakeLists.txt \
+  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.cpp \
+  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.h \
   C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.cpp \
   C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.h \
   C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/employe.cpp \
@@ -623,11 +637,13 @@ smartoil_autogen/timestamp: C:/Program\ Files/CMake/bin/cmake.exe \
   C:/opencv/build_mingw/OpenCVModules.cmake
 
 
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/clocale:
-
 C:/Program\ Files/CMake/share/cmake-4.2/Modules/CMakeGenericSystem.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Core/Qt6CoreTargets.cmake:
+
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/clocale:
+
+C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtGui/qimage.h:
 
@@ -651,19 +667,17 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qxptype_traits.h:
 
 C:/Program\ Files/CMake/share/cmake-4.2/Modules/CMakeInitializeConfigs.cmake:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qcompare_impl.h:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ext/new_allocator.h:
 
 C:/Program\ Files/CMake/share/cmake-4.2/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qatomic.h:
 
-C:/Program\ Files/CMake/share/cmake-4.2/Modules/Internal/CheckFlagCommonConfig.cmake:
+C:/Qt/6.7.3/mingw_64/include/QtCore/qstring.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/climits:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qstring.h:
+C:/Program\ Files/CMake/share/cmake-4.2/Modules/Internal/CheckFlagCommonConfig.cmake:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/algorithm:
 
@@ -787,6 +801,8 @@ C:/Program\ Files/CMake/share/cmake-4.2/Modules/GNUInstallDirs.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersionImpl.cmake:
 
+C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug:
+
 C:/Program\ Files/CMake/share/cmake-4.2/Modules/Internal/CheckCompilerFlag.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfigVersion.cmake:
@@ -794,6 +810,8 @@ C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfigVersion.cm
 C:/Qt/6.7.3/mingw_64/include/QtCore/qalgorithms.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtabbar.h:
+
+C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h:
 
 C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/vadefs.h:
 
@@ -813,9 +831,11 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/allo
 
 C:/Program\ Files/CMake/share/cmake-4.2/Modules/Platform/Windows-Initialize.cmake:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qshareddata_impl.h:
-
 C:/Program\ Files/CMake/share/cmake-4.2/Modules/Platform/Windows-windres.cmake:
+
+C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qshareddata_impl.h:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Core/Qt6CoreAdditionalTargetInfo.cmake:
 
@@ -861,9 +881,11 @@ C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6QModernWindowsStylePluginTargets-re
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qassert.h:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qbasicatomic.h:
+C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cstddef:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qbasicatomic.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qbindingstorage.h:
 
@@ -878,6 +900,8 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h:
 C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearraylist.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearrayview.h:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qcompare_impl.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qcompilerdetection.h:
 
@@ -929,11 +953,11 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/eras
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qfloat16.h:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qforeach.h:
+C:/Qt/6.7.3/mingw_64/include/QtGui/qtguiexports.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/streambuf.tcc:
 
-C:/Qt/6.7.3/mingw_64/include/QtGui/qtguiexports.h:
+C:/Qt/6.7.3/mingw_64/include/QtCore/qforeach.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/functional:
 
@@ -961,6 +985,12 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/initializ
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qhashfunctions.h:
 
+C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qiterator.h:
+
+C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QTuioTouchPluginAdditionalTargetInfo.cmake:
+
 C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevicebase.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qscopedpointer.h:
@@ -970,10 +1000,6 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qitemselectionmodel.h:
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/limits:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qiterable.h:
-
-C:/Qt/6.7.3/mingw_64/include/QtCore/qiterator.h:
-
-C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QTuioTouchPluginAdditionalTargetInfo.cmake:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qlatin1stringview.h:
 
@@ -1001,6 +1027,8 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qminmax.h:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6CoreTools/Qt6CoreToolsDependencies.cmake:
 
+C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.cpp:
+
 C:/Qt/6.7.3/mingw_64/include/QtCore/qnumeric.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qobject_impl.h:
@@ -1020,6 +1048,16 @@ C:/Qt/6.7.3/mingw_64/include/QtGui/qpaintdevice.h:
 C:/Qt/6.7.3/mingw_64/include/QtCore/qpoint.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qstringtokenizer.h:
+
+C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/sec_api/stdio_s.h:
+
+C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfig.cmake:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h:
+
+C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateAdditionalTargetInfo.cmake:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qsystemdetection.h:
 
@@ -1061,9 +1099,9 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qstringconverter.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyle.h:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qstringconverter_base.h:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stringfwd.h:
+
+C:/Qt/6.7.3/mingw_64/include/QtCore/qstringconverter_base.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qstringfwd.h:
 
@@ -1235,6 +1273,16 @@ C:/Qt/6.7.3/mingw_64/include/QtGui/qwindowdefs.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtGui/qwindowdefs_win.h:
 
+C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo:
+
+C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h:
+
+C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6ZlibPrivate/Qt6ZlibPrivateTargets.cmake:
+
+C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h:
+
+C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton:
+
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget:
 
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/face_recognition_dialog.h:
@@ -1267,11 +1315,11 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h:
 
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/streambuf_iterator.h:
+
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmainwindow.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/hash_bytes.h:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/streambuf_iterator.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h:
 
@@ -1291,11 +1339,11 @@ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtablewidget.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtabwidget.h:
 
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/vector.tcc:
+
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtwidgets-config.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_classes.h:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/vector.tcc:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtwidgetsexports.h:
 
@@ -1347,9 +1395,9 @@ C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicTestHelpers.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QMinimalIntegrationPluginConfig.cmake:
 
-C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QICNSPluginTargets.cmake:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cerrno:
+
+C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QICNSPluginTargets.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicToolHelpers.cmake:
 
@@ -1402,12 +1450,6 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w6
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6CoreTools/Qt6CoreToolsVersionlessTargets.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointMinGW32Target.cmake:
-
-C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/sec_api/stdio_s.h:
-
-C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfig.cmake:
-
-C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateAdditionalTargetInfo.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateConfig.cmake:
 
@@ -1477,9 +1519,9 @@ C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QInsightTrackerPluginAdditionalTargetIn
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_vector.h:
 
-C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QInsightTrackerPluginTargets-relwithdebinfo.cmake:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/uses_allocator.h:
+
+C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QInsightTrackerPluginTargets-relwithdebinfo.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QInsightTrackerPluginTargets.cmake:
 
@@ -1520,8 +1562,6 @@ C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QSvgPluginTargets-relwithdebinfo.cmake:
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QSvgPluginTargets.cmake:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QTgaPluginConfig.cmake:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cmath:
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui/Qt6QTgaPluginTargets-relwithdebinfo.cmake:
 
@@ -1679,8 +1719,6 @@ C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6ZlibPrivate/Qt6ZlibPrivateAdditionalTargetInfo
 
 C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6ZlibPrivate/Qt6ZlibPrivateConfigVersionImpl.cmake:
 
-C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6ZlibPrivate/Qt6ZlibPrivateTargets.cmake:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/syslimits.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/allocator.h:
@@ -1703,8 +1741,6 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/loca
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/move.h:
 
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/chrono:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/parse_numbers.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_algo.h:
@@ -1724,6 +1760,10 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stream_iterator.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cctype:
+
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/chrono:
+
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cmath:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ctime:
 
@@ -1842,6 +1882,8 @@ C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/sys/timeb.h:
 C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/time.h:
 
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/CMakeLists.txt:
+
+C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.h:
 
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.cpp:
 

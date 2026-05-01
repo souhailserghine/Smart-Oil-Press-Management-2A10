@@ -388,10 +388,25 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtoolbutton.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\arduino.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
  C:/Users/ADMINI~1/DOCUME~1/SMARTO~1/SMART-~1/out/build/Debug/SMARTO~1/include/ui_mainwindow.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QVariant \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qvariant.h \
@@ -442,7 +457,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLabel \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlabel.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpicture.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qtextdocument.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qurl.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLineEdit \
@@ -482,7 +496,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qrawfont.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qfontdatabase.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpacerItem \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayoutitem.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpinBox \
@@ -610,7 +623,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QVBoxLayout \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHBoxLayout \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGridLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmessagebox.h \
@@ -728,4 +740,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QCoreApplication \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreapplication.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QStandardPaths \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qstandardpaths.h
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qstandardpaths.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlRecord \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlrecord.h

@@ -405,6 +405,12 @@
 	"HEADERS" : 
 	[
 		[
+			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/arduino.h",
+			"MU",
+			"EWIEGA46WW/moc_arduino.cpp",
+			null
+		],
+		[
 			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/connection.h",
 			"MU",
 			"EWIEGA46WW/moc_connection.cpp",
@@ -432,6 +438,12 @@
 			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_recognition_service.h",
 			"MU",
 			"EWIEGA46WW/moc_face_recognition_service.cpp",
+			null
+		],
+		[
+			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/fingerprintservice.h",
+			"MU",
+			"EWIEGA46WW/moc_fingerprintservice.cpp",
 			null
 		],
 		[
@@ -532,6 +544,11 @@
 	"SOURCES" : 
 	[
 		[
+			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/arduino.cpp",
+			"MU",
+			null
+		],
+		[
 			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/connection.cpp",
 			"MU",
 			null
@@ -553,6 +570,11 @@
 		],
 		[
 			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_recognition_service.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/fingerprintservice.cpp",
 			"MU",
 			null
 		],

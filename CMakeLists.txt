@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
     face_recognition_dialog.cpp
     face_capture_dialog.h
     face_capture_dialog.cpp
+    fingerprintservice.h
+    fingerprintservice.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -47,6 +49,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         style.qrc
         img.qrc
+    arduino.h
+    arduino.cpp
         connection.h
         connection.cpp
         employe.h employe.cpp

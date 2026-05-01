@@ -9,7 +9,7 @@
 #include <QPushButton>
 #include <QByteArray>
 #include <QMap>
-#include "arduino.h"
+#include "fingerprintservice.h"
 
 class FaceRecognitionService;
 
@@ -156,19 +156,25 @@ private:
 
     // ── Facial recognition (moved out to a service) ───────────────────────
     QByteArray encodeFaceFromFile(const QString& imagePath);
-    void initFingerprintTerminal();
-    void processFingerprintTerminalLine(const QString& line);
-    void sendFingerprintTerminalCommand(const QString& command);
-    bool resolveEmployeeByFingerprintId(int fingerprintId, int& employeeId, QString& fullName) const;
-    void setFingerprintStatus(const QString& text, const QString& style = QString());
-    bool saveFingerprintIdForEmployee(int employeeId, int fingerprintId) const;
-    void tryLinkPendingFingerprintForEmployee(int employeeId, const QString& contextPastPart);
+
+    // ── Fingerprint service initialization and slots ──────────────────────
+    void initFingerprintService();
+    void onFingerprintMatched(int fingerprintId);
+    void onEnrollmentResult(bool success, int fingerprintId, const QString &reason);
+    void onFingerprintDeletionResult(int fingerprintId, bool success);
+    void onFingerprintError(const QString &message);
+    void onFingerprintScanningStateChanged(bool scanning);
+    void onFingerprintServiceReady();
+
     void startFingerprintEnrollmentFromForm();
+
     FaceRecognitionService* m_faceService = nullptr;
-    Arduino m_fingerprintTerminal;
-    QByteArray m_fingerprintRxBuffer;
+    FingerprintService *m_fingerprintService = nullptr;
     int m_pendingFingerprintId = -1;
-    bool m_fingerprintEnrollInProgress = false;
+
+private:
+    // ── Fingerprint UI helpers ──────────────────────────────────────────────
+    void setFingerprintStatus(const QString& text, const QString& style = QString());
 
     bool m_sidebarCollapsed = false;
     int  m_loggedInId = -1;            // id_emp of the currently authenticated user

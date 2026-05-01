@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="MainStacked">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="loginpage">
        <widget class="QLabel" name="logintext">
@@ -223,7 +223,73 @@ border-top-left-radius : 50px;</string>
        <zorder>logintext</zorder>
        <zorder>sidebarlogo_2</zorder>
       </widget>
-      <widget class="QWidget" name="mainprogram">
+    <widget class="QWidget" name="mainprogram">
+     <widget class="QWidget" name="mainprogramLayoutHost">
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1325</width>
+      <height>1005</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="mainprogramLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+    </layout>
+     </widget>
+     <widget class="QWidget" name="contentArea">
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>0</y>
+      <width>1120</width>
+      <height>950</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="contentLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+    </layout>
+     </widget>
        <widget class="QStackedWidget" name="modules">
         <property name="geometry">
          <rect>
@@ -452,7 +518,40 @@ border-top-left-radius : 50px;</string>
                </item>
               </layout>
              </item>
-             <item row="8" column="1">
+               <item row="8" column="0">
+                <widget class="QLabel" name="fingerprintLabel">
+                 <property name="text">
+                  <string>Empreinte</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="1">
+                <widget class="QPushButton" name="enrollFingerprintBtn">
+                 <property name="toolTip">
+                  <string>Lancer l'enrôlement d'empreinte sur le terminal.</string>
+                 </property>
+                 <property name="text">
+                  <string>Enrôler empreinte</string>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>34</height>
+                  </size>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="img.qrc">
+                   <normaloff>:/img/add.svg</normaloff>:/img/add.svg</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>18</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="1">
               <layout class="QHBoxLayout" name="qjouterEmpRow">
                <property name="spacing">
                 <number>7</number>
@@ -494,6 +593,31 @@ border-top-left-radius : 50px;</string>
              </item>
             </layout>
            </widget>
+             <widget class="QLabel" name="employeeValidationLabel">
+              <property name="geometry">
+               <rect>
+                <x>850</x>
+                <y>30</y>
+                <width>180</width>
+                <height>220</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>160</width>
+                <height>36</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Remplissez le formulaire pour vérifier la validité des champs.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+             </widget>
           </widget>
           <widget class="QWidget" name="consulterpersonnel">
            <layout class="QVBoxLayout" name="consulterLayout">
@@ -698,6 +822,11 @@ border-top-left-radius : 50px;</string>
                 <height>440</height>
                </size>
               </property>
+               <property name="styleSheet">
+                <string notr="true">background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;</string>
+               </property>
              </widget>
             </item>
            </layout>
@@ -829,6 +958,16 @@ border-top-left-radius : 50px;</string>
                     </property>
                    </widget>
                   </item>
+                  <item row="5" column="1">
+                   <widget class="QCheckBox" name="affOpenEndedCheck">
+                    <property name="text">
+                     <string>Affectation active (sans date fin)</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </item>
                 <item>
@@ -924,6 +1063,28 @@ border-top-left-radius : 50px;</string>
                     </property>
                    </widget>
                   </item>
+                    <item>
+                     <widget class="QComboBox" name="affStatusFilterCombo">
+                      <property name="toolTip">
+                       <string>Filtrer les affectations par état.</string>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>Toutes</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Actives</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Terminées</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
                   <item>
                    <widget class="QToolButton" name="affRefreshBtn">
                     <property name="text">
@@ -1290,7 +1451,24 @@ border-top-left-radius : 50px;</string>
              </property>
             </widget>
            </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_auto_aff_stock">
+             <property name="text">
+              <string>Auto affectation (Stock → Employé)</string>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="1">
+            <widget class="QCheckBox" name="settingsAutoAssignCheck">
+             <property name="toolTip">
+              <string>Si activé, chaque nouveau stock affecte automatiquement un employé disponible à la série associée.</string>
+             </property>
+             <property name="text">
+              <string>Activer l'affectation automatique</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
             <widget class="QPushButton" name="settingsSaveBtn">
              <property name="toolTip">
               <string>Enregistrer les paramètres</string>
@@ -1798,6 +1976,11 @@ border-top-left-radius : 50px;</string>
                 <height>440</height>
                </size>
               </property>
+               <property name="styleSheet">
+                <string notr="true">background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;</string>
+               </property>
               <widget class="QLabel" name="FaireLesStat">
                <property name="geometry">
                 <rect>
@@ -2630,6 +2813,11 @@ border-top-left-radius : 50px;</string>
                 <height>440</height>
                </size>
               </property>
+               <property name="styleSheet">
+                <string notr="true">background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;</string>
+               </property>
               <widget class="QLabel" name="trilabel">
                <property name="geometry">
                 <rect>
@@ -4148,7 +4336,21 @@ color: rgb(0, 0, 0);</string>
                </property>
               </widget>
              </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="stockSerieLabel">
+               <property name="text">
+                <string>Série associée</string>
+               </property>
+              </widget>
+             </item>
              <item row="6" column="1">
+              <widget class="QComboBox" name="stockSerieCombo">
+               <property name="toolTip">
+                <string>Série machine liée à ce stock.</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
               <layout class="QHBoxLayout" name="qjouterqtoliveRow">
                <item>
                 <spacer name="horizontalSpacer_ajouteremp_2">
@@ -4420,6 +4622,11 @@ color: rgb(0, 0, 0);</string>
                 <height>440</height>
                </size>
               </property>
+               <property name="styleSheet">
+                <string notr="true">background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;</string>
+               </property>
               <widget class="QLabel" name="label_4">
                <property name="geometry">
                 <rect>
@@ -4565,6 +4772,27 @@ color: rgb(0, 0, 0);</string>
           <height>56</height>
          </rect>
         </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>56</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777215</width>
+      <height>56</height>
+     </size>
+    </property>
+    <property name="role" stdset="0">
+     <string>panel</string>
+    </property>
         <layout class="QHBoxLayout" name="userInfoLayout">
          <item>
           <spacer name="userInfoSpacer">
@@ -4628,14 +4856,20 @@ color: rgb(0, 0, 0);</string>
         <property name="minimumSize">
          <size>
           <width>200</width>
-          <height>720</height>
+          <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>220</width>
-          <height>720</height>
+          <height>16777215</height>
          </size>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="autoFillBackground">
          <bool>true</bool>
@@ -4652,6 +4886,24 @@ color: rgb(0, 0, 0);</string>
            <height>720</height>
           </rect>
          </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
            <number>39</number>
@@ -4720,10 +4972,36 @@ color: rgb(0, 0, 0);</string>
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QToolButton" name="sidebarToggleBtn">
+              <property name="toolTip">
+               <string>Réduire / étendre la barre latérale</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="img.qrc">
+                <normaloff>:/img/menu.svg</normaloff>:/img/menu.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>18</width>
+                <height>18</height>
+               </size>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod1">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Aller au module Personnel</string>
             </property>
@@ -4744,6 +5022,9 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod2">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Aller au module Stock</string>
             </property>
@@ -4764,6 +5045,9 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod3">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Aller au module Citernes</string>
             </property>
@@ -4784,6 +5068,9 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod4">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Aller au module Huile</string>
             </property>
@@ -4804,6 +5091,9 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod5">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Aller au module Machine</string>
             </property>
@@ -4824,6 +5114,9 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod6">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Aller au module Agriculteurs</string>
             </property>
@@ -4844,6 +5137,9 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnSettings">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>Paramètres</string>
             </property>
@@ -4869,6 +5165,35 @@ color: rgb(0, 0, 0);</string>
      </widget>
     </item>
    </layout>
+   <widget class="QToolButton" name="chatLauncher">
+    <property name="geometry">
+     <rect>
+      <x>1260</x>
+      <y>940</y>
+      <width>48</width>
+      <height>48</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Ouvrir le chat</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="img.qrc">
+      <normaloff>:/img/chat.svg</normaloff>:/img/chat.svg</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>24</width>
+      <height>24</height>
+     </size>
+    </property>
+    <property name="autoRaise">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -4880,7 +5205,38 @@ color: rgb(0, 0, 0);</string>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <widget class="QWidget" name="clockLeftSpacer">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+   </widget>
+   <widget class="QLabel" name="clockLabel">
+    <property name="minimumSize">
+     <size>
+      <width>140</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QWidget" name="clockRightSpacer">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <resources>
   <include location="img.qrc"/>

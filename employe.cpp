@@ -1,6 +1,55 @@
 
 #include "employe.h"
 #include <QDebug>
+#include <QSet>
+
+namespace {
+QString detectEmployeFingerprintColumn(QSqlError* errorOut = nullptr)
+{
+    if (!QSqlDatabase::database().isOpen()) {
+        if (errorOut) *errorOut = QSqlError();
+        return QString();
+    }
+
+    QSet<QString> existing;
+    QSqlQuery qCols;
+    qCols.prepare(
+        "SELECT COLUMN_NAME "
+        "FROM USER_TAB_COLUMNS "
+        "WHERE TABLE_NAME = 'EMPLOYE'"
+    );
+    if (!qCols.exec()) {
+        if (errorOut) *errorOut = qCols.lastError();
+        return QString();
+    }
+    while (qCols.next()) {
+        existing.insert(qCols.value(0).toString().trimmed().toUpper());
+    }
+
+    static const QStringList candidates = {
+        QStringLiteral("FINGERID"),
+        QStringLiteral("FINGER_ID"),
+        QStringLiteral("FINGERPRINT_ID"),
+        QStringLiteral("ID_FINGERPRINT"),
+        QStringLiteral("EMP_FINGERPRINT_ID"),
+        QStringLiteral("EMPREINTE")
+    };
+
+    for (const QString& c : candidates) {
+        if (existing.contains(c)) return c;
+    }
+    return QString();
+}
+
+void bindFingerprintValue(QSqlQuery& query, const QString& column, const QString& fingerId)
+{
+    if (column == QStringLiteral("EMPREINTE")) {
+        query.bindValue(":finger_id", fingerId.toUtf8());
+    } else {
+        query.bindValue(":finger_id", fingerId);
+    }
+}
+}
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Constructors
@@ -17,13 +66,15 @@ Employe::Employe()
     , m_photo()
     , m_empreinte()
     , m_modeleFaciale()
+    , m_fingerId()
 {}
 
 Employe::Employe(int id_emp, const QString& nom_emp, const QString& prenom_emp,
                  const QString& email, const QString& role, const QString& mdp,
                  const QDate& dateEmbauche,
                  const QByteArray& photo, const QByteArray& empreinte,
-                 const QByteArray& modeleFaciale)
+                 const QByteArray& modeleFaciale,
+                 const QString& fingerid)
     : m_idEmp(id_emp)
     , m_nomEmp(nom_emp)
     , m_prenomEmp(prenom_emp)
@@ -34,6 +85,7 @@ Employe::Employe(int id_emp, const QString& nom_emp, const QString& prenom_emp,
     , m_photo(photo)
     , m_empreinte(empreinte)
     , m_modeleFaciale(modeleFaciale)
+    , m_fingerId(fingerid)
 {}
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -50,6 +102,7 @@ QDate      Employe::getDateEmbauche()  const { return m_dateEmbauche; }
 QByteArray Employe::getPhoto()         const { return m_photo; }
 QByteArray Employe::getEmpreinte()     const { return m_empreinte; }
 QByteArray Employe::getModeleFaciale() const { return m_modeleFaciale; }
+QString    Employe::getFingerId()      const { return m_fingerId; }
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Setters
@@ -65,6 +118,7 @@ void Employe::setDateEmbauche(const QDate& date)      { m_dateEmbauche = date; }
 void Employe::setPhoto(const QByteArray& photo)       { m_photo = photo; }
 void Employe::setEmpreinte(const QByteArray& emp)     { m_empreinte = emp; }
 void Employe::setModeleFaciale(const QByteArray& m)   { m_modeleFaciale = m; }
+void Employe::setFingerId(const QString& fingerId)    { m_fingerId = fingerId; }
 
 QSqlError Employe::lastError() const { return m_lastError; }
 
@@ -279,4 +333,139 @@ int Employe::authenticate(const QString& email, const QString& mdp)
     }
     m_lastError = query.lastError();
     return -1;
+}
+
+bool Employe::existsByFingerId(const QString& fingerId)
+{
+    if (!QSqlDatabase::database().isOpen()) {
+        return false;
+    }
+
+    const QString col = detectEmployeFingerprintColumn(&m_lastError);
+    if (col.isEmpty()) return false;
+
+    QSqlQuery query;
+    if (col == QStringLiteral("EMPREINTE")) {
+        query.prepare("SELECT 1 FROM EMPLOYE WHERE EMPREINTE = :finger_id");
+    } else {
+        query.prepare(QStringLiteral("SELECT 1 FROM EMPLOYE WHERE %1 = :finger_id").arg(col));
+    }
+    bindFingerprintValue(query, col, fingerId);
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        return false;
+    }
+    return query.next();
+}
+
+QString Employe::fullNameByFingerId(const QString& fingerId)
+{
+    if (!QSqlDatabase::database().isOpen()) {
+        return QString();
+    }
+
+    const QString col = detectEmployeFingerprintColumn(&m_lastError);
+    if (col.isEmpty()) return QString();
+
+    QSqlQuery query;
+    if (col == QStringLiteral("EMPREINTE")) {
+        query.prepare(
+            "SELECT TRIM(COALESCE(prenom_emp,'') || ' ' || COALESCE(nom_emp,'')) "
+            "FROM EMPLOYE WHERE EMPREINTE = :finger_id"
+        );
+        query.bindValue(":finger_id", fingerId.toUtf8());
+    } else {
+        query.prepare(
+            QStringLiteral(
+                "SELECT TRIM(COALESCE(prenom_emp,'') || ' ' || COALESCE(nom_emp,'')) "
+                "FROM EMPLOYE WHERE %1 = :finger_id").arg(col)
+        );
+    }
+    bindFingerprintValue(query, col, fingerId);
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        return QString();
+    }
+    if (query.next()) {
+        return query.value(0).toString().trimmed();
+    }
+    return QString();
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Fingerprint helpers – Model layer convenience methods
+// ──────────────────────────────────────────────────────────────────────────────
+
+bool Employe::findByFingerprintId(const QString& fingerId, int &outEmployeeId, QString &outFullName)
+{
+    outEmployeeId = -1;
+    outFullName.clear();
+
+    if (!QSqlDatabase::database().isOpen()) {
+        return false;
+    }
+
+    const QString col = detectEmployeFingerprintColumn(&m_lastError);
+    if (col.isEmpty()) {
+        return false;
+    }
+
+    QSqlQuery query;
+    if (col == QStringLiteral("EMPREINTE")) {
+        query.prepare(
+            "SELECT id_emp, TRIM(COALESCE(prenom_emp,'') || ' ' || COALESCE(nom_emp,'')) "
+            "FROM EMPLOYE WHERE EMPREINTE = :finger_id"
+        );
+        query.bindValue(":finger_id", fingerId.toUtf8());
+    } else {
+        query.prepare(
+            QStringLiteral(
+                "SELECT id_emp, TRIM(COALESCE(prenom_emp,'') || ' ' || COALESCE(nom_emp,'')) "
+                "FROM EMPLOYE WHERE %1 = :finger_id").arg(col)
+        );
+        bindFingerprintValue(query, col, fingerId);
+    }
+
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        return false;
+    }
+
+    if (query.next()) {
+        outEmployeeId = query.value(0).toInt();
+        outFullName = query.value(1).toString().trimmed();
+        return outEmployeeId > 0;
+    }
+
+    return false;
+}
+
+bool Employe::updateFingerprintId(int employeeId, const QString &fingerprintId)
+{
+    if (!QSqlDatabase::database().isOpen()) {
+        return false;
+    }
+
+    const QString col = detectEmployeFingerprintColumn(&m_lastError);
+    if (col.isEmpty()) {
+        return false;
+    }
+
+    QSqlQuery query;
+    if (col == QStringLiteral("EMPREINTE")) {
+        query.prepare(QStringLiteral("UPDATE EMPLOYE SET EMPREINTE = :finger_id WHERE id_emp = :id"));
+        query.bindValue(":finger_id", fingerprintId.toUtf8());
+    } else {
+        query.prepare(QStringLiteral("UPDATE EMPLOYE SET %1 = :finger_id WHERE id_emp = :id").arg(col));
+        query.bindValue(":finger_id", fingerprintId);
+    }
+    query.bindValue(":id", employeeId);
+
+    if (!query.exec()) {
+        m_lastError = query.lastError();
+        qDebug() << "updateFingerprintId() error:" << m_lastError.text();
+        return false;
+    }
+
+    return true;
 }

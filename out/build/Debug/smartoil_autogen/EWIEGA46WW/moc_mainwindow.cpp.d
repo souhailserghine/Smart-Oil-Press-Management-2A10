@@ -1,5 +1,6 @@
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/out/build/Debug/smartoil_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/mainwindow.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QObject \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
@@ -47,6 +48,7 @@ C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-M
   C:/Qt/6.7.3/mingw_64/include/QtCore/qglobalstatic.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qhash.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qhashfunctions.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevicebase.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qitemselectionmodel.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qiterable.h \
@@ -73,6 +75,8 @@ C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-M
   C:/Qt/6.7.3/mingw_64/include/QtCore/qpair.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qpoint.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qprocessordetection.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qrect.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qrefcount.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
@@ -149,7 +153,14 @@ C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-M
   C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
   C:/Qt/6.7.3/mingw_64/include/QtGui/qwindowdefs.h \
   C:/Qt/6.7.3/mingw_64/include/QtGui/qwindowdefs_win.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMainWindow \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
@@ -161,6 +172,7 @@ C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-M
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmainwindow.h \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsizepolicy.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qslider.h \
@@ -330,4 +342,5 @@ C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-M
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/sys/types.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/vadefs.h \
-  C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h
+  C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h \
+  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.h
