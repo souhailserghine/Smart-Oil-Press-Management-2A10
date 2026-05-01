@@ -345,4 +345,6 @@ CMakeFiles/smartoil.dir/employe.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QSet \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qset.h

@@ -80,3 +80,8 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+/out/
+/Debug/
+/Release/
+/.vs/
+.cmake/

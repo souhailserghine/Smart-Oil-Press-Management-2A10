@@ -229,35 +229,134 @@ void MainWindow::setFingerprintStatus(const QString& text, const QString& style)
     ui->faceStatusLabel->setStyleSheet(style);
 }
 
-void MainWindow::initFingerprintTerminal()
+void MainWindow::initFingerprintService()
 {
-    const int rc = m_fingerprintTerminal.connect_arduino();
-    if (rc != 0) {
-        setFingerprintStatus(tr("⚠ Terminal d'empreintes non détecté."), 
-                           QStringLiteral("color: #ef6c00; font-weight: bold;"));
+    if (m_fingerprintService) {
+        delete m_fingerprintService;
+    }
+
+    m_fingerprintService = new FingerprintService(this);
+
+    // Connect service signals to UI slots
+    connect(m_fingerprintService, &FingerprintService::ready,
+            this, &MainWindow::onFingerprintServiceReady);
+    connect(m_fingerprintService, &FingerprintService::matched,
+            this, &MainWindow::onFingerprintMatched);
+    connect(m_fingerprintService, &FingerprintService::enrollmentResult,
+            this, &MainWindow::onEnrollmentResult);
+    connect(m_fingerprintService, &FingerprintService::deletionResult,
+            this, &MainWindow::onFingerprintDeletionResult);
+    connect(m_fingerprintService, &FingerprintService::error,
+            this, &MainWindow::onFingerprintError);
+    connect(m_fingerprintService, &FingerprintService::scanningStateChanged,
+            this, &MainWindow::onFingerprintScanningStateChanged);
+
+    // Auto re-enable scanning when returning to login screen
+    if (ui && ui->MainStacked) {
+        connect(ui->MainStacked, QOverload<int>::of(&QStackedWidget::currentChanged),
+                this, [this](int index) {
+            if (index == 0 && m_fingerprintService) {  // 0 = login screen
+                m_fingerprintService->startScanning();
+            }
+        }, Qt::UniqueConnection);
+    }
+
+    // Initialize the service (connects to Arduino)
+    m_fingerprintService->initialize();
+}
+
+void MainWindow::onFingerprintServiceReady()
+{
+    setFingerprintStatus(tr("✔ Fingerprint ready"), 
+                        QStringLiteral("color: #2e7d32; font-weight: bold;"));
+    qDebug() << "[MainWindow] Fingerprint service ready";
+}
+
+void MainWindow::onFingerprintMatched(int fingerprintId)
+{
+    qDebug() << "[MainWindow] Fingerprint matched, ID:" << fingerprintId;
+
+    const bool onLogin = ui->MainStacked && ui->MainStacked->currentIndex() == 0;
+
+    // Look up employee by fingerprint ID using model layer
+    Employe employe;
+    int empId = -1;
+    QString empName;
+
+    if (!employe.findByFingerprintId(QString::number(fingerprintId), empId, empName) || empId <= 0) {
+        qWarning() << "[MainWindow] Unknown fingerprint:" << fingerprintId;
+        m_fingerprintService->sendDenied();
+        if (onLogin) {
+            setFingerprintStatus(tr("Unknown fingerprint"),
+                               QStringLiteral("color: #c62828;"));
+        }
         return;
     }
 
-    QObject::connect(m_fingerprintTerminal.getserial(), &QSerialPort::readyRead,
-                     this, &MainWindow::onFingerprintTerminalReadyRead);
+    // Send employee name to Arduino
+    m_fingerprintService->sendName(empName);
 
-    // When user returns to login screen, re-enable fingerprint scanning
-    if (ui && ui->MainStacked) {
-        QObject::connect(ui->MainStacked, QOverload<int>::of(&QStackedWidget::currentChanged),
-                        this, [this](int index) {
-            if (index == 0) {  // 0 = login screen
-                sendFingerprintTerminalCommand("LOGIN_ON");
-            }
-        });
-    }
+    // Log in
+    m_loggedInId = empId;
+    if (ui->userNameLabel) ui->userNameLabel->setText(empName);
+    if (ui->userinput) ui->userinput->clear();
+    if (ui->pwdinput) ui->pwdinput->clear();
+    if (onLogin) ui->MainStacked->setCurrentIndex(1);
 
-    sendFingerprintTerminalCommand(QStringLiteral("LOGIN_ON"));
+    // Re-enable scanning after 2 seconds for next login attempt
+    QTimer::singleShot(2000, this, [this]() {
+        if (m_fingerprintService) {
+            m_fingerprintService->startScanning();
+        }
+    });
+
+    setFingerprintStatus(tr("✔ Login successful"),
+                       QStringLiteral("color: #2e7d32; font-weight: bold;"));
 }
 
-void MainWindow::sendFingerprintTerminalCommand(const QString& command)
+void MainWindow::onEnrollmentResult(bool success, int fingerprintId, const QString &reason)
 {
-    QByteArray payload = command.toUtf8() + "\n";
-    m_fingerprintTerminal.write_to_arduino(payload);
+    if (success && fingerprintId > 0) {
+        m_pendingFingerprintId = fingerprintId;
+        setFingerprintStatus(QString("✔ Enrolled ID %1").arg(fingerprintId),
+                           QStringLiteral("color: #2e7d32; font-weight: bold;"));
+        qDebug() << "[MainWindow] Enrollment successful, ID:" << fingerprintId;
+    } else {
+        setFingerprintStatus(tr("❌ Enrollment failed: %1").arg(reason),
+                           QStringLiteral("color: #c62828; font-weight: bold;"));
+        qWarning() << "[MainWindow] Enrollment failed:" << reason;
+    }
+}
+
+void MainWindow::onFingerprintDeletionResult(int fingerprintId, bool success)
+{
+    if (success) {
+        setFingerprintStatus(QString("✔ Deleted ID %1").arg(fingerprintId),
+                           QStringLiteral("color: #2e7d32; font-weight: bold;"));
+        qDebug() << "[MainWindow] Deletion successful, ID:" << fingerprintId;
+    } else {
+        setFingerprintStatus(QString("❌ Deletion failed for ID %1").arg(fingerprintId),
+                           QStringLiteral("color: #c62828; font-weight: bold;"));
+        qWarning() << "[MainWindow] Deletion failed, ID:" << fingerprintId;
+    }
+}
+
+void MainWindow::onFingerprintError(const QString &message)
+{
+    qWarning() << "[MainWindow] Fingerprint error:" << message;
+    setFingerprintStatus(QString("⚠ Error: %1").arg(message),
+                       QStringLiteral("color: #ef6c00; font-weight: bold;"));
+}
+
+void MainWindow::onFingerprintScanningStateChanged(bool scanning)
+{
+    if (scanning) {
+        qDebug() << "[MainWindow] Fingerprint scanning started";
+        setFingerprintStatus(tr("Scanning..."), QStringLiteral("color: #1976d2;"));
+    } else {
+        qDebug() << "[MainWindow] Fingerprint scanning stopped";
+        setFingerprintStatus(tr("Scanning stopped"), QStringLiteral("color: #666;"));
+    }
 }
 
 void MainWindow::startFingerprintEnrollmentFromForm()
@@ -340,7 +439,14 @@ void MainWindow::on_ajouterEmpBtn_clicked()
             return;
         }
 
-    tryLinkPendingFingerprintForEmployee(editingId, tr("modifié"));
+        // Link pending fingerprint if one was enrolled
+        if (m_pendingFingerprintId > 0) {
+            Employe empHelper;
+            if (empHelper.updateFingerprintId(editingId, QString::number(m_pendingFingerprintId))) {
+                qDebug() << "[MainWindow] Linked fingerprint" << m_pendingFingerprintId << "to employee" << editingId;
+                m_pendingFingerprintId = -1;
+            }
+        }
 
         QMessageBox::information(this, tr("Succès"),
             tr("L'employé (ID : %1) a été modifié avec succès.").arg(editingId));
@@ -362,7 +468,13 @@ void MainWindow::on_ajouterEmpBtn_clicked()
             return;
         }
 
-    tryLinkPendingFingerprintForEmployee(emp.getIdEmp(), tr("ajouté"));
+        // Link pending fingerprint if one was enrolled
+        if (m_pendingFingerprintId > 0) {
+            if (emp.updateFingerprintId(emp.getIdEmp(), QString::number(m_pendingFingerprintId))) {
+                qDebug() << "[MainWindow] Linked fingerprint" << m_pendingFingerprintId << "to new employee" << emp.getIdEmp();
+                m_pendingFingerprintId = -1;
+            }
+        }
 
         QMessageBox::information(this, tr("Succès"),
             tr("L'employé a été ajouté avec succès (ID : %1).").arg(emp.getIdEmp()));

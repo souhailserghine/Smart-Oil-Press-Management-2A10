@@ -388,10 +388,25 @@ CMakeFiles/smartoil.dir/main.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtoolbutton.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\arduino.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmessagebox.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
@@ -411,7 +426,6 @@ CMakeFiles/smartoil.dir/main.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QFile \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qfile.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qfiledevice.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/filesystem \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_fwd.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_path.h \

@@ -93,6 +93,23 @@ public:
      */
     QString fullNameByFingerId(const QString& fingerId);
 
+    /**
+     * @brief Finds an employee by fingerprint ID.
+     * @param fingerId Fingerprint sensor ID (template slot).
+     * @param outEmployeeId Output parameter: employee ID if found.
+     * @param outFullName Output parameter: full name if found.
+     * @return true if employee found, false otherwise.
+     */
+    bool findByFingerprintId(const QString& fingerId, int &outEmployeeId, QString &outFullName);
+
+    /**
+     * @brief Updates an employee's fingerprint ID in the database.
+     * @param employeeId Employee ID.
+     * @param fingerprintId New fingerprint ID from sensor.
+     * @return true on success, false on database error.
+     */
+    bool updateFingerprintId(int employeeId, const QString &fingerprintId);
+
     QSqlError lastError() const;
 
 private:

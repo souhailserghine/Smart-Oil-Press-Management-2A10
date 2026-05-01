@@ -28,17 +28,18 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     Connection c;
-    bool test = c.createconnect();
-    if (test) {
-        w.show();
-        QMessageBox::information(nullptr, QObject::tr("database is open"),
-                                 QObject::tr("connection successful.\n"
-                                             "Click Cancel to exit."), QMessageBox::Cancel);
-    } else {
+    if (!c.createconnect()) {
         QMessageBox::critical(nullptr, QObject::tr("database is not open"),
                               QObject::tr("connection failed.\n"
                                           "Click Cancel to exit."), QMessageBox::Cancel);
+        return 0;
     }
+
+    MainWindow w;
+    w.show();
+    QMessageBox::information(nullptr, QObject::tr("database is open"),
+                             QObject::tr("connection successful.\n"
+                                         "Click Cancel to exit."), QMessageBox::Cancel);
     return a.exec();
 }
 

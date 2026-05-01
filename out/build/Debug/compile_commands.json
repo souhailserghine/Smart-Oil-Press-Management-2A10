@@ -37,6 +37,18 @@
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\fingerprintservice.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\fingerprintservice.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/fingerprintservice.cpp",
+  "output": "CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\arduino.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\arduino.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/arduino.cpp",
+  "output": "CMakeFiles/smartoil.dir/arduino.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
   "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\connection.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\connection.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/connection.cpp",
   "output": "CMakeFiles/smartoil.dir/connection.cpp.obj"

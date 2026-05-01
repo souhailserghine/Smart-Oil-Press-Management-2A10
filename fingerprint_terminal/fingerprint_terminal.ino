@@ -195,13 +195,14 @@ void scanFingerprint() {
   if (matchId == lastMatchId) {
     return;
   }
-  
-  lastMatchId = matchId;
-  
-  // Send to Qt
-  Serial.print("MATCH:");
-  Serial.println(matchId);
-  
+lastMatchId = matchId;
+
+if (matchId >= 1 ){
+  matchId = (matchId - 1) / 5 + 1;
+}
+
+Serial.print("MATCH:");
+Serial.println(matchId);
   // Show on LCD
   lcd.clear();
   lcd.setCursor(0, 0);

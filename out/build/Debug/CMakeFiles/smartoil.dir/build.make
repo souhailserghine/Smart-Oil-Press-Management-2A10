@@ -209,11 +209,41 @@ CMakeFiles/smartoil.dir/face_capture_dialog.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/smartoil.dir/face_capture_dialog.cpp.s"
 	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\face_capture_dialog.cpp" -o CMakeFiles\smartoil.dir\face_capture_dialog.cpp.s
 
+CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj: CMakeFiles/smartoil.dir/flags.make
+CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj: CMakeFiles/smartoil.dir/includes_CXX.rsp
+CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj: C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/fingerprintservice.cpp
+CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj: CMakeFiles/smartoil.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj"
+	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj -MF CMakeFiles\smartoil.dir\fingerprintservice.cpp.obj.d -o CMakeFiles\smartoil.dir\fingerprintservice.cpp.obj -c "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\fingerprintservice.cpp"
+
+CMakeFiles/smartoil.dir/fingerprintservice.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/smartoil.dir/fingerprintservice.cpp.i"
+	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\fingerprintservice.cpp" > CMakeFiles\smartoil.dir\fingerprintservice.cpp.i
+
+CMakeFiles/smartoil.dir/fingerprintservice.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/smartoil.dir/fingerprintservice.cpp.s"
+	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\fingerprintservice.cpp" -o CMakeFiles\smartoil.dir\fingerprintservice.cpp.s
+
+CMakeFiles/smartoil.dir/arduino.cpp.obj: CMakeFiles/smartoil.dir/flags.make
+CMakeFiles/smartoil.dir/arduino.cpp.obj: CMakeFiles/smartoil.dir/includes_CXX.rsp
+CMakeFiles/smartoil.dir/arduino.cpp.obj: C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.cpp
+CMakeFiles/smartoil.dir/arduino.cpp.obj: CMakeFiles/smartoil.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/smartoil.dir/arduino.cpp.obj"
+	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/smartoil.dir/arduino.cpp.obj -MF CMakeFiles\smartoil.dir\arduino.cpp.obj.d -o CMakeFiles\smartoil.dir\arduino.cpp.obj -c "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\arduino.cpp"
+
+CMakeFiles/smartoil.dir/arduino.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/smartoil.dir/arduino.cpp.i"
+	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\arduino.cpp" > CMakeFiles\smartoil.dir\arduino.cpp.i
+
+CMakeFiles/smartoil.dir/arduino.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/smartoil.dir/arduino.cpp.s"
+	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\arduino.cpp" -o CMakeFiles\smartoil.dir\arduino.cpp.s
+
 CMakeFiles/smartoil.dir/connection.cpp.obj: CMakeFiles/smartoil.dir/flags.make
 CMakeFiles/smartoil.dir/connection.cpp.obj: CMakeFiles/smartoil.dir/includes_CXX.rsp
 CMakeFiles/smartoil.dir/connection.cpp.obj: C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.cpp
 CMakeFiles/smartoil.dir/connection.cpp.obj: CMakeFiles/smartoil.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/smartoil.dir/connection.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/smartoil.dir/connection.cpp.obj"
 	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/smartoil.dir/connection.cpp.obj -MF CMakeFiles\smartoil.dir\connection.cpp.obj.d -o CMakeFiles\smartoil.dir\connection.cpp.obj -c "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\connection.cpp"
 
 CMakeFiles/smartoil.dir/connection.cpp.i: cmake_force
@@ -228,7 +258,7 @@ CMakeFiles/smartoil.dir/employe.cpp.obj: CMakeFiles/smartoil.dir/flags.make
 CMakeFiles/smartoil.dir/employe.cpp.obj: CMakeFiles/smartoil.dir/includes_CXX.rsp
 CMakeFiles/smartoil.dir/employe.cpp.obj: C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/employe.cpp
 CMakeFiles/smartoil.dir/employe.cpp.obj: CMakeFiles/smartoil.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/smartoil.dir/employe.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/smartoil.dir/employe.cpp.obj"
 	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/smartoil.dir/employe.cpp.obj -MF CMakeFiles\smartoil.dir\employe.cpp.obj.d -o CMakeFiles\smartoil.dir\employe.cpp.obj -c "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\employe.cpp"
 
 CMakeFiles/smartoil.dir/employe.cpp.i: cmake_force
@@ -243,7 +273,7 @@ CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj: CMakeFile
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj: CMakeFiles/smartoil.dir/includes_CXX.rsp
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj: smartoil_autogen/EWIEGA46WW/qrc_style.cpp
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj: CMakeFiles/smartoil.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj"
 	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj -MF CMakeFiles\smartoil.dir\smartoil_autogen\EWIEGA46WW\qrc_style.cpp.obj.d -o CMakeFiles\smartoil.dir\smartoil_autogen\EWIEGA46WW\qrc_style.cpp.obj -c "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\smartoil_autogen\EWIEGA46WW\qrc_style.cpp"
 
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.i: cmake_force
@@ -258,7 +288,7 @@ CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj: CMakeFiles/
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj: CMakeFiles/smartoil.dir/includes_CXX.rsp
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj: smartoil_autogen/EWIEGA46WW/qrc_img.cpp
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj: CMakeFiles/smartoil.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj"
 	C:\Qt\Tools\mingw1120_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj -MF CMakeFiles\smartoil.dir\smartoil_autogen\EWIEGA46WW\qrc_img.cpp.obj.d -o CMakeFiles\smartoil.dir\smartoil_autogen\EWIEGA46WW\qrc_img.cpp.obj -c "C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\smartoil_autogen\EWIEGA46WW\qrc_img.cpp"
 
 CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.i: cmake_force
@@ -277,6 +307,8 @@ smartoil_OBJECTS = \
 "CMakeFiles/smartoil.dir/face_recognition_service.cpp.obj" \
 "CMakeFiles/smartoil.dir/face_recognition_dialog.cpp.obj" \
 "CMakeFiles/smartoil.dir/face_capture_dialog.cpp.obj" \
+"CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj" \
+"CMakeFiles/smartoil.dir/arduino.cpp.obj" \
 "CMakeFiles/smartoil.dir/connection.cpp.obj" \
 "CMakeFiles/smartoil.dir/employe.cpp.obj" \
 "CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj" \
@@ -291,6 +323,8 @@ smartoil.exe: CMakeFiles/smartoil.dir/mainwindow.cpp.obj
 smartoil.exe: CMakeFiles/smartoil.dir/face_recognition_service.cpp.obj
 smartoil.exe: CMakeFiles/smartoil.dir/face_recognition_dialog.cpp.obj
 smartoil.exe: CMakeFiles/smartoil.dir/face_capture_dialog.cpp.obj
+smartoil.exe: CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj
+smartoil.exe: CMakeFiles/smartoil.dir/arduino.cpp.obj
 smartoil.exe: CMakeFiles/smartoil.dir/connection.cpp.obj
 smartoil.exe: CMakeFiles/smartoil.dir/employe.cpp.obj
 smartoil.exe: CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj
@@ -318,7 +352,7 @@ smartoil.exe: C:/opencv/build_mingw/lib/libopencv_core4120.dll.a
 smartoil.exe: CMakeFiles/smartoil.dir/linkLibs.rsp
 smartoil.exe: CMakeFiles/smartoil.dir/objects1.rsp
 smartoil.exe: CMakeFiles/smartoil.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable smartoil.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\Users\Administrator\Documents\Smart Oil Press Management\Smart-Oil-Press-Management-2A10\out\build\Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_16) "Linking CXX executable smartoil.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\smartoil.dir\link.txt --verbose=$(VERBOSE)
 	"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/models/face_detection_yunet_2023mar.onnx" "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug/face_detection_yunet_2023mar.onnx"
 	"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/models/face_recognition_sface_2021dec.onnx" "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug/face_recognition_sface_2021dec.onnx"
