@@ -516,13 +516,10 @@ void MainWindow::on_loginbtn_clicked()
     m_loggedInId = userId;
 
     // Fetch the employee's name to display in the top-right info bar
-    QSqlQuery q;
-    q.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
-    q.bindValue(":id", userId);
-    if (q.exec() && q.next()) {
-        const QString fullName = q.value(0).toString() + " " + q.value(1).toString();
-        if (ui->userNameLabel)
-            ui->userNameLabel->setText(fullName);
+    Employe emp;
+    QString fullName = emp.getFullNameById(userId);
+    if (!fullName.isEmpty() && ui->userNameLabel) {
+        ui->userNameLabel->setText(fullName);
     }
 
     // Clear credentials so they are not visible if the user later logs out
@@ -750,12 +747,11 @@ void MainWindow::populateAffCombos()
 
     // ── Employees ────────────────────────────────────────────────────────────
     ui->affEmpCombo->clear();
-    QSqlQuery qEmp(
-        "SELECT id_emp, nom_emp || ' ' || prenom_emp "
-        "FROM   EMPLOYE "
-        "ORDER BY nom_emp");
-    while (qEmp.next())
-        ui->affEmpCombo->addItem(qEmp.value(1).toString(), qEmp.value(0).toInt());
+    Employe emp;
+    QList<QPair<int, QString>> employees = emp.getAllEmployeesWithNames();
+    for (const auto& pair : employees) {
+        ui->affEmpCombo->addItem(pair.second, pair.first);
+    }
 
     // ── Séries (joined with Machine name for display) ─────────────────────
     // MACHINE has ID_SERIE FK → we join to show "NomMachine – NomSerie"
@@ -831,14 +827,9 @@ void MainWindow::updateAffectationRemainingInfo()
         return;
     }
 
-    QSqlQuery q;
-    q.prepare(
-        "SELECT COUNT(*) "
-        "FROM EMP_MACH "
-        "WHERE id_emp = :id_emp "
-        "  AND date_fin IS NULL");
-    q.bindValue(":id_emp", empId);
-    if (!q.exec() || !q.next()) {
+    Employe emp;
+    int used = emp.countAssignments(empId);
+    if (used < 0) {
         canSave = false;
         if (hasRemainingLabel) {
             ui->affRemainingInfoLabel->setText(
@@ -849,7 +840,6 @@ void MainWindow::updateAffectationRemainingInfo()
         return;
     }
 
-    const int used = q.value(0).toInt();
     const int remaining = qMax(0, m_maxAffectationsPerEmployee - used);
     const bool isEditMode = (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0);
     const bool increasesCount = !isEditMode || (empId != m_editingAffIdEmp);
@@ -892,14 +882,8 @@ void MainWindow::updateAffectationRemainingInfo()
 
 bool MainWindow::hasDuplicateAffectation(int empId, int serieId) const
 {
-    QSqlQuery qCheck;
-    qCheck.prepare(
-        "SELECT COUNT(*) FROM EMP_MACH "
-        "WHERE id_emp = :id_emp AND id_serie = :id_serie");
-    qCheck.bindValue(":id_emp", empId);
-    qCheck.bindValue(":id_serie", serieId);
-    qCheck.exec();
-    return qCheck.next() && qCheck.value(0).toInt() > 0;
+    Employe emp;
+    return emp.hasAffectationFor(empId, serieId);
 }
 
 void MainWindow::prepareInsertAffectationQuery(QSqlQuery& query,
