@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Stocks</class>
+ <widget class="QMainWindow" name="Stocks">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1032</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="metiersStock">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="ajoutStock">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QFormLayout" name="ajoutLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_saiCategorie">
+          <property name="text">
+           <string>Catégorie</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="SaiCategorie"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_saiDescription">
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPlainTextEdit" name="SaiDescription"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_saiDateAjout">
+          <property name="text">
+           <string>Date d'ajout</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QDateEdit" name="SaiDateAjout"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_saiDateMAJ">
+          <property name="text">
+           <string>Date mise à jour</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QDateEdit" name="SaiDateMAJ"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_saiQuantite">
+          <property name="text">
+           <string>Quantité (KG)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="SaiQuantite"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_saiQualite">
+          <property name="text">
+           <string>Qualité</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QComboBox" name="SaiQualite"/>
+        </item>
+        <item row="6" column="1">
+         <widget class="QPushButton" name="ConAjout">
+          <property name="text">
+           <string>Ajouter</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="consulterStock">
+     <layout class="QVBoxLayout" name="consulterLayout">
+      <item>
+       <layout class="QHBoxLayout" name="searchLayout">
+        <item>
+         <widget class="QLineEdit" name="SaiRecherche">
+          <property name="placeholderText">
+           <string>Rechercher...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="Trier">
+          <property name="placeholderText">
+           <string>Tri</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="ListeStock"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="exportLayout">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="exporterListeStock">
+          <property name="text">
+           <string>Exporter PDF</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="statStock">
+     <layout class="QVBoxLayout" name="statLayout">
+      <item>
+       <widget class="QWidget" name="chartStatusContainer" native="true">
+        <layout class="QVBoxLayout" name="containerLayout">
+         <item>
+          <widget class="QLabel" name="FaireLesStat">
+           <property name="text">
+            <string>Faire les statistiques de</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="X"/>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="advancedButtonsLayout">
+           <item>
+            <widget class="QPushButton" name="PredictOutput">
+             <property name="text">
+              <string>Prédiction Output</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="OptimiserReappro">
+             <property name="text">
+              <string>Optimiser Réapprovisionnement</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="PredictDechet">
+             <property name="text">
+              <string>Prédiction Déchet</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="GestionQualite">
+             <property name="text">
+              <string>Gestion Qualité</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_advanced">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1032</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

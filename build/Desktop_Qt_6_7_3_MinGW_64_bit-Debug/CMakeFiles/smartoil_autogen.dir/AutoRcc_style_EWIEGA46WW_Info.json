@@ -1,0 +1,25 @@
+{
+	"BUILD_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj",
+	"CMAKE_SOURCE_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/style.qss"
+	],
+	"LOCK_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir/AutoRcc_style_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "style" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_style.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir/AutoRcc_style_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/style.qrc",
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}
