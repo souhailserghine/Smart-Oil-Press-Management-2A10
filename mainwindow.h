@@ -14,8 +14,12 @@
 #include <QSqlRecord>
 #include <QColor>
 #include <QByteArray>
+#include <QMap>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <opencv2/objdetect.hpp>
+
+#include "arduino.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,8 +35,15 @@ class QDateEdit;
 class QWidget;
 class QSpinBox;
 class QDoubleSpinBox;
+class QCheckBox;
+class QSqlQuery;
+class QToolButton;
+class QResizeEvent;
 class Citernes;
 class Stocks;
+class HoverShadowFilter;
+class FaceRecognitionService;
+class FingerprintService;
 
 class MainWindow : public QMainWindow
 {
@@ -74,6 +85,7 @@ private slots:
     void on_affCancelBtn_clicked();     // back to table (affStack → 1)
     void on_affRefreshBtn_clicked();    // reload affectation table
     void on_affSearchEdit_textChanged(const QString& text);
+    void on_settingsSaveBtn_clicked(); // save affectation settings from Paramètres
 
     // Sidebar module navigation
     void on_btnmod1_clicked();
@@ -108,18 +120,17 @@ void on_ajouterlineseriemachine_2_clicked();
     void disconnectMachineSensor();
     void readMachineSerialData();
 
-    // Module 5 (Machines) toolbar actions
-    void on_btnConsulterMachines_clicked();
-    void on_btnAjouterMachines_clicked();
-    void on_btnStatMachines_clicked();
-    void on_btnAvanceMachines_clicked();
-
     // Module 6 (Agriculteurs) toolbar actions
     void on_btnConsulterAgr_clicked();
     void on_btnAjouterAgr_clicked();
     void on_btnStatAgr_clicked();
     void on_btnAvanceAgr_clicked();
     void onFingerprintTerminalReadyRead();
+    void onEnrollmentResult(bool success, int fingerprintId, const QString& reason);
+    void onFingerprintDeletionResult(int fingerprintId, bool success);
+    void onFingerprintError(const QString& message);
+    void onFingerprintScanningStateChanged(bool scanning);
+    void onFingerprintServiceReady();
 
 
 private:
@@ -128,9 +139,17 @@ private:
     // Helper methods
     void setupPersonnelChart();
     void setupPersonnelTable();
+    void loadEmployeeTable();
+    void loadEmployeeStats();
+    void loadFaceEmbeddings();
     void addActionButtonsToRow(int row);
     int findRowForButton(QObject* button) const;
     void setActiveModuleButton(int index);
+    int moduleIndex(QWidget* moduleWidget) const;
+    void ensureModuleIndex(int moduleIndex);
+    void openModulePage(QStackedWidget* modulePages, int moduleIndex, int pageIndex);
+    void openSidebarModule(int moduleIndex, QStackedWidget* modulePages, int pageIndex,
+                           int activeButtonIndex, bool refreshStockChoices = false);
     int m_editingIdLot = -1;
 
     // Statistiques et métier avancé Huile
@@ -209,6 +228,17 @@ private:
     void refreshStockSerieChoices();
     bool tryAutoAssignForSerie(int serieId, QString& detailMessage);
     void loadStocksTable();
+    void repositionUserInfo();
+    void resizeEvent(QResizeEvent* event) override;
+    void makeAvatarCircular();
+    void updateLoggedInUserInfo(int empId, const QString& fallbackName = QString());
+    void repositionChatLauncher();
+    void updateClock();
+    QByteArray encodeFaceFromFile(const QString& imagePath);
+    void initFingerprintService();
+    void onFingerprintMatched(int fingerprintId);
+    void startFingerprintEnrollmentFromForm();
+    void setFingerprintStatus(const QString& text, const QString& style = QString());
 
 // ===== Module machines =====
 QComboBox* cbSerieMachine = nullptr;
@@ -308,10 +338,18 @@ void openStocksWindow(int pageIndex = -1);
 
     Citernes* m_citernesWindow = nullptr;
     Stocks* m_stocksWindow = nullptr;
+    FaceRecognitionService* m_faceService = nullptr;
+    FingerprintService* m_fingerprintService = nullptr;
+    Arduino m_fingerprintTerminal;
     bool m_sidebarCollapsed = false;
     int  m_loggedInId = -1;            // id_emp of the currently authenticated user
     QByteArray m_selectedPhoto;
     QByteArray m_capturedFaceBlob;     // face embedding captured via webcam for new employee
+    cv::Ptr<cv::FaceDetectorYN> m_faceDetector;
+    cv::Ptr<cv::FaceRecognizerSF> m_faceRecognizer;
+    QMap<int, cv::Mat> m_faceEmbeddings;
+    int m_pendingFingerprintId = -1;
+    bool m_fingerprintEnrollInProgress = false;
     // Composite PK tracking for EMP_MACH edit mode
     int  m_editingAffIdEmp   = -1;     // id_emp being edited (-1 = insert mode)
     int  m_editingAffIdSerie = -1;     // id_serie being edited (-1 = insert mode)

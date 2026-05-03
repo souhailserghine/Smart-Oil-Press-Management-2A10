@@ -2,6 +2,11 @@
 #include "ui_mainwindow.h"
 #include "citernes.h"
 #include "stocks.h"
+#include "employe.h"
+#include "face_capture_dialog.h"
+#include "face_recognition_dialog.h"
+#include "face_recognition_service.h"
+#include "fingerprintservice.h"
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
@@ -22,6 +27,19 @@
 #include <QSizePolicy>
 #include <QAbstractItemView>
 #include <QAbstractButton>
+#include <QAction>
+#include <QBrush>
+#include <QFont>
+#include <QLayout>
+#include <QLayoutItem>
+#include <QPainter>
+#include <QPixmap>
+#include <QBuffer>
+#include <QImage>
+#include <QImageReader>
+#include <QSpacerItem>
+#include <QVector>
+#include <QPair>
 #include <QString>
 #include <QDialog>
 #include <QLabel>
@@ -40,6 +58,11 @@
 #include <QRegularExpression>
 #include <QDebug>
 #include <QFile>
+#include <QDir>
+#include <QDataStream>
+#include <QCoreApplication>
+#include <QStandardPaths>
+#include <QMetaType>
 #include <QMenu>
 #include <QTextStream>
 #include <QFileDialog>
@@ -63,6 +86,7 @@
 #include <QDoubleSpinBox>
 #include <QDoubleValidator>
 #include <QScrollArea>
+#include <QScrollBar>
 #include <QPrinter>
 #include <QTextDocument>
 #include <QDateTime>
@@ -70,16 +94,811 @@
 #include <QPen>
 #include <QPageSize>
 #include <QPageLayout>
+#include <QCheckBox>
+#include <QFrame>
+#include <QStatusBar>
+#include <QTimer>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/videoio.hpp>
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
+
+namespace {
+
+QPixmap pixmapFromImageBytesRespectingOrientation(const QByteArray& bytes)
+{
+    QPixmap pixmap;
+    if (bytes.isEmpty()) return pixmap;
+
+    // Employee photos commonly come from phones. Many phone JPEGs store the
+    // real orientation in EXIF instead of rotating pixels. QPixmap::loadFromData
+    // ignores that metadata, which can make the top-bar avatar appear rotated.
+    QBuffer buffer;
+    buffer.setData(bytes);
+    if (buffer.open(QIODevice::ReadOnly)) {
+        QImageReader reader(&buffer);
+        reader.setAutoTransform(true); // apply EXIF orientation when available
+        const QImage image = reader.read();
+        if (!image.isNull())
+            pixmap = QPixmap::fromImage(image);
+    }
+
+    // Fallback for unusual formats/drivers if QImageReader could not decode.
+    if (pixmap.isNull())
+        pixmap.loadFromData(bytes);
+    return pixmap;
+}
+
+void setSafeGeometry(QWidget* widget, int x, int y, int w, int h)
+{
+    if (!widget || w <= 0 || h <= 0) return;
+    widget->setGeometry(x, y, w, h);
+}
+
+void centerFixedChild(QWidget* parent, QWidget* child, int preferredW, int preferredH, int topY)
+{
+    if (!parent || !child) return;
+    const int availableW = qMax(parent->width(), preferredW + 40);
+    const int availableH = qMax(parent->height(), preferredH + topY + 40);
+    const int w = qMin(preferredW, qMax(360, availableW - 80));
+    const int h = qMin(preferredH, qMax(360, availableH - topY - 40));
+    const int x = qMax(24, (availableW - w) / 2);
+    child->setGeometry(x, topY, w, h);
+}
+
+void setReferenceTableMetrics(QTableWidget* table, int actionsColumn = -1)
+{
+    if (!table) return;
+    table->setAlternatingRowColors(true);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setShowGrid(false);
+    table->setWordWrap(false);
+    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    if (table->verticalHeader()) {
+        table->verticalHeader()->setVisible(false);
+        table->verticalHeader()->setDefaultSectionSize(48);
+    }
+    if (table->horizontalHeader()) {
+        table->horizontalHeader()->setMinimumHeight(46);
+        table->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
+        table->horizontalHeader()->setStretchLastSection(false);
+        const int last = table->columnCount() - 1;
+        const int actionCol = (actionsColumn >= 0) ? actionsColumn : last;
+        for (int c = 0; c < table->columnCount(); ++c) {
+            if (c == actionCol)
+                table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Fixed);
+            else
+                table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+        }
+        if (actionCol >= 0 && actionCol < table->columnCount())
+            table->setColumnWidth(actionCol, 210);
+    }
+}
+
+QPushButton* createReferenceTableButton(const QString& text, const char* objectName, const QString& type, QWidget* parent)
+{
+    auto* button = new QPushButton(text, parent);
+    button->setObjectName(QString::fromLatin1(objectName));
+    button->setProperty("type", type);
+    button->setProperty("role", "tableAction");
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setMinimumSize(text.contains(QStringLiteral("Supprimer")) ? QSize(98, 30) : QSize(92, 30));
+    button->setMaximumHeight(30);
+    button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    return button;
+}
+
+void applyModuleLayoutRefinements(QWidget* module, QWidget* toolbar, QStackedWidget* stack)
+{
+    if (!module) return;
+    if (auto* lay = qobject_cast<QVBoxLayout*>(module->layout())) {
+        lay->setContentsMargins(18, 14, 18, 18);
+        lay->setSpacing(12);
+        if (QLayoutItem* headerItem = lay->itemAt(0)) {
+            if (auto* header = headerItem->layout()) {
+                header->setContentsMargins(0, 0, 0, 0);
+                header->setSpacing(10);
+            }
+        }
+    }
+    if (toolbar) {
+        toolbar->setMinimumSize(460, 64);
+        toolbar->setMaximumWidth(560);
+        toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    }
+    if (stack) {
+        stack->setMinimumSize(980, 760);
+        stack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    }
+}
+
+void applyRuntimeUxPolish(Ui::MainWindow* ui)
+{
+    if (!ui) return;
+
+    applyModuleLayoutRefinements(ui->module2, ui->horizontalLayoutWidget_4, ui->metiersstocks);
+    applyModuleLayoutRefinements(ui->module3, ui->horizontalLayoutWidget_5, ui->metiersCiternes);
+    applyModuleLayoutRefinements(ui->module4, ui->horizontalLayoutWidget_6, ui->metiershuile);
+    applyModuleLayoutRefinements(ui->module5, ui->horizontalLayoutWidget_7, ui->metierspersonnel_2);
+    applyModuleLayoutRefinements(ui->module6, ui->horizontalLayoutWidget_8, ui->metiersagriculteurs);
+    applyModuleLayoutRefinements(ui->module7, nullptr, nullptr);
+
+    for (QLabel* title : { ui->label_2, ui->label_5, ui->label_huile, ui->label_7, ui->label_8, ui->label_settings_title }) {
+        if (!title) continue;
+        title->setMinimumHeight(42);
+        title->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+        title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+
+    for (QTableWidget* table : { ui->tableEmp, ui->tableWidget_2, ui->ListeCiterne, ui->tableWidget_4, ui->tablemachine, ui->tableWidget_5, ui->affTable }) {
+        if (table) setReferenceTableMetrics(table);
+    }
+
+    if (ui->tablemachine) ui->tablemachine->setColumnWidth(8, 210);
+    if (ui->tableWidget_4 && ui->tableWidget_4->columnCount() > 0)
+        ui->tableWidget_4->setColumnWidth(ui->tableWidget_4->columnCount() - 1, 210);
+    if (ui->tableEmp && ui->tableEmp->columnCount() > 0)
+        ui->tableEmp->setColumnWidth(ui->tableEmp->columnCount() - 1, 210);
+
+    if (ui->chartStatusContainer) ui->chartStatusContainer->setMinimumHeight(1800);
+}
+
+void installReferenceModuleLayout(QWidget* module,
+                                  QToolButton* icon,
+                                  QLabel* title,
+                                  QWidget* toolbar,
+                                  QStackedWidget* stack)
+{
+    if (!module || module->layout()) return;
+
+    auto* moduleLayout = new QVBoxLayout(module);
+    moduleLayout->setContentsMargins(18, 14, 18, 18);
+    moduleLayout->setSpacing(12);
+
+    auto* headerRow = new QHBoxLayout();
+    headerRow->setContentsMargins(0, 0, 0, 0);
+    headerRow->setSpacing(10);
+
+    if (icon) {
+        icon->setParent(module);
+        icon->setFixedSize(36, 36);
+        icon->setIconSize(QSize(28, 28));
+        icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        headerRow->addWidget(icon, 0, Qt::AlignVCenter);
+    }
+
+    if (title) {
+        title->setParent(module);
+        title->setMinimumHeight(40);
+        title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        title->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+        headerRow->addWidget(title, 1, Qt::AlignVCenter);
+    } else {
+        headerRow->addStretch(1);
+    }
+
+    if (toolbar) {
+        toolbar->setParent(module);
+        toolbar->setMinimumWidth(430);
+        toolbar->setMaximumWidth(520);
+        toolbar->setMinimumHeight(64);
+        toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        headerRow->addWidget(toolbar, 0, Qt::AlignRight | Qt::AlignVCenter);
+    }
+
+    moduleLayout->addLayout(headerRow);
+
+    if (stack) {
+        stack->setParent(module);
+        stack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        stack->setMinimumSize(920, 680);
+        moduleLayout->addWidget(stack, 1);
+    } else {
+        moduleLayout->addStretch(1);
+    }
+}
+
+void normalizeMainModuleGeometry(Ui::MainWindow* ui)
+{
+    if (!ui || !ui->modules) return;
+
+    const int moduleW = qMax(980, ui->modules->width());
+    const int moduleH = qMax(805, ui->modules->height());
+    const int titleW = qMax(360, moduleW - 600);
+    const int toolbarW = 465;
+    const int sideMargin = 32;
+    const int titleX = 70;
+    const int titleY = 34;
+    const int iconX = 30;
+    const int iconY = 31;
+    const int toolbarX = qMax(500, moduleW - toolbarW - sideMargin);
+    const int toolbarY = 22;
+    const int toolbarH = 64;
+    const int stackX = 32;
+    const int stackY = 112;
+    const int stackW = qMax(920, moduleW - (stackX * 2));
+    const int stackH = qMax(680, moduleH - stackY - 24);
+
+    auto apply = [&](QWidget* module, QLabel* title, QToolButton* icon, QWidget* toolbar, QStackedWidget* stack) {
+        if (!module) return;
+        module->setMinimumSize(moduleW, moduleH);
+
+        const bool layoutManaged = module->layout() != nullptr;
+        if (!layoutManaged) {
+            if (icon) setSafeGeometry(icon, iconX, iconY, 36, 36);
+            if (title) setSafeGeometry(title, titleX, titleY, titleW, 38);
+            if (toolbar) setSafeGeometry(toolbar, toolbarX, toolbarY, toolbarW, toolbarH);
+            if (stack) stack->setGeometry(stackX, stackY, stackW, stackH);
+        } else if (stack) {
+            stack->setMinimumSize(920, 680);
+        }
+
+        if (stack) {
+            stack->setMinimumSize(920, 680);
+            for (int i = 0; i < stack->count(); ++i) {
+                if (QWidget* page = stack->widget(i)) {
+                    page->resize(stack->size());
+                    page->setMinimumSize(stack->size());
+                    if (QLayout* pageLayout = page->layout()) {
+                        pageLayout->setContentsMargins(0, 0, 0, 0);
+                        pageLayout->setSpacing(qMax(8, pageLayout->spacing()));
+                        pageLayout->activate();
+                    }
+                }
+            }
+        }
+    };
+
+    // Do not restyle Personnel itself: it is the reference layout. Only keep the stats page scrollable below.
+    if (ui->module1 && ui->metierspersonnel) {
+        ui->metierspersonnel->setMinimumSize(920, 740);
+        if (ui->chartStatusContainer) ui->chartStatusContainer->setMinimumHeight(1550);
+    }
+
+    apply(ui->module2, ui->label_2, ui->module2Icon, ui->horizontalLayoutWidget_4, ui->metiersstocks);
+    apply(ui->module3, ui->label_5, ui->module3Icon, ui->horizontalLayoutWidget_5, ui->metiersCiternes);
+    apply(ui->module4, ui->label_huile, ui->module4Icon, ui->horizontalLayoutWidget_6, ui->metiershuile);
+    apply(ui->module5, ui->label_7, ui->module5Icon, ui->horizontalLayoutWidget_7, ui->metierspersonnel_2);
+    apply(ui->module6, ui->label_8, ui->module6Icon, ui->horizontalLayoutWidget_8, ui->metiersagriculteurs);
+    apply(ui->module7, ui->label_settings_title, ui->module7Icon, nullptr, nullptr);
+
+    // Center form-only pages so they no longer feel glued to the left.
+    if (ui->ajoutqtolives && ui->formLayoutWidget_2)
+        centerFixedChild(ui->ajoutqtolives, ui->formLayoutWidget_2, 760, 735, 20);
+    if (ui->ajoutCiternes && ui->formLayoutWidget_3)
+        centerFixedChild(ui->ajoutCiternes, ui->formLayoutWidget_3, 760, 540, 26);
+    if (ui->ajouthuile) {
+        const int pageW = qMax(980, ui->ajouthuile->width());
+        const int gap = 28;
+        const int panelW = qMin(430, qMax(360, (pageW - gap - 120) / 2));
+        const int x1 = qMax(40, (pageW - (panelW * 2 + gap)) / 2);
+        if (ui->formLayoutWidget_5) ui->formLayoutWidget_5->setGeometry(x1, 24, panelW, 560);
+        if (ui->formLayoutWidget_4) ui->formLayoutWidget_4->setGeometry(x1 + panelW + gap, 24, panelW, 560);
+    }
+    if (ui->ajoutpersonnel_3 && ui->formLayoutWidget_6)
+        centerFixedChild(ui->ajoutpersonnel_3, ui->formLayoutWidget_6, 760, 560, 28);
+    if (ui->ajoutagriculteur && ui->formLayoutWidget_7)
+        centerFixedChild(ui->ajoutagriculteur, ui->formLayoutWidget_7, 760, 660, 22);
+
+    // Advanced Citernes page contains a small absolute widget; keep it centered.
+    if (ui->AvCiterne) {
+        if (QWidget* panel = ui->AvCiterne->findChild<QWidget*>(QStringLiteral("layoutWidget"))) {
+            setSafeGeometry(panel, qMax(24, (ui->AvCiterne->width() - 260) / 2), 32, 260, 44);
+        }
+    }
+
+    applyRuntimeUxPolish(ui);
+}
+}
+
+
+
+namespace {
+QString premiumInterfaceTheme()
+{
+    return QStringLiteral(R"QSS(
+/* ───────────────── Smart Oil Premium UI Theme ───────────────── */
+QMainWindow,
+QWidget#centralwidget,
+QWidget#mainprogram,
+QWidget#contentArea,
+QStackedWidget#MainStacked {
+    background: #f6f8f2;
+    color: #25331f;
+    font-family: "Segoe UI", "Inter", "Arial";
+    font-size: 10.5pt;
+}
+
+QWidget#loginpage {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #eef4df,
+                                stop:0.48 #f8faf3,
+                                stop:1 #dfeac9);
+}
+QLabel#loginarea {
+    background: rgba(255, 255, 255, 248);
+    border: 1px solid rgba(126, 145, 82, 75);
+    border-radius: 34px;
+}
+QLabel#loginpic {
+    border-radius: 34px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+QLabel#logintext {
+    background: transparent;
+    color: #263414;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+QLineEdit#userinput,
+QLineEdit#pwdinput {
+    background: #ffffff;
+    border: 1px solid #d7e2c6;
+    border-radius: 16px;
+    color: #243018;
+    padding: 0 16px;
+    min-height: 44px;
+}
+QLineEdit#userinput:focus,
+QLineEdit#pwdinput:focus {
+    border: 2px solid #7a9444;
+    background: #fbfdf7;
+}
+QPushButton#loginbtn {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #6b7f3d,
+                                stop:1 #95a95a);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    padding: 10px 18px;
+    font-weight: 800;
+    min-height: 42px;
+}
+QPushButton#loginbtn:hover { background: #5f7334; }
+QPushButton#faceBtn {
+    background: #eef4df;
+    color: #445922;
+    border: 1px solid #d8e2c8;
+    border-radius: 16px;
+    padding: 9px 16px;
+    font-weight: 700;
+}
+QPushButton#faceBtn:hover { background: #e4edcf; }
+
+QWidget#sidebar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #6f8343,
+                                stop:0.55 #5f7438,
+                                stop:1 #53672f);
+    border-right: 1px solid rgba(68, 86, 36, 90);
+}
+QLabel#sidebartitle,
+QLabel#sidebarsubtitle {
+    color: #fbfff3;
+    background: transparent;
+}
+QToolButton#sidebarToggleBtn {
+    background: rgba(255, 255, 255, 34);
+    border: 1px solid rgba(255, 255, 255, 70);
+    border-radius: 12px;
+    padding: 6px;
+    color: #ffffff;
+}
+QToolButton#sidebarToggleBtn:hover {
+    background: rgba(255, 255, 255, 58);
+}
+QPushButton#btnmod1,
+QPushButton#btnmod2,
+QPushButton#btnmod3,
+QPushButton#btnmod4,
+QPushButton#btnmod5,
+QPushButton#btnmod6,
+QPushButton#btnSettings {
+    background: transparent;
+    color: #fbfff3;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 750;
+    min-height: 42px;
+}
+QPushButton#btnmod1:hover,
+QPushButton#btnmod2:hover,
+QPushButton#btnmod3:hover,
+QPushButton#btnmod4:hover,
+QPushButton#btnmod5:hover,
+QPushButton#btnmod6:hover,
+QPushButton#btnSettings:hover {
+    background: rgba(255, 255, 255, 34);
+    border: 1px solid rgba(255, 255, 255, 55);
+}
+QPushButton#btnmod1:checked,
+QPushButton#btnmod2:checked,
+QPushButton#btnmod3:checked,
+QPushButton#btnmod4:checked,
+QPushButton#btnmod5:checked,
+QPushButton#btnmod6:checked,
+QPushButton#btnSettings:checked {
+    background: rgba(255, 255, 255, 72);
+    border: 1px solid rgba(255, 255, 255, 100);
+    color: #ffffff;
+}
+
+QWidget#userInfoContainer,
+QGroupBox,
+QFrame[role="card"],
+QWidget#chartStatusContainer,
+QWidget#chartStatusContainer_2,
+QWidget#chartStatusContainer_3 {
+    background: #ffffff;
+    border: 1px solid #e0e8d4;
+    border-radius: 20px;
+}
+QLabel#label_personnel,
+QLabel#label_2,
+QLabel#label_5,
+QLabel#label_huile,
+QLabel#label_7,
+QLabel#label_8,
+QLabel#label_settings_title,
+QLabel#label_citerne,
+QLabel#label_machine,
+QLabel#label_agriculteur,
+QLabel#label_stock {
+    color: #263414;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    background: transparent;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+QPushButton {
+    background: #e7ecd8;
+    color: #263414;
+    border: 1px solid #d9e4c7;
+    border-radius: 14px;
+    padding: 8px 16px;
+    font-weight: 700;
+    min-height: 32px;
+}
+QPushButton:hover { background: #dfe9cc; border-color: #c8d8ad; }
+QPushButton:pressed { background: #cdddb4; }
+QPushButton[type="primary"] {
+    background: #667c3a;
+    border-color: #667c3a;
+    color: white;
+}
+QPushButton[type="primary"]:hover { background: #566d2d; }
+QPushButton[type="warning"] {
+    background: #e6a817;
+    border-color: #e6a817;
+    color: white;
+}
+QPushButton[type="danger"] {
+    background: #c94a45;
+    border-color: #c94a45;
+    color: white;
+}
+QPushButton[type="success"] {
+    background: #3f8f62;
+    border-color: #3f8f62;
+    color: white;
+}
+QPushButton[role="tableAction"],
+QToolButton[role="tableAction"] {
+    min-height: 0px;
+    max-height: 30px;
+    padding: 0px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+}
+QToolButton[role="tableAction"] {
+    background: #e7ecd8;
+    color: #263414;
+    border: 1px solid #d9e4c7;
+}
+QToolButton[role="tableAction"][type="warning"] {
+    background: #e6a817;
+    border-color: #e6a817;
+    color: white;
+}
+QToolButton[role="tableAction"][type="danger"] {
+    background: #c94a45;
+    border-color: #c94a45;
+    color: white;
+}
+QWidget[role="tableActionsContainer"] {
+    background: transparent;
+    border: none;
+}
+
+QToolButton {
+    background: #ffffff;
+    color: #415524;
+    border: 1px solid #dde7d0;
+    border-radius: 14px;
+    padding: 8px 10px;
+    font-weight: 700;
+    min-height: 34px;
+}
+QToolButton:hover { background: #eff5e5; border-color: #c8d8ad; }
+QToolButton:checked { background: #dfeacc; color: #263414; }
+QToolButton[autoRaise="true"] { background: transparent; border: 1px solid transparent; }
+QToolButton[autoRaise="true"]:hover { background: #eff5e5; border-color: #d7e3c6; }
+
+QLineEdit,
+QTextEdit,
+QPlainTextEdit,
+QComboBox,
+QDateEdit,
+QSpinBox,
+QDoubleSpinBox {
+    background: #ffffff;
+    border: 1px solid #d9e2cd;
+    border-radius: 12px;
+    padding: 7px 10px;
+    color: #25331f;
+    selection-background-color: #80964b;
+    selection-color: white;
+    min-height: 32px;
+}
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus,
+QComboBox:focus,
+QDateEdit:focus,
+QSpinBox:focus,
+QDoubleSpinBox:focus {
+    border: 2px solid #7d9746;
+    background: #fbfdf7;
+}
+QLineEdit[readOnly="true"] {
+    background: #f2f5ec;
+    color: #68715e;
+}
+QComboBox::drop-down {
+    border: none;
+    width: 26px;
+}
+
+QTableWidget,
+QTableView {
+    background: #ffffff;
+    alternate-background-color: #f8faf4;
+    border: 1px solid #dfe8d4;
+    border-radius: 18px;
+    gridline-color: #edf2e6;
+    selection-background-color: #e5efd3;
+    selection-color: #263414;
+    outline: none;
+}
+QTableWidget::item,
+QTableView::item {
+    padding: 7px 8px;
+    border-bottom: 1px solid #edf2e6;
+}
+QTableWidget::item:selected,
+QTableView::item:selected {
+    background: #e5efd3;
+    color: #263414;
+}
+QHeaderView::section {
+    background: #6b7f3d;
+    color: white;
+    border: none;
+    border-right: 1px solid rgba(255,255,255,45);
+    padding: 9px 8px;
+    font-weight: 800;
+}
+QHeaderView::section:first {
+    border-top-left-radius: 12px;
+}
+QHeaderView::section:last {
+    border-top-right-radius: 12px;
+}
+
+QTabWidget::pane,
+QStackedWidget#modules {
+    border: none;
+    background: transparent;
+}
+QScrollArea,
+QScrollArea > QWidget > QWidget {
+    background: transparent;
+    border: none;
+}
+QGroupBox {
+    margin-top: 18px;
+    padding: 18px;
+    font-weight: 800;
+    color: #405323;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 18px;
+    padding: 0 8px;
+    color: #405323;
+}
+QCheckBox {
+    spacing: 8px;
+    color: #344521;
+}
+QStatusBar {
+    background: #f6f8f2;
+    color: #536143;
+}
+QToolTip {
+    background: #263414;
+    color: #ffffff;
+    border: 1px solid #94a85a;
+    border-radius: 8px;
+    padding: 6px 8px;
+}
+
+
+QPushButton[role="tableAction"], QToolButton[role="tableAction"] {
+    min-width: 92px;
+    max-width: 108px;
+    min-height: 30px;
+    max-height: 30px;
+    border-radius: 0px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 0px 10px;
+}
+QPushButton[role="tableAction"][type="warning"], QToolButton[role="tableAction"][type="warning"] {
+    background: #e8a307;
+    border: 1px solid #e8a307;
+}
+QPushButton[role="tableAction"][type="warning"]:hover, QToolButton[role="tableAction"][type="warning"]:hover {
+    background: #c98a05;
+}
+QPushButton[role="tableAction"][type="danger"], QToolButton[role="tableAction"][type="danger"] {
+    background: #cf4642;
+    border: 1px solid #cf4642;
+}
+QPushButton[role="tableAction"][type="danger"]:hover, QToolButton[role="tableAction"][type="danger"]:hover {
+    background: #ad3431;
+}
+QWidget[role="tableActionsContainer"] {
+    background: transparent;
+}
+
+#userInfoContainer {
+    background: #ffffff;
+    border: 1px solid #d9e4c7;
+    border-radius: 24px;
+}
+#userNameLabel {
+    color: #16240f;
+    font-weight: 600;
+    padding-right: 4px;
+}
+#userAvatar {
+    background: #6f873d;
+    border: 2px solid #dfe8c9;
+    border-radius: 21px;
+}
+)QSS");
+}
+
+void applyPremiumInterfacePolish(MainWindow* window, Ui::MainWindow* ui)
+{
+    if (!window || !ui) return;
+
+    // Clear old inline styles on merged login widgets so the premium theme can apply.
+    for (QWidget* loginWidget : { static_cast<QWidget*>(ui->loginarea),
+                                  static_cast<QWidget*>(ui->logintext),
+                                  static_cast<QWidget*>(ui->userinput),
+                                  static_cast<QWidget*>(ui->pwdinput),
+                                  static_cast<QWidget*>(ui->loginbtn),
+                                  static_cast<QWidget*>(ui->faceBtn) }) {
+        if (loginWidget) loginWidget->setStyleSheet(QString());
+    }
+
+    window->setStyleSheet(window->styleSheet() + premiumInterfaceTheme());
+    window->setWindowTitle(QStringLiteral("Smart Oil Press Management"));
+    window->setMinimumSize(1100, 720);
+
+    // Make the login page look intentional without changing the login logic.
+    if (ui->loginpic) {
+        ui->loginpic->setGeometry(170, 85, 560, 610);
+        ui->loginpic->setScaledContents(true);
+    }
+    if (ui->loginarea) ui->loginarea->setGeometry(700, 85, 430, 610);
+    if (ui->sidebarlogo_2) ui->sidebarlogo_2->setGeometry(870, 145, 90, 90);
+    if (ui->logintext) {
+        ui->logintext->setGeometry(785, 245, 260, 46);
+        ui->logintext->setAlignment(Qt::AlignCenter);
+    }
+    if (ui->userinput) ui->userinput->setGeometry(770, 320, 290, 46);
+    if (ui->pwdinput) ui->pwdinput->setGeometry(770, 384, 290, 46);
+    if (ui->loginbtn) ui->loginbtn->setGeometry(770, 462, 290, 52);
+    if (ui->faceBtn) ui->faceBtn->setGeometry(770, 532, 290, 48);
+
+    // Give all interactive controls a consistent feel.
+    const QList<QAbstractButton*> buttons = window->findChildren<QAbstractButton*>();
+    for (QAbstractButton* button : buttons) {
+        if (!button) continue;
+        button->setCursor(Qt::PointingHandCursor);
+        if (button->minimumHeight() < 34) button->setMinimumHeight(34);
+    }
+
+    const QList<QLineEdit*> edits = window->findChildren<QLineEdit*>();
+    for (QLineEdit* edit : edits) {
+        if (!edit) continue;
+        if (edit->minimumHeight() < 34) edit->setMinimumHeight(34);
+        edit->setClearButtonEnabled(true);
+    }
+
+    const QList<QComboBox*> combos = window->findChildren<QComboBox*>();
+    for (QComboBox* combo : combos) {
+        if (!combo) continue;
+        if (combo->minimumHeight() < 34) combo->setMinimumHeight(34);
+    }
+
+    const QList<QDateEdit*> dates = window->findChildren<QDateEdit*>();
+    for (QDateEdit* dateEdit : dates) {
+        if (!dateEdit) continue;
+        dateEdit->setCalendarPopup(true);
+        if (dateEdit->minimumHeight() < 34) dateEdit->setMinimumHeight(34);
+    }
+
+    const QList<QTableWidget*> tables = window->findChildren<QTableWidget*>();
+    for (QTableWidget* table : tables) {
+        if (!table) continue;
+        table->setAlternatingRowColors(true);
+        table->setShowGrid(false);
+        table->setSelectionBehavior(QAbstractItemView::SelectRows);
+        table->setSelectionMode(QAbstractItemView::SingleSelection);
+        table->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        if (table->verticalHeader()) {
+            table->verticalHeader()->setVisible(false);
+            table->verticalHeader()->setDefaultSectionSize(42);
+        }
+        if (table->horizontalHeader()) {
+            table->horizontalHeader()->setHighlightSections(false);
+            table->horizontalHeader()->setMinimumHeight(42);
+        }
+    }
+
+    if (ui->sidebar) {
+        ui->sidebar->setMinimumWidth(230);
+        ui->sidebar->setMaximumWidth(240);
+    }
+    if (ui->contentArea) {
+        ui->contentArea->setContentsMargins(0, 0, 0, 0);
+    }
+}
+} // namespace
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Always start from the login page. Some merged .ui files keep a design-time
+    // currentIndex that skips the login page.
+    if (ui->MainStacked) {
+        ui->MainStacked->setCurrentIndex(0);
+    }
+
+    m_faceService = new FaceRecognitionService();
+    m_faceService->ensureModelsLoaded();
 
     machineSerial = new QSerialPort(this);
     connect(machineSerial, &QSerialPort::readyRead, this, &MainWindow::readMachineSerialData);
@@ -118,26 +937,47 @@ MainWindow::MainWindow(QWidget *parent)
         QObject::connect(btnAdv, &QPushButton::clicked, this, [this]() { openStocksWindow(3); });
     }
 
-    // Layout the sidebar and modules side-by-side to avoid overlap
+    // Normalize the main application layout. The merged .ui kept several
+    // absolute-positioned placeholders, which caused the sidebar/content area
+    // to overlap or get squeezed on different screen sizes.
     {
-        auto mainLayout = new QHBoxLayout(ui->mainprogram);
+        if (ui->mainprogramLayoutHost) {
+            ui->mainprogramLayoutHost->hide();
+        }
+
+        QHBoxLayout* mainLayout = qobject_cast<QHBoxLayout*>(ui->mainprogram->layout());
+        if (!mainLayout) {
+            mainLayout = new QHBoxLayout(ui->mainprogram);
+        }
         mainLayout->setContentsMargins(0, 0, 0, 0);
         mainLayout->setSpacing(0);
-        // Respect intended sidebar width constraints and prevent layout from squashing it
-        ui->sidebar->setMinimumWidth(200);
+
+        // Clear possible stale designer/runtime layout items before rebuilding.
+        while (QLayoutItem* item = mainLayout->takeAt(0)) {
+            delete item;
+        }
+
+        ui->sidebar->setParent(ui->mainprogram);
+        ui->sidebar->setMinimumWidth(220);
         ui->sidebar->setMaximumWidth(220);
         ui->sidebar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         mainLayout->addWidget(ui->sidebar);
-        // Ensure button text is never elided: compute required width per button via style and set minimums
-        // Wrap the modules in a content area that applies offsets (drop + right shift)
-        auto* contentArea = new QWidget(ui->mainprogram);
-        auto* contentLayout = new QVBoxLayout(contentArea);
-        // Keep margins simple and predictable; no need for DPI-based mm conversion here.
-        contentLayout->setContentsMargins(16, 8, 0, 0);
-        contentLayout->setSpacing(8); // small gap between user info and content
 
-        // Place the user info bar above modules within the content area so it's layout-managed
+        ui->contentArea->setParent(ui->mainprogram);
+        ui->contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+        QVBoxLayout* contentLayout = qobject_cast<QVBoxLayout*>(ui->contentArea->layout());
+        if (!contentLayout) {
+            contentLayout = new QVBoxLayout(ui->contentArea);
+        }
+        while (QLayoutItem* item = contentLayout->takeAt(0)) {
+            delete item;
+        }
+        contentLayout->setContentsMargins(18, 10, 18, 16);
+        contentLayout->setSpacing(10);
+
         if (ui->userInfoContainer) {
+            ui->userInfoContainer->setParent(ui->contentArea);
             ui->userInfoContainer->setProperty("role", "panel");
             ui->userInfoContainer->setMinimumHeight(56);
             ui->userInfoContainer->setMaximumHeight(56);
@@ -145,9 +985,117 @@ MainWindow::MainWindow(QWidget *parent)
             contentLayout->addWidget(ui->userInfoContainer);
         }
 
-        // Modules sit below the user info bar
-        contentLayout->addWidget(ui->modules);
-        mainLayout->addWidget(contentArea);
+        ui->modules->setParent(ui->contentArea);
+        ui->modules->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        contentLayout->addWidget(ui->modules, 1);
+        mainLayout->addWidget(ui->contentArea, 1);
+    }
+
+    // Normalize the Personnel module layout. The merge left this page mostly
+    // geometry-based, so its title, toolbar and content could overlap/squash.
+    if (ui->module1 && !ui->module1->layout()) {
+        auto* moduleLayout = new QVBoxLayout(ui->module1);
+        moduleLayout->setContentsMargins(18, 14, 18, 18);
+        moduleLayout->setSpacing(12);
+
+        auto* headerRow = new QHBoxLayout();
+        headerRow->setContentsMargins(0, 0, 0, 0);
+        headerRow->setSpacing(10);
+
+        if (ui->module1Icon) {
+            ui->module1Icon->setParent(ui->module1);
+            ui->module1Icon->setFixedSize(36, 36);
+            headerRow->addWidget(ui->module1Icon);
+        }
+        if (ui->label_personnel) {
+            ui->label_personnel->setParent(ui->module1);
+            ui->label_personnel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+            headerRow->addWidget(ui->label_personnel);
+        }
+        headerRow->addStretch(1);
+        if (ui->horizontalLayoutWidget_3) {
+            ui->horizontalLayoutWidget_3->setParent(ui->module1);
+            ui->horizontalLayoutWidget_3->setMinimumWidth(430);
+            ui->horizontalLayoutWidget_3->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            headerRow->addWidget(ui->horizontalLayoutWidget_3);
+        }
+        moduleLayout->addLayout(headerRow);
+
+        if (ui->metierspersonnel) {
+            ui->metierspersonnel->setParent(ui->module1);
+            ui->metierspersonnel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            moduleLayout->addWidget(ui->metierspersonnel, 1);
+        }
+    }
+
+
+
+    // Give every non-Personnel module the same header/content layout model as Personnel.
+    // This replaces the old fixed-position top rows that kept Machine/Huile/Stock/Citernes
+    // leaning left or clipped after resize, while preserving the existing widgets and slots.
+    installReferenceModuleLayout(ui->module2, ui->module2Icon, ui->label_2,
+                                 ui->horizontalLayoutWidget_4, ui->metiersstocks);
+    installReferenceModuleLayout(ui->module3, ui->module3Icon, ui->label_5,
+                                 ui->horizontalLayoutWidget_5, ui->metiersCiternes);
+    installReferenceModuleLayout(ui->module4, ui->module4Icon, ui->label_huile,
+                                 ui->horizontalLayoutWidget_6, ui->metiershuile);
+    installReferenceModuleLayout(ui->module5, ui->module5Icon, ui->label_7,
+                                 ui->horizontalLayoutWidget_7, ui->metierspersonnel_2);
+    installReferenceModuleLayout(ui->module6, ui->module6Icon, ui->label_8,
+                                 ui->horizontalLayoutWidget_8, ui->metiersagriculteurs);
+    installReferenceModuleLayout(ui->module7, ui->module7Icon, ui->label_settings_title,
+                                 nullptr, nullptr);
+
+    if (ui->ajoutpersonnel && !ui->ajoutpersonnel->layout()) {
+        auto* addLayout = new QVBoxLayout(ui->ajoutpersonnel);
+        addLayout->setContentsMargins(0, 0, 0, 0);
+        addLayout->setSpacing(0);
+
+        auto* scroll = new QScrollArea(ui->ajoutpersonnel);
+        scroll->setObjectName(QStringLiteral("personnelAddScroll"));
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        scroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+        auto* scrollContent = new QWidget(scroll);
+        scrollContent->setObjectName(QStringLiteral("personnelAddScrollContent"));
+        scrollContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        auto* scrollLayout = new QVBoxLayout(scrollContent);
+        scrollLayout->setContentsMargins(24, 20, 24, 32);
+        scrollLayout->setSpacing(14);
+
+        auto* formRow = new QHBoxLayout();
+        formRow->setContentsMargins(0, 0, 0, 0);
+        formRow->setSpacing(22);
+        formRow->addStretch(1);
+
+        if (ui->formLayoutWidget) {
+            ui->formLayoutWidget->setParent(scrollContent);
+            ui->formLayoutWidget->setMinimumWidth(560);
+            ui->formLayoutWidget->setMaximumWidth(780);
+            ui->formLayoutWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+            if (ui->formLayout) {
+                ui->formLayout->setVerticalSpacing(14);
+                ui->formLayout->setHorizontalSpacing(16);
+            }
+            formRow->addWidget(ui->formLayoutWidget, 3, Qt::AlignTop);
+        }
+        if (ui->employeeValidationLabel) {
+            ui->employeeValidationLabel->setParent(scrollContent);
+            ui->employeeValidationLabel->setMinimumWidth(220);
+            ui->employeeValidationLabel->setMaximumWidth(320);
+            ui->employeeValidationLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+            formRow->addWidget(ui->employeeValidationLabel, 1, Qt::AlignTop);
+        }
+
+        formRow->addStretch(1);
+        scrollLayout->addLayout(formRow);
+        scrollLayout->addStretch(1);
+        scroll->setWidget(scrollContent);
+        addLayout->addWidget(scroll, 1);
     }
 
     // Sidebar buttons: make checkable for active state highlight
@@ -158,7 +1106,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->btnmod4->setCheckable(true);
         ui->btnmod5->setCheckable(true);
         ui->btnmod6->setCheckable(true);
-        setActiveModuleButton(0);
+        if (ui->btnSettings) ui->btnSettings->setCheckable(true);
+        setActiveModuleButton(moduleIndex(ui->module1));
     }
 
     // Initialize the personnel statistics chart
@@ -169,6 +1118,28 @@ MainWindow::MainWindow(QWidget *parent)
     setupPersonnelTable();
     // Add sidebar toggle button (hamburger) and interaction hooks
     setupInteractiveHooks();
+
+    // Enable Personnel form live validation and wire the fingerprint enrollment button.
+    setupEmployeeFormValidation();
+
+    // Restore affectation settings behavior from the personnel branch.
+    // These calls wire the advanced affectation controls, load persisted settings.dat,
+    // and make the Paramètres > Enregistrer button actually commit the settings.
+    setupAffectationStatusFilter();
+    setupAffectationOpenEndedOption();
+    setupSettingsAutoAssignOption();
+    refreshStockSerieChoices();
+    loadAffectationSettings();
+    if (ui->settingsSaveBtn && !ui->settingsSaveBtn->property("settingsSaveWired").toBool()) {
+        connect(ui->settingsSaveBtn, &QPushButton::clicked,
+                this, &MainWindow::on_settingsSaveBtn_clicked, Qt::UniqueConnection);
+        ui->settingsSaveBtn->setProperty("settingsSaveWired", true);
+    }
+
+    // Start the fingerprint terminal service at application startup.
+    // If the Arduino is not connected yet, the service keeps retrying.
+    initFingerprintService();
+
     connect(ui->btnStatHuile, &QToolButton::clicked, this, &MainWindow::on_btnStatHuile_clicked);
     setupModule5();
     // Palette de couleur — QLineEdit ne supporte pas clicked(), connexion manuelle
@@ -185,6 +1156,26 @@ MainWindow::MainWindow(QWidget *parent)
     if (ui->exporterListeCiterne) {
         QObject::connect(ui->exporterListeCiterne, &QPushButton::clicked, this, [this]() { openCiternesWindow(1); });
     }
+
+    // Default landing order after the merge:
+    // Module 1 is Personnel, and every module opens on its Consulter page.
+    if (ui->modules && ui->module1) ui->modules->setCurrentWidget(ui->module1);
+    if (ui->metierspersonnel && ui->consulterpersonnel) ui->metierspersonnel->setCurrentWidget(ui->consulterpersonnel);
+    if (ui->affStack && ui->affTablePage) ui->affStack->setCurrentWidget(ui->affTablePage);
+    if (ui->metiersCiternes && ui->consulterciterne) ui->metiersCiternes->setCurrentWidget(ui->consulterciterne);
+    if (ui->metiershuile && ui->consulterhuile) ui->metiershuile->setCurrentWidget(ui->consulterhuile);
+    if (ui->metierspersonnel_2 && ui->consulterpersonnel_3) ui->metierspersonnel_2->setCurrentWidget(ui->consulterpersonnel_3);
+    if (ui->metiersagriculteurs && ui->consulteragriculteur) ui->metiersagriculteurs->setCurrentWidget(ui->consulteragriculteur);
+    if (ui->metiersstocks && ui->consulterqtolives) ui->metiersstocks->setCurrentWidget(ui->consulterqtolives);
+    setActiveModuleButton(moduleIndex(ui->module1));
+
+    QTimer::singleShot(0, this, [this]() {
+        normalizeMainModuleGeometry(ui);
+    });
+
+    applyPremiumInterfacePolish(this, ui);
+    applyRuntimeUxPolish(ui);
+    makeAvatarCircular();
 }
 
 void MainWindow::openCiternesWindow(int pageIndex)
@@ -212,6 +1203,8 @@ MainWindow::~MainWindow()
 {
     // Always release serial port before UI teardown.
     m_fingerprintTerminal.close_arduino();
+    delete m_faceService;
+    m_faceService = nullptr;
     delete ui;
 }
 
@@ -224,6 +1217,10 @@ QByteArray MainWindow::encodeFaceFromFile(const QString& imagePath)
 
 void MainWindow::setFingerprintStatus(const QString& text, const QString& style)
 {
+    if (statusBar()) {
+        statusBar()->showMessage(text, 5000);
+    }
+
     if (!ui || !ui->faceStatusLabel) return;
     ui->faceStatusLabel->setText(text);
     ui->faceStatusLabel->setStyleSheet(style);
@@ -251,14 +1248,16 @@ void MainWindow::initFingerprintService()
     connect(m_fingerprintService, &FingerprintService::scanningStateChanged,
             this, &MainWindow::onFingerprintScanningStateChanged);
 
-    // Auto re-enable scanning when returning to login screen
-    if (ui && ui->MainStacked) {
+    // Auto re-enable scanning when returning to login screen.
+    // Do not use Qt::UniqueConnection with a lambda: Qt asserts in Debug builds.
+    if (ui && ui->MainStacked && !ui->MainStacked->property("fingerprintAutoScanWired").toBool()) {
         connect(ui->MainStacked, QOverload<int>::of(&QStackedWidget::currentChanged),
                 this, [this](int index) {
             if (index == 0 && m_fingerprintService) {  // 0 = login screen
                 m_fingerprintService->startScanning();
             }
-        }, Qt::UniqueConnection);
+        });
+        ui->MainStacked->setProperty("fingerprintAutoScanWired", true);
     }
 
     // Initialize the service (connects to Arduino)
@@ -270,6 +1269,84 @@ void MainWindow::onFingerprintServiceReady()
     setFingerprintStatus(tr("✔ Fingerprint ready"), 
                         QStringLiteral("color: #2e7d32; font-weight: bold;"));
     qDebug() << "[MainWindow] Fingerprint service ready";
+}
+
+void MainWindow::updateLoggedInUserInfo(int empId, const QString& fallbackName)
+{
+    if (empId <= 0) {
+        if (ui && ui->userNameLabel)
+            ui->userNameLabel->setText(fallbackName.isEmpty() ? tr("Utilisateur") : fallbackName);
+        makeAvatarCircular();
+        return;
+    }
+
+    QString fullName = fallbackName.trimmed();
+    QByteArray photoBytes;
+
+    QSqlQuery q;
+    q.prepare(QStringLiteral(
+        "SELECT nom_emp, prenom_emp, photo "
+        "FROM EMPLOYE "
+        "WHERE id_emp = :id"));
+    q.bindValue(QStringLiteral(":id"), empId);
+
+    if (q.exec() && q.next()) {
+        const QString nom = q.value(0).toString().trimmed();
+        const QString prenom = q.value(1).toString().trimmed();
+        const QString fromDb = (prenom + QStringLiteral(" ") + nom).trimmed();
+        if (!fromDb.isEmpty())
+            fullName = fromDb;
+        photoBytes = q.value(2).toByteArray();
+    } else {
+        qWarning() << "[MainWindow] Could not load logged-in employee info:" << q.lastError().text();
+    }
+
+    if (fullName.isEmpty())
+        fullName = tr("Utilisateur");
+
+    if (ui && ui->userNameLabel) {
+        ui->userNameLabel->setText(fullName);
+        ui->userNameLabel->setToolTip(fullName);
+    }
+
+    QLabel* avatar = ui ? ui->userAvatar : nullptr;
+    if (!avatar)
+        return;
+
+    const int side = 42;
+    QPixmap source;
+    if (!photoBytes.isEmpty()) {
+        source = pixmapFromImageBytesRespectingOrientation(photoBytes);
+    }
+
+    if (source.isNull()) {
+        source = QPixmap(side, side);
+        source.fill(Qt::transparent);
+        QPainter p(&source);
+        p.setRenderHint(QPainter::Antialiasing, true);
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(QStringLiteral("#6f873d")));
+        p.drawEllipse(0, 0, side, side);
+
+        QString initials;
+        const QStringList parts = fullName.split(QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts);
+        for (const QString& part : parts) {
+            if (!part.isEmpty()) initials += part.left(1).toUpper();
+            if (initials.size() >= 2) break;
+        }
+        if (initials.isEmpty()) initials = QStringLiteral("U");
+
+        QFont f = avatar->font();
+        f.setBold(true);
+        f.setPointSize(12);
+        p.setFont(f);
+        p.setPen(Qt::white);
+        p.drawText(source.rect(), Qt::AlignCenter, initials.left(2));
+        p.end();
+    }
+
+    avatar->setPixmap(source);
+    makeAvatarCircular();
 }
 
 void MainWindow::onFingerprintMatched(int fingerprintId)
@@ -298,10 +1375,12 @@ void MainWindow::onFingerprintMatched(int fingerprintId)
 
     // Log in
     m_loggedInId = empId;
-    if (ui->userNameLabel) ui->userNameLabel->setText(empName);
+    updateLoggedInUserInfo(empId, empName);
     if (ui->userinput) ui->userinput->clear();
     if (ui->pwdinput) ui->pwdinput->clear();
-    if (onLogin) ui->MainStacked->setCurrentIndex(1);
+    if (onLogin) {
+        on_btnmod1_clicked();
+    }
 
     // Re-enable scanning after 2 seconds for next login attempt
     QTimer::singleShot(2000, this, [this]() {
@@ -361,9 +1440,28 @@ void MainWindow::onFingerprintScanningStateChanged(bool scanning)
 
 void MainWindow::startFingerprintEnrollmentFromForm()
 {
-    if (machineSerial && machineSerial->isOpen())
+    // Avoid two modules owning the same serial port at the same time.
+    if (machineSerial && machineSerial->isOpen()) {
         machineSerial->close();
-    delete ui;
+    }
+
+    if (!m_fingerprintService) {
+        initFingerprintService();
+    } else if (!m_fingerprintService->isConnected()) {
+        // Try immediately instead of waiting for the reconnect timer.
+        m_fingerprintService->initialize();
+    }
+
+    if (!m_fingerprintService || !m_fingerprintService->isConnected()) {
+        setFingerprintStatus(tr("Terminal empreinte indisponible"),
+                             QStringLiteral("color: #ef6c00; font-weight: bold;"));
+        return;
+    }
+
+    m_fingerprintEnrollInProgress = true;
+    setFingerprintStatus(tr("Placez le doigt sur le capteur..."),
+                         QStringLiteral("color: #1976d2; font-weight: bold;"));
+    m_fingerprintService->requestEnrollment();
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -372,7 +1470,31 @@ void MainWindow::startFingerprintEnrollmentFromForm()
 
 void MainWindow::on_loginbtn_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
+    const QString email = ui->userinput ? ui->userinput->text().trimmed() : QString();
+    const QString password = ui->pwdinput ? ui->pwdinput->text() : QString();
+
+    if (email.isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, tr("Connexion"),
+                             tr("Veuillez saisir votre email et votre mot de passe."));
+        return;
+    }
+
+    Employe employe;
+    const int empId = employe.authenticate(email, password);
+    if (empId <= 0) {
+        QMessageBox::warning(this, tr("Connexion refusée"),
+                             tr("Email ou mot de passe incorrect."));
+        return;
+    }
+
+    m_loggedInId = empId;
+    updateLoggedInUserInfo(empId);
+
+    if (ui->userinput) ui->userinput->clear();
+    if (ui->pwdinput) ui->pwdinput->clear();
+
+    // After login, always land on Module 1: Gestion de personnel > Consulter.
+    on_btnmod1_clicked();
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -381,9 +1503,17 @@ void MainWindow::on_loginbtn_clicked()
 
 void MainWindow::on_btnAjouterEmp_clicked()
 {
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    const int personnelIdx = moduleIndex(ui->module1);
+    if (ui->modules->currentIndex() != personnelIdx)
+        crossFadeToIndex(ui->modules, personnelIdx);
     crossFadeToIndex(ui->metierspersonnel, 0);
+    if (auto* scroll = ui->ajoutpersonnel ? ui->ajoutpersonnel->findChild<QScrollArea*>(QStringLiteral("personnelAddScroll")) : nullptr) {
+        QTimer::singleShot(0, scroll->verticalScrollBar(), [scroll]() {
+            if (scroll && scroll->verticalScrollBar()) {
+                scroll->verticalScrollBar()->setValue(0);
+            }
+        });
+    }
     validateEmployeeForm(false);
 }
 
@@ -547,23 +1677,27 @@ void MainWindow::on_captureFaceBtn_clicked()
 
 void MainWindow::on_btnConsulterEmp_clicked()
 {
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    const int personnelIdx = moduleIndex(ui->module1);
+    if (ui->modules->currentIndex() != personnelIdx)
+        crossFadeToIndex(ui->modules, personnelIdx);
     crossFadeToIndex(ui->metierspersonnel, 1);
+    loadEmployeeTable();
 }
 
 void MainWindow::on_btnStatEmp_clicked()
 {
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    const int personnelIdx = moduleIndex(ui->module1);
+    if (ui->modules->currentIndex() != personnelIdx)
+        crossFadeToIndex(ui->modules, personnelIdx);
     crossFadeToIndex(ui->metierspersonnel, 2);
     loadEmployeeStats();
 }
 
 void MainWindow::on_btnAdvEmp_clicked()
 {
-    if (ui->modules->currentIndex() != 0)
-        crossFadeToIndex(ui->modules, 0);
+    const int personnelIdx = moduleIndex(ui->module1);
+    if (ui->modules->currentIndex() != personnelIdx)
+        crossFadeToIndex(ui->modules, personnelIdx);
     crossFadeToIndex(ui->metierspersonnel, 3);
     populateAffCombos();
     loadAffectationTable();
@@ -590,80 +1724,71 @@ void MainWindow::openStocksWindow(int pageIndex)
 
 void MainWindow::on_btnmod1_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    ui->modules->setCurrentIndex(0);
-    setActiveModuleButton(0);
+    const int idx = moduleIndex(ui->module1);
+    openSidebarModule(idx, ui->metierspersonnel, 1, idx);
+    loadEmployeeTable();
 }
 
 void MainWindow::on_btnmod2_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    ui->modules->setCurrentIndex(5);
-    ui->metiersstocks->setCurrentIndex(3);
-    setActiveModuleButton(5);
+    const int idx = moduleIndex(ui->module2);
+    openSidebarModule(idx, ui->metiersstocks, 1, idx, true);
     openStocksWindow(1);
 }
 
-
 void MainWindow::on_btnAjouterstc_clicked()
 {
-    if (ui->modules->currentIndex() != 5)
-        crossFadeToIndex(ui->modules, 5);
-    crossFadeToIndex(ui->metiersstocks, 3);
+    const int idx = moduleIndex(ui->module2);
+    openSidebarModule(idx, ui->metiersstocks, 0, idx, true);
     openStocksWindow(0);
 }
 
 void MainWindow::on_btnConsulterstc_clicked()
 {
-    if (ui->modules->currentIndex() != 5)
-        crossFadeToIndex(ui->modules, 5);
-    crossFadeToIndex(ui->metiersstocks, 3);
+    const int idx = moduleIndex(ui->module2);
+    openSidebarModule(idx, ui->metiersstocks, 1, idx, true);
     openStocksWindow(1);
 }
 
 void MainWindow::on_btnStatstc_clicked()
 {
-    if (ui->modules->currentIndex() != 5)
-        crossFadeToIndex(ui->modules, 5);
-    crossFadeToIndex(ui->metiersstocks, 3);
+    const int idx = moduleIndex(ui->module2);
+    openSidebarModule(idx, ui->metiersstocks, 2, idx, true);
     openStocksWindow(2);
 }
 
 void MainWindow::on_toolButton_5_clicked()
 {
-    if (ui->modules->currentIndex() != 5)
-        crossFadeToIndex(ui->modules, 5);
-    crossFadeToIndex(ui->metiersstocks, 3);
+    const int idx = moduleIndex(ui->module2);
+    openSidebarModule(idx, ui->metiersstocks, 3, idx, true);
     openStocksWindow(3);
 }
 
 void MainWindow::on_btnmod3_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    ui->modules->setCurrentIndex(1);
-    setActiveModuleButton(1);
+    const int idx = moduleIndex(ui->module3);
+    openSidebarModule(idx, ui->metiersCiternes, 1, idx);
     openCiternesWindow(1);
 }
 
 void MainWindow::on_btnmod4_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    ui->modules->setCurrentIndex(2);
-    setActiveModuleButton(2);
+    const int idx = moduleIndex(ui->module4);
+    openSidebarModule(idx, ui->metiershuile, 1, idx);
+    on_btnConsulterQualite_clicked();
 }
 
 void MainWindow::on_btnmod5_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    ui->modules->setCurrentIndex(3);
-    setActiveModuleButton(3);
+    const int idx = moduleIndex(ui->module5);
+    openSidebarModule(idx, ui->metierspersonnel_2, 1, idx);
+    if (dbOpen()) loadMachines();
 }
 
 void MainWindow::on_btnmod6_clicked()
 {
-    ui->MainStacked->setCurrentIndex(1);
-    ui->modules->setCurrentIndex(4);
-    setActiveModuleButton(4);
+    const int idx = moduleIndex(ui->module6);
+    openSidebarModule(idx, ui->metiersagriculteurs, 1, idx);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -718,6 +1843,18 @@ void MainWindow::on_btnConsulterQualite_clicked()
         ui->tableWidget_4->setItem(row, 9, new QTableWidgetItem(query.value("code_couleur").toString()));
         addHuileActionButtonsToRow(row);
         row++;
+    }
+
+    if (ui->tableWidget_4 && ui->tableWidget_4->horizontalHeader()) {
+        const int actionsCol = ui->tableWidget_4->columnCount() - 1;
+        for (int c = 0; c < actionsCol; ++c) {
+            ui->tableWidget_4->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+        }
+        ui->tableWidget_4->horizontalHeader()->setSectionResizeMode(actionsCol, QHeaderView::Fixed);
+        ui->tableWidget_4->setColumnWidth(actionsCol, 210);
+        if (ui->tableWidget_4->verticalHeader()) {
+            ui->tableWidget_4->verticalHeader()->setDefaultSectionSize(48);
+        }
     }
 }
 void MainWindow::on_amertureLineEdit_textChanged(const QString &text)
@@ -896,34 +2033,31 @@ void MainWindow::on_ajouterHuileBtn_clicked()
 }
 void MainWindow::setActiveModuleButton(int index)
 {
-    QPushButton* buttons[6] = { ui->btnmod1, ui->btnmod2, ui->btnmod3,
-                               ui->btnmod4, ui->btnmod5, ui->btnmod6 };
-    for (auto* b : buttons)
-        b->setChecked(false);
-
-    switch (index) {
-    case 0: ui->btnmod1->setChecked(true); break;
-    case 1: ui->btnmod3->setChecked(true); break;
-    case 2: ui->btnmod4->setChecked(true); break;
-    case 3: ui->btnmod5->setChecked(true); break;
-    case 4: ui->btnmod6->setChecked(true); break;
-    case 5: ui->btnmod2->setChecked(true); break;
-    default: ui->btnmod1->setChecked(true); break;
-    }
-
-    // module index -> sidebar button mapping
-    QPushButton* mapped[] = {
-        ui->btnmod1,    // module1
-        ui->btnmod3,    // module3
-        ui->btnmod4,    // module4
-        ui->btnmod5,    // module5
-        ui->btnmod6,    // module6
-        ui->btnmod2,    // module2
-        ui->btnSettings // module7
+    QPushButton* buttons[] = {
+        ui->btnmod1,
+        ui->btnmod2,
+        ui->btnmod3,
+        ui->btnmod4,
+        ui->btnmod5,
+        ui->btnmod6,
+        ui->btnSettings
     };
 
-    const int clamped = (index >= 0 && index < 7) ? index : 0;
-    if (mapped[clamped]) mapped[clamped]->setChecked(true);
+    for (QPushButton* b : buttons) {
+        if (b) b->setChecked(false);
+    }
+
+    QPushButton* active = nullptr;
+    if (index == moduleIndex(ui->module1))      active = ui->btnmod1;    // Personnel
+    else if (index == moduleIndex(ui->module2)) active = ui->btnmod2;    // Stocks
+    else if (index == moduleIndex(ui->module3)) active = ui->btnmod3;    // Citernes
+    else if (index == moduleIndex(ui->module4)) active = ui->btnmod4;    // Qualité
+    else if (index == moduleIndex(ui->module5)) active = ui->btnmod5;    // Machines
+    else if (index == moduleIndex(ui->module6)) active = ui->btnmod6;    // Agriculteurs
+    else if (index == moduleIndex(ui->module7)) active = ui->btnSettings; // Paramètres
+
+    if (!active) active = ui->btnmod1;
+    if (active) active->setChecked(true);
 }
 
 // ── Generic UI helpers (page switch / avatar / layout reactions) ───────────
@@ -962,57 +2096,44 @@ void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
     if (!stack || newIndex < 0 || newIndex >= stack->count())
         return;
 
-    QWidget* current = stack->currentWidget();
-    QWidget* next = stack->widget(newIndex);
-
-    // If already on the target page, just make sure it's enabled and return
-    if (!current || !next || current == next) {
-        stack->setCurrentIndex(newIndex);
-        stack->setEnabled(true);
-        return;
+    // The previous half-implemented fade left QLabel screenshots above the
+    // stacked widget, so navigation appeared frozen even though the index had
+    // changed. Keep switching direct and deterministic for sidebar/module pages.
+    const auto directChildren = stack->findChildren<QLabel*>(QString(), Qt::FindDirectChildrenOnly);
+    for (QLabel* label : directChildren) {
+        if (label && label->property("stackFadeOverlay").toBool()) {
+            label->hide();
+            label->deleteLater();
+        }
     }
 
-    // Create overlays sized to the stacked widget area
-    const QRect area = stack->rect();
-    auto* currentOverlay = new QLabel(stack);
-    auto* nextOverlay    = new QLabel(stack);
-    currentOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    nextOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    currentOverlay->setGeometry(area);
-    nextOverlay->setGeometry(area);
-
-    // Render snapshots of both pages (works even if 'next' is not visible)
-    QPixmap currentShot(area.size());
-    currentShot.fill(Qt::transparent);
-    current->update();
-    current->render(&currentShot, QPoint(), QRegion(), QWidget::DrawChildren);
-
-    QPixmap nextShot(area.size());
-    nextShot.fill(Qt::transparent);
-    next->update();
-    next->render(&nextShot, QPoint(), QRegion(), QWidget::DrawChildren);
-
-    currentOverlay->setPixmap(currentShot);
-    nextOverlay->setPixmap(nextShot);
-    currentOverlay->raise();
-    nextOverlay->raise();
-
-    // Prepare opacity effects for parallel fade
-    auto* currEff = new QGraphicsOpacityEffect(currentOverlay);
-    auto* nextEff = new QGraphicsOpacityEffect(nextOverlay);
-    currentOverlay->setGraphicsEffect(currEff);
-    nextOverlay->setGraphicsEffect(nextEff);
-    currEff->setOpacity(1.0);
-    nextEff->setOpacity(0.0);
-
-    // Show target page beneath overlays to avoid a blank gap
     stack->setCurrentIndex(newIndex);
+    stack->setEnabled(true);
+    stack->update();
 }
 
 void MainWindow::animateSidebarToggle(bool collapse)
 {
-    int from = ui->sidebar->width();
-    int to = collapse ? 48 : 200;
+    if (!ui || !ui->sidebar) return;
+
+    const auto setButtonTextPreserved = [](QPushButton* button, bool showText) {
+        if (!button) return;
+        if (!button->property("expandedText").isValid())
+            button->setProperty("expandedText", button->text());
+        button->setText(showText ? button->property("expandedText").toString() : QString());
+        button->setToolTip(button->property("expandedText").toString());
+    };
+
+    QPushButton* buttons[] = { ui->btnmod1, ui->btnmod2, ui->btnmod3,
+                               ui->btnmod4, ui->btnmod5, ui->btnmod6, ui->btnSettings };
+    for (QPushButton* b : buttons)
+        setButtonTextPreserved(b, !collapse);
+
+    if (ui->namesidebar)
+        ui->namesidebar->setVisible(!collapse);
+
+    const int from = ui->sidebar->width();
+    const int to = collapse ? 56 : 220;
     auto* anim = new QPropertyAnimation(ui->sidebar, "minimumWidth", this);
     anim->setDuration(220);
     anim->setStartValue(from);
@@ -1021,7 +2142,9 @@ void MainWindow::animateSidebarToggle(bool collapse)
     QObject::connect(anim, &QPropertyAnimation::valueChanged, this, [this](const QVariant&) {
         ui->sidebar->setMaximumWidth(ui->sidebar->minimumWidth());
     });
-    QObject::connect(anim, &QPropertyAnimation::finished, this, [this, collapse]() {
+    QObject::connect(anim, &QPropertyAnimation::finished, this, [this, collapse, to]() {
+        ui->sidebar->setMinimumWidth(to);
+        ui->sidebar->setMaximumWidth(to);
         m_sidebarCollapsed = collapse;
     });
     anim->start(QAbstractAnimation::DeleteWhenStopped);
@@ -1029,22 +2152,118 @@ void MainWindow::animateSidebarToggle(bool collapse)
 
 void MainWindow::setupInteractiveHooks()
 {
-    if (auto* headerLayout = ui->centralwidget->findChild<QHBoxLayout*>(QStringLiteral("logoandnamesidebar"))) {
-        auto* toggleBtn = new QToolButton(ui->sidebar);
-        toggleBtn->setAutoRaise(true);
-    toggleBtn->setToolTip(tr("Réduire / étendre la barre latérale"));
-        toggleBtn->setIcon(QIcon(QStringLiteral(":/img/menu.svg")));
-        toggleBtn->setIconSize(QSize(18, 18));
-        headerLayout->addStretch();
-        headerLayout->addWidget(toggleBtn);
-        QObject::connect(toggleBtn, &QToolButton::clicked, this, [this]() {
-            animateSidebarToggle(!m_sidebarCollapsed);
-        });
+    // Use the toggle button that already exists in mainwindow.ui. The previous
+    // runtime patch created a second hamburger button, so the sidebar showed two
+    // minimize controls.
+    if (ui->sidebarToggleBtn) {
+        ui->sidebarToggleBtn->setAutoRaise(true);
+        ui->sidebarToggleBtn->setToolTip(tr("Réduire / étendre la barre latérale"));
+        ui->sidebarToggleBtn->setIcon(QIcon(QStringLiteral(":/img/menu.svg")));
+        ui->sidebarToggleBtn->setIconSize(QSize(18, 18));
+        if (!ui->sidebarToggleBtn->property("sidebarToggleConnected").toBool()) {
+            QObject::connect(ui->sidebarToggleBtn, &QToolButton::clicked, this, [this]() {
+                animateSidebarToggle(!m_sidebarCollapsed);
+            });
+            ui->sidebarToggleBtn->setProperty("sidebarToggleConnected", true);
+        }
     }
 
-    if (ui->lineEdit && ui->comboBox && ui->tableWidget_4) {
-        QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, [this](const QString&) { filterPersonnelTable(); });
-        QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this, [this](const QString&) { filterPersonnelTable(); });
+    // btnSettings does not have an auto-connected slot in mainwindow.h, so wire it explicitly.
+    if (ui->btnSettings && !ui->btnSettings->property("settingsNavigationConnected").toBool()) {
+        QObject::connect(ui->btnSettings, &QPushButton::clicked, this, [this]() {
+            const int idx = moduleIndex(ui->module7);
+            openSidebarModule(idx, nullptr, -1, idx);
+        });
+        ui->btnSettings->setProperty("settingsNavigationConnected", true);
+    }
+
+    if (ui->lineEdit && ui->comboBox && ui->tableEmp) {
+        if (!ui->lineEdit->property("personnelSearchConnected").toBool()) {
+            QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, [this](const QString&) { filterPersonnelTable(); });
+            ui->lineEdit->setProperty("personnelSearchConnected", true);
+        }
+        if (!ui->comboBox->property("personnelFilterConnected").toBool()) {
+            QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this, [this](const QString&) { filterPersonnelTable(); });
+            ui->comboBox->setProperty("personnelFilterConnected", true);
+        }
+    }
+
+    // Personnel table toolbar: these buttons are QToolButtons in the .ui, so they
+    // are not connected automatically unless explicit slots exist. Wire them here
+    // to preserve the designed toolbar while keeping the table behavior reliable.
+    if (ui->toolButton_2 && !ui->toolButton_2->property("personnelRefreshConnected").toBool()) {
+        QObject::connect(ui->toolButton_2, &QToolButton::clicked, this, [this]() {
+            loadEmployeeTable();
+            filterPersonnelTable();
+        });
+        ui->toolButton_2->setProperty("personnelRefreshConnected", true);
+    }
+
+    if (ui->searchEmpButton && !ui->searchEmpButton->property("personnelSearchButtonConnected").toBool()) {
+        QObject::connect(ui->searchEmpButton, &QToolButton::clicked, this, [this]() {
+            filterPersonnelTable();
+            if (ui->lineEdit) ui->lineEdit->setFocus();
+        });
+        ui->searchEmpButton->setProperty("personnelSearchButtonConnected", true);
+    }
+
+    if (ui->toolButton_4 && !ui->toolButton_4->property("personnelFilterButtonConnected").toBool()) {
+        QObject::connect(ui->toolButton_4, &QToolButton::clicked, this, [this]() {
+            if (ui->comboBox) {
+                ui->comboBox->showPopup();
+            }
+        });
+        ui->toolButton_4->setProperty("personnelFilterButtonConnected", true);
+    }
+
+    if (ui->exportEmpBtn && !ui->exportEmpBtn->property("personnelExportConnected").toBool()) {
+        QObject::connect(ui->exportEmpBtn, &QToolButton::clicked, this, [this]() {
+            if (!ui->tableEmp || ui->tableEmp->rowCount() == 0) {
+                QMessageBox::warning(this, tr("Export"), tr("Aucune donnée personnel à exporter."));
+                return;
+            }
+
+            const QString filePath = QFileDialog::getSaveFileName(
+                this, tr("Exporter le personnel"),
+                QStringLiteral("personnel.csv"),
+                tr("Fichiers CSV (*.csv)"));
+            if (filePath.isEmpty()) return;
+
+            QFile file(filePath);
+            if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QMessageBox::critical(this, tr("Export"), tr("Impossible de créer le fichier."));
+                return;
+            }
+
+            QTextStream out(&file);
+            out.setEncoding(QStringConverter::Utf8);
+
+            const int actionCol = ui->tableEmp->columnCount() - 1;
+            QStringList headers;
+            for (int c = 0; c < ui->tableEmp->columnCount(); ++c) {
+                if (c == actionCol) continue;
+                QTableWidgetItem* header = ui->tableEmp->horizontalHeaderItem(c);
+                headers << (header ? header->text() : QStringLiteral("Col%1").arg(c + 1));
+            }
+            out << headers.join(';') << '\n';
+
+            for (int r = 0; r < ui->tableEmp->rowCount(); ++r) {
+                if (ui->tableEmp->isRowHidden(r)) continue;
+                QStringList values;
+                for (int c = 0; c < ui->tableEmp->columnCount(); ++c) {
+                    if (c == actionCol) continue;
+                    QString value = ui->tableEmp->item(r, c) ? ui->tableEmp->item(r, c)->text() : QString();
+                    value.replace(QStringLiteral("\""), QStringLiteral("\"\""));
+                    if (value.contains(';') || value.contains('"') || value.contains('\n'))
+                        value = '"' + value + '"';
+                    values << value;
+                }
+                out << values.join(';') << '\n';
+            }
+            file.close();
+            QMessageBox::information(this, tr("Export"), tr("Export du personnel terminé."));
+        });
+        ui->exportEmpBtn->setProperty("personnelExportConnected", true);
     }
 
     // Live remaining-slots info for affectation form
@@ -1070,7 +2289,7 @@ void MainWindow::setupEmployeeFormValidation()
     };
 
     // Keep the form compact enough so the submit row is visible without excessive clipping.
-    ui->formLayout->setVerticalSpacing(22);
+    ui->formLayout->setVerticalSpacing(14);
 
     // Prevent placeholder/text clipping on dense DPI/font setups.
     const int fieldMinH = 34;
@@ -1101,6 +2320,8 @@ void MainWindow::setupEmployeeFormValidation()
     if (!validationHost)
         validationHost = ui->formLayoutWidget;
 
+    const bool personnelAddPageUsesLayout = ui->ajoutpersonnel && ui->ajoutpersonnel->layout();
+
     QLabel* feedback = ui->employeeValidationLabel;
     if (!feedback)
         return;
@@ -1111,9 +2332,9 @@ void MainWindow::setupEmployeeFormValidation()
     feedback->setMargin(0);
     feedback->setMinimumHeight(36);
     feedback->setMinimumWidth(160);
-    feedback->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    feedback->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    if (validationHost && ui->formLayoutWidget) {
+    if (!personnelAddPageUsesLayout && validationHost && ui->formLayoutWidget) {
         const QPoint formTopLeft = ui->formLayoutWidget->mapTo(validationHost, QPoint(0, 0));
         const QRect formRect(formTopLeft, ui->formLayoutWidget->size());
         const int margin = 16;
@@ -1151,32 +2372,33 @@ void MainWindow::setupEmployeeFormValidation()
     feedback->setText(tr("Remplissez le formulaire pour vérifier la validité des champs."));
     feedback->setStyleSheet(QStringLiteral("color: #546e7a;"));
 
-    // The form container is absolute-positioned in the UI; keep enough room for all rows.
     if (QLayout* fl = ui->formLayoutWidget->layout()) {
         fl->activate();
         const QSize needed = fl->sizeHint() + QSize(24, 24);
-        if (needed.height() > ui->formLayoutWidget->minimumHeight()) {
+        if (needed.height() > ui->formLayoutWidget->minimumHeight())
             ui->formLayoutWidget->setMinimumHeight(needed.height());
-        }
-        if (needed.width() > ui->formLayoutWidget->minimumWidth()) {
+        if (needed.width() > ui->formLayoutWidget->minimumWidth())
             ui->formLayoutWidget->setMinimumWidth(needed.width());
-        }
-        ui->formLayoutWidget->resize(
-            qMax(ui->formLayoutWidget->width(), needed.width()),
-            qMax(ui->formLayoutWidget->height(), needed.height()));
 
-        // Also refresh parent page minimum size so the wrapping QScrollArea can actually scroll to it.
-        if (QWidget* page = ui->formLayoutWidget->parentWidget()) {
-            QRect bounds;
-            const auto children = page->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
-            for (QWidget* child : children) {
-                if (!child) continue;
-                bounds = bounds.united(child->geometry());
-            }
-            if (!bounds.isNull()) {
-                const QSize pageMin(bounds.right() + 1 + 24, bounds.bottom() + 1 + 32);
-                page->setMinimumSize(pageMin);
-                page->resize(qMax(page->width(), pageMin.width()), qMax(page->height(), pageMin.height()));
+        // Only resize by geometry when the page is still absolute-positioned.
+        // The repaired Personnel page is layout-managed, so Qt should own the sizes.
+        if (!personnelAddPageUsesLayout) {
+            ui->formLayoutWidget->resize(
+                qMax(ui->formLayoutWidget->width(), needed.width()),
+                qMax(ui->formLayoutWidget->height(), needed.height()));
+
+            if (QWidget* page = ui->formLayoutWidget->parentWidget()) {
+                QRect bounds;
+                const auto children = page->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+                for (QWidget* child : children) {
+                    if (!child) continue;
+                    bounds = bounds.united(child->geometry());
+                }
+                if (!bounds.isNull()) {
+                    const QSize pageMin(bounds.right() + 1 + 24, bounds.bottom() + 1 + 32);
+                    page->setMinimumSize(pageMin);
+                    page->resize(qMax(page->width(), pageMin.width()), qMax(page->height(), pageMin.height()));
+                }
             }
         }
     }
@@ -1315,7 +2537,7 @@ bool MainWindow::validateEmployeeForm(bool showFeedbackText)
         }
         feedback->show();
 
-        if (validationHost && ui->formLayoutWidget) {
+        if (!(ui->ajoutpersonnel && ui->ajoutpersonnel->layout()) && validationHost && ui->formLayoutWidget) {
             const QPoint formTopLeft = ui->formLayoutWidget->mapTo(validationHost, QPoint(0, 0));
             const QRect formRect(formTopLeft, ui->formLayoutWidget->size());
             const int margin = 16;
@@ -1357,19 +2579,26 @@ bool MainWindow::validateEmployeeForm(bool showFeedbackText)
 
 void MainWindow::filterPersonnelTable()
 {
-    if (!ui->tableWidget_4 || !ui->comboBox) return;
-    QString needle = ui->lineEdit ? ui->lineEdit->text().trimmed() : QString();
-    QString mode = ui->comboBox->currentText();
-    int col = 0;
-    if (mode.compare(QStringLiteral("Name"), Qt::CaseInsensitive) == 0 ||
-        mode.compare(QStringLiteral("Nom"), Qt::CaseInsensitive) == 0) col = 1;
-    else if (mode.compare(QStringLiteral("Status"), Qt::CaseInsensitive) == 0) col = 2;
-    else col = 0;
+    if (!ui->tableEmp || !ui->comboBox) return;
 
-    for (int r = 0; r < ui->tableWidget_4->rowCount(); ++r) {
-        auto* item = ui->tableWidget_4->item(r, col);
-        bool match = needle.isEmpty() || (item && item->text().contains(needle, Qt::CaseInsensitive));
-        ui->tableWidget_4->setRowHidden(r, !match);
+    const QString needle = ui->lineEdit ? ui->lineEdit->text().trimmed() : QString();
+    const QString mode = ui->comboBox->currentText();
+
+    int col = 1; // Nom
+    if (mode.compare(QStringLiteral("Email"), Qt::CaseInsensitive) == 0)
+        col = 3;
+    else if (mode.compare(QStringLiteral("Rôle"), Qt::CaseInsensitive) == 0 ||
+             mode.compare(QStringLiteral("Role"), Qt::CaseInsensitive) == 0 ||
+             mode.compare(QStringLiteral("Status"), Qt::CaseInsensitive) == 0)
+        col = 4;
+    else if (mode.compare(QStringLiteral("Prénom"), Qt::CaseInsensitive) == 0 ||
+             mode.compare(QStringLiteral("Prenom"), Qt::CaseInsensitive) == 0)
+        col = 2;
+
+    for (int r = 0; r < ui->tableEmp->rowCount(); ++r) {
+        const auto* item = ui->tableEmp->item(r, col);
+        const bool match = needle.isEmpty() || (item && item->text().contains(needle, Qt::CaseInsensitive));
+        ui->tableEmp->setRowHidden(r, !match);
     }
 }
 
@@ -1377,63 +2606,152 @@ void MainWindow::filterPersonnelTable()
 namespace {
 void clearLayoutWidgets(QLayout* layout)
 {
-    QPieSeries *series = new QPieSeries();
-    series->append("Actifs", 42);
-    series->append("En congé", 8);
-    series->append("Suspendus", 3);
+    if (!layout) return;
 
-    QChart *chart = new QChart();
+    while (QLayoutItem* item = layout->takeAt(0)) {
+        if (QWidget* widget = item->widget()) {
+            widget->deleteLater();
+        }
+        if (QLayout* childLayout = item->layout()) {
+            clearLayoutWidgets(childLayout);
+            delete childLayout;
+        }
+        delete item;
+    }
+}
+}
+
+void MainWindow::setupPersonnelChart()
+{
+    if (!ui || !ui->chartStatusContainer) return;
+
+    QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(ui->chartStatusContainer->layout());
+    if (!rootLayout) {
+        rootLayout = new QVBoxLayout(ui->chartStatusContainer);
+        rootLayout->setContentsMargins(0, 0, 0, 0);
+        rootLayout->setSpacing(0);
+    } else {
+        clearLayoutWidgets(rootLayout);
+    }
+
+    ui->chartStatusContainer->setMinimumHeight(1550);
+    ui->chartStatusContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    auto* scroll = new QScrollArea(ui->chartStatusContainer);
+    scroll->setWidgetResizable(true);
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setStyleSheet(QStringLiteral("QScrollArea { background: transparent; border: none; }"));
+
+    auto* content = new QWidget(scroll);
+    auto* contentLayout = new QVBoxLayout(content);
+    contentLayout->setContentsMargins(22, 20, 22, 80);
+    content->setMinimumHeight(1550);
+    contentLayout->setSpacing(16);
+
+    auto* hero = new QFrame(content);
+    hero->setStyleSheet(QStringLiteral(
+        "QFrame { background:#fbfcf7; border:1px solid #dbe6c8; border-radius:18px; }"
+    ));
+    auto* heroLayout = new QVBoxLayout(hero);
+    heroLayout->setContentsMargins(22, 16, 22, 16);
+    heroLayout->setSpacing(6);
+
+    auto* title = new QLabel(QStringLiteral("Tableau de bord du personnel"), hero);
+    title->setStyleSheet(QStringLiteral("font-size:24px; font-weight:800; color:#253418; border:none; background:transparent;"));
+    title->setWordWrap(true);
+    heroLayout->addWidget(title);
+
+    auto* subtitle = new QLabel(QStringLiteral("Vue synthétique des statuts, des départements et de l'évolution de l'effectif."), hero);
+    subtitle->setStyleSheet(QStringLiteral("font-size:13px; color:#5f6f48; border:none; background:transparent;"));
+    subtitle->setWordWrap(true);
+    heroLayout->addWidget(subtitle);
+    contentLayout->addWidget(hero);
+
+    auto createChartCard = [](const QString& titleText, const QString& subtitleText, QChartView* view, int minHeight) {
+        auto* card = new QFrame();
+        card->setMinimumHeight(minHeight);
+        card->setStyleSheet(QStringLiteral(
+            "QFrame { background:#ffffff; border:1px solid #dbe6c8; border-radius:18px; }"
+        ));
+        auto* layout = new QVBoxLayout(card);
+        layout->setContentsMargins(18, 16, 18, 18);
+        layout->setSpacing(8);
+
+        auto* label = new QLabel(titleText, card);
+        label->setStyleSheet(QStringLiteral("font-size:16px; font-weight:800; color:#2a391f; border:none; background:transparent;"));
+        label->setWordWrap(true);
+        layout->addWidget(label);
+
+        auto* sub = new QLabel(subtitleText, card);
+        sub->setStyleSheet(QStringLiteral("font-size:12px; color:#6d7b56; border:none; background:transparent;"));
+        sub->setWordWrap(true);
+        layout->addWidget(sub);
+
+        view->setMinimumHeight(qMax(220, minHeight - 86));
+        view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        view->setStyleSheet(QStringLiteral("background: transparent; border: none;"));
+        layout->addWidget(view, 1);
+        return card;
+    };
+
+    QPieSeries* series = new QPieSeries();
+    series->append(QStringLiteral("Actifs"), 42);
+    series->append(QStringLiteral("En congé"), 8);
+    series->append(QStringLiteral("Suspendus"), 3);
+    series->setHoleSize(0.42);
+
+    QChart* chart = new QChart();
     chart->addSeries(series);
-    chart->setTitle("Répartition des employés");
-    chart->legend()->setAlignment(Qt::AlignRight);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+    chart->legend()->setLabelColor(QColor("#415033"));
+    chart->setBackgroundVisible(false);
+    chart->setMargins(QMargins(4, 4, 4, 4));
+    chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    QChartView *chartView = new QChartView(chart);
+    QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
-    QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(ui->chartStatusContainer->layout());
-    if (!layout) {
-        layout = new QVBoxLayout(ui->chartStatusContainer);
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(12);
-    }
-    layout->addWidget(chartView);
-
-    QBarSet *setActifs = new QBarSet("Actifs");
-    QBarSet *setConge  = new QBarSet("En congé");
-    QBarSet *setSusp   = new QBarSet("Suspendus");
+    QBarSet* setActifs = new QBarSet(QStringLiteral("Actifs"));
+    QBarSet* setConge  = new QBarSet(QStringLiteral("En congé"));
+    QBarSet* setSusp   = new QBarSet(QStringLiteral("Suspendus"));
     *setActifs << 18 << 15 << 9;
     *setConge  << 3  << 2  << 3;
     *setSusp   << 1  << 1  << 1;
 
-    QBarSeries *barSeries = new QBarSeries();
+    QBarSeries* barSeries = new QBarSeries();
     barSeries->append(setActifs);
     barSeries->append(setConge);
     barSeries->append(setSusp);
 
-    QChart *barChart = new QChart();
+    QChart* barChart = new QChart();
     barChart->addSeries(barSeries);
-    barChart->setTitle("Statut par département");
-    barChart->setAnimationOptions(QChart::AllAnimations);
+    barChart->setAnimationOptions(QChart::SeriesAnimations);
+    barChart->setBackgroundVisible(false);
+    barChart->setMargins(QMargins(8, 8, 8, 8));
     QStringList categories;
-    categories << "Production" << "Qualité" << "Support";
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    categories << QStringLiteral("Production") << QStringLiteral("Qualité") << QStringLiteral("Support");
+    QBarCategoryAxis* axisX = new QBarCategoryAxis();
     axisX->append(categories);
-    QValueAxis *axisY = new QValueAxis();
+    axisX->setLabelsColor(QColor("#556B2F"));
+    QValueAxis* axisY = new QValueAxis();
     axisY->setRange(0, 20);
-    axisY->setTitleText("Employés");
+    axisY->setTitleText(QStringLiteral("Employés"));
+    axisY->setLabelsColor(QColor("#556B2F"));
+    axisY->setGridLineColor(QColor("#edf2e3"));
     barChart->addAxis(axisX, Qt::AlignBottom);
     barChart->addAxis(axisY, Qt::AlignLeft);
     barSeries->attachAxis(axisX);
     barSeries->attachAxis(axisY);
     barChart->legend()->setVisible(true);
     barChart->legend()->setAlignment(Qt::AlignBottom);
+    barChart->legend()->setLabelColor(QColor("#415033"));
 
-    QChartView *barView = new QChartView(barChart);
+    QChartView* barView = new QChartView(barChart);
     barView->setRenderHint(QPainter::Antialiasing);
-    layout->addWidget(barView);
 
-    QLineSeries *lineSeries = new QLineSeries();
-    lineSeries->setName("Effectif total");
+    QLineSeries* lineSeries = new QLineSeries();
+    lineSeries->setName(QStringLiteral("Effectif total"));
     lineSeries->append(0, 38);
     lineSeries->append(1, 39);
     lineSeries->append(2, 40);
@@ -1441,28 +2759,55 @@ void clearLayoutWidgets(QLayout* layout)
     lineSeries->append(4, 43);
     lineSeries->append(5, 45);
 
-    QChart *lineChart = new QChart();
+    QChart* lineChart = new QChart();
     lineChart->addSeries(lineSeries);
-    lineChart->setTitle("Tendance de l'effectif (semestre)");
-    lineChart->setAnimationOptions(QChart::AllAnimations);
+    lineChart->setAnimationOptions(QChart::SeriesAnimations);
+    lineChart->setBackgroundVisible(false);
+    lineChart->setMargins(QMargins(8, 8, 8, 8));
 
-    QValueAxis *xAxis = new QValueAxis();
+    QValueAxis* xAxis = new QValueAxis();
     xAxis->setLabelFormat("%d");
-    xAxis->setTitleText("Mois");
+    xAxis->setTitleText(QStringLiteral("Mois"));
     xAxis->setTickCount(7);
     xAxis->setRange(0, 5);
-    QValueAxis *yAxis = new QValueAxis();
-    yAxis->setTitleText("Employés");
+    xAxis->setLabelsColor(QColor("#556B2F"));
+    xAxis->setGridLineColor(QColor("#edf2e3"));
+    QValueAxis* yAxis = new QValueAxis();
+    yAxis->setTitleText(QStringLiteral("Employés"));
     yAxis->setRange(35, 50);
+    yAxis->setLabelsColor(QColor("#556B2F"));
+    yAxis->setGridLineColor(QColor("#edf2e3"));
     lineChart->addAxis(xAxis, Qt::AlignBottom);
     lineChart->addAxis(yAxis, Qt::AlignLeft);
     lineSeries->attachAxis(xAxis);
     lineSeries->attachAxis(yAxis);
-    lineChart->legend()->setVisible(false);
+    lineChart->legend()->hide();
 
-    QChartView *lineView = new QChartView(lineChart);
+    QChartView* lineView = new QChartView(lineChart);
     lineView->setRenderHint(QPainter::Antialiasing);
-    layout->addWidget(lineView);
+
+    auto* topCharts = new QHBoxLayout();
+    topCharts->setSpacing(16);
+    topCharts->addWidget(createChartCard(QStringLiteral("Répartition des employés"),
+                                         QStringLiteral("Lecture immédiate des statuts du personnel."),
+                                         chartView, 520), 1);
+    topCharts->addWidget(createChartCard(QStringLiteral("Statut par département"),
+                                         QStringLiteral("Comparaison claire entre Production, Qualité et Support."),
+                                         barView, 520), 1);
+    contentLayout->addLayout(topCharts);
+
+    contentLayout->addWidget(createChartCard(QStringLiteral("Tendance de l'effectif"),
+                                             QStringLiteral("Évolution de l'effectif total sur le semestre."),
+                                             lineView, 620));
+    contentLayout->addStretch(1);
+
+    scroll->setWidget(content);
+    rootLayout->addWidget(scroll);
+}
+
+void MainWindow::loadEmployeeStats()
+{
+    setupPersonnelChart();
 }
 
 // ── Personnel table population + row action buttons ─────────────────────────
@@ -1471,167 +2816,154 @@ void MainWindow::loadEmployeeTable()
     QTableWidget* table = ui->tableEmp;
     if (!table) return;
 
-    // ── Query the DB ────────────────────────────────────────────────────────
     Employe emp;
     QSqlQueryModel* model = emp.afficher();
+    if (!model) return;
 
-    // ── Set up columns (ID / Nom / Prénom / Email / Rôle / Actions) ─────────
-    const int dataCols = 5; // id, nom, prenom, email, role
+    const int dataCols = 5;
+    table->setSortingEnabled(false);
+    table->clearContents();
     table->setColumnCount(dataCols + 1);
     table->setHorizontalHeaderLabels({
-        "ID", "Nom", QStringLiteral("Pr\u00e9nom"), "Email",
-        QStringLiteral("R\u00f4le"), "Actions"
+        QStringLiteral("ID"),
+        QStringLiteral("Nom"),
+        QStringLiteral("Prénom"),
+        QStringLiteral("Email"),
+        QStringLiteral("Rôle"),
+        QStringLiteral("Actions")
     });
 
-    // ── Fill rows ───────────────────────────────────────────────────────────
-    int rowCount = model->rowCount();
+    const int rowCount = model->rowCount();
     table->setRowCount(rowCount);
-
     for (int r = 0; r < rowCount; ++r) {
         for (int c = 0; c < dataCols; ++c) {
-            QString text = model->data(model->index(r, c)).toString();
-            QTableWidgetItem* item = new QTableWidgetItem(text);
+            QTableWidgetItem* item = new QTableWidgetItem(model->data(model->index(r, c)).toString());
             item->setFlags(item->flags() & ~Qt::ItemIsEditable);
             table->setItem(r, c, item);
         }
-        addActionButtonsToRow(table, r);
+        addActionButtonsToRow(r);
     }
-
     delete model;
 
-    // ── Column sizing ───────────────────────────────────────────────────────
     if (table->horizontalHeader()) {
         table->horizontalHeader()->setStretchLastSection(false);
-        // ID column: compact
         table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-        // Data columns: stretch
         for (int c = 1; c < dataCols; ++c)
             table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
-        // Actions column: fixed
         table->horizontalHeader()->setSectionResizeMode(dataCols, QHeaderView::Fixed);
-    table->setColumnWidth(dataCols, 96);
+        table->setColumnWidth(dataCols, 210);
     }
+    if (table->verticalHeader())
+        table->verticalHeader()->setDefaultSectionSize(42);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    if (table->verticalHeader())
-    table->verticalHeader()->setDefaultSectionSize(34);
+    table->setSortingEnabled(true);
 }
 
 void MainWindow::setupPersonnelTable()
 {
-    if (!ui->tableWidget_4)
-        return;
+    QTableWidget* table = ui->tableEmp;
+    if (!table) return;
 
-    QTableWidget* table = ui->tableWidget_4;
-
-    if (table->columnCount() > 0) {
-        int last = table->columnCount() - 1;
-        auto* hLast = table->horizontalHeaderItem(last);
-        if (hLast && hLast->text().trimmed().compare(QStringLiteral("Actions"), Qt::CaseInsensitive) == 0) {
-            for (int r = 0; r < table->rowCount(); ++r) {
-                if (!table->cellWidget(r, last)) addActionButtonsToRow(r);
-            }
-            return;
-        }
-    }
-
-    int actionsCol = table->columnCount();
-    table->insertColumn(actionsCol);
-
-    QStringList headers;
-    for (int c = 0; c < table->columnCount(); ++c) {
-        if (c == actionsCol) {
-            headers << QStringLiteral("Actions");
-        } else {
-            auto* item = table->horizontalHeaderItem(c);
-            headers << (item ? item->text() : QString("Col %1").arg(c));
-        }
-    }
-    table->setHorizontalHeaderLabels(headers);
-
+    table->setColumnCount(6);
+    table->setHorizontalHeaderLabels({
+        QStringLiteral("ID"),
+        QStringLiteral("Nom"),
+        QStringLiteral("Prénom"),
+        QStringLiteral("Email"),
+        QStringLiteral("Rôle"),
+        QStringLiteral("Actions")
+    });
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     if (table->verticalHeader())
-        table->verticalHeader()->setDefaultSectionSize(32);
+        table->verticalHeader()->setDefaultSectionSize(42);
 
-    for (int r = 0; r < table->rowCount(); ++r)
-        addActionButtonsToRow(r);
-
-    if (table->horizontalHeader()) {
-        table->horizontalHeader()->setStretchLastSection(false);
-        int last = table->columnCount() - 1;
-        for (int c = 0; c < last; ++c)
-            table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
-        table->horizontalHeader()->setSectionResizeMode(last, QHeaderView::ResizeToContents);
-        table->setColumnWidth(last, 96);
-    }
+    loadEmployeeTable();
 }
 
 void MainWindow::addActionButtonsToRow(int row)
 {
-    if (!ui->tableWidget_4) return;
-    auto* table = ui->tableWidget_4;
+    QTableWidget* table = ui->tableEmp;
+    if (!table || row < 0 || row >= table->rowCount()) return;
 
+    const int actionsCol = table->columnCount() - 1;
     QWidget* container = new QWidget(table);
+    container->setProperty("role", "tableActionsContainer");
     auto* h = new QHBoxLayout(container);
-    h->setContentsMargins(0, 0, 0, 0);
+    h->setContentsMargins(2, 2, 2, 2);
     h->setSpacing(6);
-    h->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    h->setAlignment(Qt::AlignCenter);
 
-    QPushButton* btnModify = new QPushButton(QString(), container);
+    QPushButton* btnModify = new QPushButton(QStringLiteral("Modifier"), container);
+    btnModify->setObjectName(QStringLiteral("modifyBtn"));
     btnModify->setProperty("type", "warning");
-    btnModify->setProperty("size", "small");
-    btnModify->setObjectName("modifyBtn");
+    btnModify->setProperty("role", "tableAction");
     btnModify->setFocusPolicy(Qt::NoFocus);
-    btnModify->setToolTip(tr("Modifier"));
-    btnModify->setIcon(QIcon(QStringLiteral(":/img/edit.svg")));
-    btnModify->setIconSize(QSize(16, 16));
-    btnModify->setFixedSize(28, 24);
+    btnModify->setFixedSize(92, 30);
 
-    QPushButton* btnDelete = new QPushButton(QString(), container);
+    QPushButton* btnDelete = new QPushButton(QStringLiteral("Supprimer"), container);
+    btnDelete->setObjectName(QStringLiteral("deleteBtn"));
     btnDelete->setProperty("type", "danger");
-    btnDelete->setProperty("size", "small");
-    btnDelete->setObjectName("deleteBtn");
+    btnDelete->setProperty("role", "tableAction");
     btnDelete->setFocusPolicy(Qt::NoFocus);
-    btnDelete->setToolTip(tr("Supprimer"));
-    btnDelete->setIcon(QIcon(QStringLiteral(":/img/delete.svg")));
-    btnDelete->setIconSize(QSize(16, 16));
-    btnDelete->setFixedSize(28, 24);
+    btnDelete->setFixedSize(98, 30);
 
     h->addWidget(btnModify);
     h->addWidget(btnDelete);
-    container->setLayout(h);
-
-    table->setCellWidget(row, table->columnCount() - 1, container);
-    table->setRowHeight(row, 34);
+    table->setCellWidget(row, actionsCol, container);
+    table->setRowHeight(row, 48);
 
     connect(btnModify, &QPushButton::clicked, this, [this]() {
-        int row = findRowForButton(sender());
-        if (row < 0) return;
-        ui->tableWidget_4->selectRow(row);
-        QMessageBox::information(this, tr("Modifier"), tr("Modifier la ligne %1").arg(row + 1));
+        const int row = findRowForButton(sender());
+        if (row < 0 || !ui->tableEmp) return;
+
+        ui->tableEmp->selectRow(row);
+        if (ui->tableEmp->item(row, 0))
+            ui->ajouterEmpBtn->setProperty("editingId", ui->tableEmp->item(row, 0)->text().toInt());
+        if (ui->tableEmp->item(row, 1)) ui->nomLineEdit->setText(ui->tableEmp->item(row, 1)->text());
+        if (ui->tableEmp->item(row, 2)) ui->prNomLineEdit->setText(ui->tableEmp->item(row, 2)->text());
+        if (ui->tableEmp->item(row, 3)) ui->emailLineEdit->setText(ui->tableEmp->item(row, 3)->text());
+        if (ui->tableEmp->item(row, 4)) {
+            const int roleIndex = ui->roleComboBox->findText(ui->tableEmp->item(row, 4)->text());
+            if (roleIndex >= 0) ui->roleComboBox->setCurrentIndex(roleIndex);
+        }
+        ui->mdpLineEdit->clear();
+        ui->ajouterEmpBtn->setText(tr("Modifier"));
+        crossFadeToIndex(ui->metierspersonnel, 0);
     });
 
     connect(btnDelete, &QPushButton::clicked, this, [this]() {
-        int row = findRowForButton(sender());
-        if (row < 0) return;
-        auto reply = QMessageBox::question(this, tr("Supprimer"), tr("Supprimer la ligne %1 ?").arg(row + 1));
-        if (reply == QMessageBox::Yes)
-            ui->tableWidget_4->removeRow(row);
+        const int row = findRowForButton(sender());
+        if (row < 0 || !ui->tableEmp || !ui->tableEmp->item(row, 0)) return;
+
+        const int id = ui->tableEmp->item(row, 0)->text().toInt();
+        const auto reply = QMessageBox::question(this, tr("Supprimer"),
+                                                 tr("Supprimer cet employé ?"));
+        if (reply != QMessageBox::Yes) return;
+
+        Employe emp;
+        if (!emp.supprimer(id)) {
+            QMessageBox::critical(this, tr("Erreur"),
+                                  tr("Impossible de supprimer l'employé :\n%1").arg(emp.lastError().text()));
+            return;
+        }
+        loadEmployeeTable();
     });
 }
 
 int MainWindow::findRowForButton(QObject* button) const
 {
-    if (!button || !ui->tableWidget_4) return -1;
-    auto* table = ui->tableWidget_4;
+    if (!button || !ui->tableEmp) return -1;
+    QTableWidget* table = ui->tableEmp;
+    const int actionsCol = table->columnCount() - 1;
 
     for (int r = 0; r < table->rowCount(); ++r) {
-        QWidget* cell = table->cellWidget(r, table->columnCount() - 1);
+        QWidget* cell = table->cellWidget(r, actionsCol);
         if (!cell) continue;
-        auto* mod = cell->findChild<QPushButton*>("modifyBtn");
-        auto* del = cell->findChild<QPushButton*>("deleteBtn");
+        auto* mod = cell->findChild<QPushButton*>(QStringLiteral("modifyBtn"));
+        auto* del = cell->findChild<QPushButton*>(QStringLiteral("deleteBtn"));
         if (mod == button || del == button)
             return r;
     }
@@ -1640,117 +2972,27 @@ int MainWindow::findRowForButton(QObject* button) const
 
 void MainWindow::on_faceBtn_clicked()
 {
-    QDialog dlg(this);
-    dlg.setWindowTitle(tr("Reconnaissance Faciale"));
-    dlg.resize(680, 560);
-
-    auto* root    = new QVBoxLayout(&dlg);
-    root->setContentsMargins(12, 12, 12, 12);
-    root->setSpacing(8);
-
-    auto* camLbl = new QLabel(&dlg);
-    camLbl->setAlignment(Qt::AlignCenter);
-    camLbl->setMinimumSize(640, 480);
-    camLbl->setStyleSheet("background:#000;");
-    root->addWidget(camLbl, 1);
-
-    auto* preview = new QWidget(&dlg);
-    preview->setObjectName("facePreview");
-    preview->setMinimumSize(560, 300);
-    root->addWidget(preview, 1);
-
-    auto* footer = new QHBoxLayout();
-    auto* status = new QLabel(tr("Camera idle"), &dlg);
-    status->setProperty("type", "subheading");
-    auto* spacer = new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    auto* btnStart = new QPushButton(tr("Start"), &dlg);
-    auto* btnClose = new QPushButton(tr("Close"), &dlg);
-    btnStart->setProperty("type", "primary");
-
-    // ── Open webcam ─────────────────────────────────────────────────────────
-    cv::VideoCapture cap(0);
-    if (!cap.isOpened()) {
-        QMessageBox::critical(this, tr("Erreur"),
-            tr("Impossible d'ouvrir la webcam (index 0)."));
+    if (!m_faceService) {
+        QMessageBox::warning(this, tr("Reconnaissance faciale"),
+                             tr("Service de reconnaissance faciale indisponible."));
         return;
     }
 
-    bool running = false;
-    QObject::connect(btnStart, &QPushButton::clicked, &dlg, [&, status, btnStart]() mutable {
-        running = !running;
-        status->setText(running ? tr("Camera running…") : tr("Camera idle"));
-        btnStart->setText(running ? tr("Stop") : tr("Start"));
-    });
-    QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::reject);
+    FaceRecognitionDialog dlg(m_faceService, this);
+    const int matchedId = dlg.execAndGetMatchedId();
+    if (matchedId <= 0)
+        return;
 
-    dlg.exec();
+    m_loggedInId = matchedId;
+    updateLoggedInUserInfo(matchedId);
 
-    // Ensure resources freed even on Cancel
-    frameTimer->stop();
-    if (cap.isOpened()) cap.release();
-
-    // ── Handle successful match ──────────────────────────────────────────────
-    if (matchedId > 0) {
-        m_loggedInId = matchedId;
-
-        QSqlQuery q;
-        q.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
-        q.bindValue(":id", matchedId);
-        if (q.exec() && q.next()) {
-            QString fullName = q.value(0).toString() + " " + q.value(1).toString();
-            if (ui->userNameLabel)
-                ui->userNameLabel->setText(fullName);
-        }
-        ui->MainStacked->setCurrentIndex(1);
-    }
-}
-
-// ── Face helper implementations ─────────────────────────────────────────────
-
-QByteArray MainWindow::encodeFaceFromFile(const QString& imagePath)
-{
-    if (!m_faceDetector || !m_faceRecognizer) return {};
-
-    cv::Mat img = cv::imread(imagePath.toStdString());
-    if (img.empty()) {
-        qWarning() << "[FaceRecog] Cannot read image:" << imagePath;
-        return {};
-    }
-
-    m_faceDetector->setInputSize(img.size());
-    cv::Mat faces;
-    m_faceDetector->detect(img, faces);
-    if (faces.rows == 0) {
-        qWarning() << "[FaceRecog] No face detected in:" << imagePath;
-        return {};
-    }
-
-    // Use the first (best-scoring) detected face
-    cv::Mat aligned, embedding;
-    m_faceRecognizer->alignCrop(img, faces.row(0), aligned);
-    m_faceRecognizer->feature(aligned, embedding); // 1×128 float32
-
-    QByteArray blob(reinterpret_cast<const char*>(embedding.data),
-                    static_cast<int>(embedding.total() * sizeof(float)));
-    qDebug() << "[FaceRecog] Encoded face blob size:" << blob.size() << "bytes";
-    return blob;
+    on_btnmod1_clicked();
 }
 
 void MainWindow::loadFaceEmbeddings()
 {
-    m_faceEmbeddings.clear();
-    if (!m_faceRecognizer) return;
-
-    QSqlQuery q;
-    q.prepare("SELECT nom_emp, prenom_emp FROM EMPLOYE WHERE id_emp = :id");
-    q.bindValue(":id", matchedId);
-    if (q.exec() && q.next()) {
-        const QString fullName = q.value(0).toString() + " " + q.value(1).toString();
-        if (ui->userNameLabel)
-            ui->userNameLabel->setText(fullName);
-    }
-
-    ui->MainStacked->setCurrentIndex(1);
+    if (m_faceService)
+        m_faceService->loadFaceEmbeddings();
 }
 // ════════════════════════════════════════════════════════════════════════════
 //  HUILE — BOUTONS ACTION (séparé du module Personnel)
@@ -1778,38 +3020,35 @@ void MainWindow::addHuileActionButtonsToRow(int row)
     int actionsCol = table->columnCount() - 1;
 
     QWidget* container = new QWidget(table);
+    container->setProperty("role", "tableActionsContainer");
     auto* h = new QHBoxLayout(container);
     h->setContentsMargins(2, 2, 2, 2);
-    h->setSpacing(4);
+    h->setSpacing(6);
     h->setAlignment(Qt::AlignCenter);
-    ui->idstockLineEdit->setText(table->item(row, 8)->text());
+    if (table->item(row, 8)) ui->idstockLineEdit->setText(table->item(row, 8)->text());
     // Bouton Modifier (orange)
     QPushButton* btnModify = new QPushButton(container);
     btnModify->setObjectName("huileModifyBtn");
     btnModify->setText(QString::fromUtf8("Modifier"));
-    btnModify->setFixedSize(100, 30);
+    btnModify->setProperty("type", "warning");
+    btnModify->setProperty("role", "tableAction");
+    btnModify->setFixedSize(92, 30);
     btnModify->setToolTip("Modifier");
-    btnModify->setStyleSheet(
-        "QPushButton#huileModifyBtn { background-color: #e6a817; color: #ffffff; border-radius: 4px; font-size: 11px; font-weight: bold; padding: 0px 4px; }"
-        "QPushButton#huileModifyBtn:hover { background-color: #c8911a; }"
-        );
 
     // Bouton Supprimer (rouge)
     QPushButton* btnDelete = new QPushButton(container);
     btnDelete->setObjectName("huileDeleteBtn");
     btnDelete->setText(QString::fromUtf8("Supprimer"));
-    btnDelete->setFixedSize(100, 30);
+    btnDelete->setProperty("type", "danger");
+    btnDelete->setProperty("role", "tableAction");
+    btnDelete->setFixedSize(98, 30);
     btnDelete->setToolTip("Supprimer");
-    btnDelete->setStyleSheet(
-        "QPushButton#huileDeleteBtn { background-color: #e53935; color: #ffffff; border-radius: 4px; font-size: 11px; font-weight: bold; padding: 0px 4px; }"
-        "QPushButton#huileDeleteBtn:hover { background-color: #b71c1c; }"
-        );
 
     h->addWidget(btnModify);
     h->addWidget(btnDelete);
     container->setLayout(h);
     table->setCellWidget(row, actionsCol, container);
-    table->setRowHeight(row, 50);
+    table->setRowHeight(row, 48);
 
     // ── SUPPRIMER ───────────────────────────────────────────────
     connect(btnDelete, &QPushButton::clicked, this, [this, table]() {
@@ -4540,8 +5779,8 @@ void MainWindow::ensureMachineTableColumns()
     for (int c = 0; c < 8; ++c)
         ui->tablemachine->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
 
-    ui->tablemachine->horizontalHeader()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
-    ui->tablemachine->setColumnWidth(8, 120);
+    ui->tablemachine->horizontalHeader()->setSectionResizeMode(8, QHeaderView::Fixed);
+    ui->tablemachine->setColumnWidth(8, 210);
 }
 
 void MainWindow::setupMachineHeaderSorting()
@@ -4804,29 +6043,22 @@ void MainWindow::loadMachines(const QString& whereSql, const QVariantList& binds
 void MainWindow::addActionsToMachineRow(int row, int idMachine)
 {
     QWidget *container = new QWidget(ui->tablemachine);
+    container->setProperty("role", "tableActionsContainer");
     auto *h = new QHBoxLayout(container);
-    h->setContentsMargins(0,0,0,0);
+    h->setContentsMargins(2, 2, 2, 2);
     h->setSpacing(6);
-    h->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    h->setAlignment(Qt::AlignCenter);
 
-    auto *btnEdit = new QPushButton(container);
+    auto *btnEdit = createReferenceTableButton(QStringLiteral("Modifier"), "machineModifyBtn", QStringLiteral("warning"), container);
     btnEdit->setToolTip("Modifier");
-    btnEdit->setIcon(QIcon(":/img/edit.svg"));
-    btnEdit->setIconSize(QSize(16,16));
-    btnEdit->setFixedSize(32,24);
-    btnEdit->setFocusPolicy(Qt::NoFocus);
 
-    auto *btnDel = new QPushButton(container);
+    auto *btnDel = createReferenceTableButton(QStringLiteral("Supprimer"), "machineDeleteBtn", QStringLiteral("danger"), container);
     btnDel->setToolTip("Supprimer");
-    btnDel->setIcon(QIcon(":/img/delete.svg"));
-    btnDel->setIconSize(QSize(16,16));
-    btnDel->setFixedSize(32,24);
-    btnDel->setFocusPolicy(Qt::NoFocus);
 
     h->addWidget(btnEdit);
     h->addWidget(btnDel);
     ui->tablemachine->setCellWidget(row, 8, container);
-    ui->tablemachine->setRowHeight(row, 34);
+    ui->tablemachine->setRowHeight(row, 48);
 
     connect(btnEdit, &QPushButton::clicked, this, [this, idMachine](){ handleEditMachine(idMachine); });
     connect(btnDel, &QPushButton::clicked, this, [this, idMachine](){ handleDeleteMachine(idMachine); });
@@ -5610,7 +6842,7 @@ void MainWindow::showMachineCorrectiveDialog()
         const int row = table->rowCount();
         table->insertRow(row);
 
-        auto makeItem = [&](const QString &value, int alignment, bool highlight = false, const QColor &customBg = QColor()) {
+        auto makeItem = [&](const QString &value, Qt::Alignment alignment, bool highlight = false, const QColor &customBg = QColor()) {
             auto *item = new QTableWidgetItem(value);
             item->setTextAlignment(alignment);
             item->setToolTip(rowData.tooltip);
@@ -6395,4 +7627,819 @@ void MainWindow::on_exportermachinne_clicked()
 void MainWindow::on_ajouterlineseriemachine_2_clicked()
 {
     addSerieFromAddPage();
+}
+
+// ============================================================================
+//  Merge-fix fallback implementations for personnel/stock/affectation helpers
+// ============================================================================
+
+void MainWindow::populateAffCombos()
+{
+    if (!ui) return;
+
+    if (ui->affEmpCombo) {
+        const QVariant previous = ui->affEmpCombo->currentData();
+        ui->affEmpCombo->clear();
+        QSqlQuery qEmp(QStringLiteral(
+            "SELECT id_emp, nom_emp, prenom_emp "
+            "FROM EMPLOYE "
+            "ORDER BY nom_emp, prenom_emp"));
+        while (qEmp.next()) {
+            const int id = qEmp.value(0).toInt();
+            const QString label = QStringLiteral("%1 %2 (ID %3)")
+                                      .arg(qEmp.value(1).toString(),
+                                           qEmp.value(2).toString())
+                                      .arg(id);
+            ui->affEmpCombo->addItem(label, id);
+        }
+        if (previous.isValid()) {
+            const int idx = ui->affEmpCombo->findData(previous);
+            if (idx >= 0) ui->affEmpCombo->setCurrentIndex(idx);
+        }
+    }
+
+    if (ui->affSerieCombo) {
+        const QVariant previous = ui->affSerieCombo->currentData();
+        ui->affSerieCombo->clear();
+        QSqlQuery qSerie(QStringLiteral(
+            "SELECT id_serie, nom_serie "
+            "FROM SERIE_MACHINE "
+            "ORDER BY nom_serie, id_serie"));
+        while (qSerie.next()) {
+            const int id = qSerie.value(0).toInt();
+            ui->affSerieCombo->addItem(
+                QStringLiteral("%1 (ID %2)").arg(qSerie.value(1).toString()).arg(id), id);
+        }
+        if (previous.isValid()) {
+            const int idx = ui->affSerieCombo->findData(previous);
+            if (idx >= 0) ui->affSerieCombo->setCurrentIndex(idx);
+        }
+    }
+
+    updateAffectationRemainingInfo();
+}
+
+void MainWindow::setupAffectationStatusFilter()
+{
+    if (!ui || !ui->affStatusFilterCombo) return;
+    if (ui->affStatusFilterCombo->property("mergeFixConnected").toBool()) return;
+    connect(ui->affStatusFilterCombo, &QComboBox::currentTextChanged,
+            this, [this](const QString&) { filterAffTable(); });
+    ui->affStatusFilterCombo->setProperty("mergeFixConnected", true);
+}
+
+void MainWindow::setupAffectationOpenEndedOption()
+{
+    if (!ui || !ui->affOpenEndedCheck || !ui->affDateFinEdit) return;
+    if (ui->affOpenEndedCheck->property("mergeFixConnected").toBool()) return;
+
+    auto applyState = [this](bool checked) {
+        if (ui->affDateFinEdit) ui->affDateFinEdit->setEnabled(!checked);
+    };
+    connect(ui->affOpenEndedCheck, &QCheckBox::toggled, this, applyState);
+    applyState(ui->affOpenEndedCheck->isChecked());
+    ui->affOpenEndedCheck->setProperty("mergeFixConnected", true);
+}
+
+void MainWindow::updateAffectationRemainingInfo()
+{
+    if (!ui || !ui->affRemainingInfoLabel || !ui->affEmpCombo) return;
+
+    const int empId = ui->affEmpCombo->currentData().toInt();
+    if (empId <= 0) {
+        ui->affRemainingInfoLabel->setText(tr("Sélectionnez un employé."));
+        return;
+    }
+
+    int used = 0;
+    QSqlQuery q;
+    q.prepare(QStringLiteral(
+        "SELECT COUNT(*) FROM EMP_MACH "
+        "WHERE id_emp = :id_emp AND date_fin IS NULL"));
+    q.bindValue(QStringLiteral(":id_emp"), empId);
+    if (q.exec() && q.next()) used = q.value(0).toInt();
+
+    const int remaining = qMax(0, m_maxAffectationsPerEmployee - used);
+    ui->affRemainingInfoLabel->setText(
+        tr("Affectations actives : %1 / %2 — restantes : %3")
+            .arg(used).arg(m_maxAffectationsPerEmployee).arg(remaining));
+}
+
+bool MainWindow::hasDuplicateAffectation(int empId, int serieId) const
+{
+    QSqlQuery q;
+    q.prepare(QStringLiteral(
+        "SELECT COUNT(*) FROM EMP_MACH "
+        "WHERE id_emp = :id_emp AND id_serie = :id_serie"));
+    q.bindValue(QStringLiteral(":id_emp"), empId);
+    q.bindValue(QStringLiteral(":id_serie"), serieId);
+    return q.exec() && q.next() && q.value(0).toInt() > 0;
+}
+
+void MainWindow::prepareInsertAffectationQuery(QSqlQuery& query,
+                                               int empId,
+                                               int serieId,
+                                               const QString& poste,
+                                               const QDate& dateDeb,
+                                               const QVariant& dateFinValue) const
+{
+    query.prepare(QStringLiteral(
+        "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
+        "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)"));
+    query.bindValue(QStringLiteral(":id_emp"), empId);
+    query.bindValue(QStringLiteral(":id_serie"), serieId);
+    query.bindValue(QStringLiteral(":poste"), poste);
+    query.bindValue(QStringLiteral(":date_debut"), dateDeb);
+    query.bindValue(QStringLiteral(":date_fin"), dateFinValue);
+}
+
+void MainWindow::loadAffectationTable()
+{
+    if (!ui || !ui->affTable) return;
+
+    QTableWidget* table = ui->affTable;
+    table->setSortingEnabled(false);
+    table->clearContents();
+    table->setRowCount(0);
+    table->setColumnCount(9);
+    table->setHorizontalHeaderLabels({
+        tr("ID Emp"), tr("Employé"), tr("Série"), tr("Machine"),
+        tr("Poste"), tr("Date début"), tr("Date fin"), tr("État"), tr("Actions")
+    });
+
+    QSqlQuery q(QStringLiteral(
+        "SELECT em.id_emp, "
+        "       e.nom_emp || ' ' || e.prenom_emp, "
+        "       em.id_serie, "
+        "       s.nom_serie, "
+        "       NVL(m.nom_machine, '-'), "
+        "       NVL(em.poste, '-'), "
+        "       TO_CHAR(em.date_debut, 'DD/MM/YYYY'), "
+        "       TO_CHAR(em.date_fin, 'DD/MM/YYYY'), "
+        "       CASE WHEN em.date_fin IS NULL THEN 'ACTIVE' ELSE 'TERMINEE' END "
+        "FROM EMP_MACH em "
+        "JOIN EMPLOYE e ON e.id_emp = em.id_emp "
+        "JOIN SERIE_MACHINE s ON s.id_serie = em.id_serie "
+        "LEFT JOIN MACHINE m ON m.id_serie = em.id_serie "
+        "ORDER BY e.nom_emp, e.prenom_emp, s.nom_serie"));
+
+    while (q.next()) {
+        const int row = table->rowCount();
+        table->insertRow(row);
+        const int idEmp = q.value(0).toInt();
+        const int idSerie = q.value(2).toInt();
+
+        const QStringList values = {
+            QString::number(idEmp),
+            q.value(1).toString(),
+            q.value(3).toString(),
+            q.value(4).toString(),
+            q.value(5).toString(),
+            q.value(6).toString(),
+            q.value(7).toString(),
+            q.value(8).toString()
+        };
+
+        for (int c = 0; c < values.size(); ++c) {
+            auto* item = new QTableWidgetItem(values[c]);
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            if (c == 2) item->setData(Qt::UserRole, idSerie);
+            if (c == 7) item->setTextAlignment(Qt::AlignCenter);
+            table->setItem(row, c, item);
+        }
+
+        auto* cell = new QWidget(table);
+        cell->setProperty("role", "tableActionsContainer");
+        auto* rowLayout = new QHBoxLayout(cell);
+        rowLayout->setContentsMargins(2, 2, 2, 2);
+        rowLayout->setSpacing(6);
+        rowLayout->setAlignment(Qt::AlignCenter);
+
+        auto* editBtn = new QToolButton(cell);
+        editBtn->setText(tr("Modifier"));
+        editBtn->setToolTip(tr("Modifier"));
+        editBtn->setProperty("type", "warning");
+        editBtn->setProperty("role", "tableAction");
+        editBtn->setAutoRaise(false);
+        editBtn->setFixedSize(92, 30);
+        auto* deleteBtn = new QToolButton(cell);
+        deleteBtn->setText(tr("Supprimer"));
+        deleteBtn->setToolTip(tr("Supprimer"));
+        deleteBtn->setProperty("type", "danger");
+        deleteBtn->setProperty("role", "tableAction");
+        deleteBtn->setAutoRaise(false);
+        deleteBtn->setFixedSize(98, 30);
+
+        rowLayout->addWidget(editBtn);
+        rowLayout->addWidget(deleteBtn);
+        table->setCellWidget(row, 8, cell);
+        table->setRowHeight(row, 48);
+
+        connect(editBtn, &QToolButton::clicked, this, [this, idEmp, idSerie, row]() {
+            if (!ui) return;
+            const int empIdx = ui->affEmpCombo->findData(idEmp);
+            if (empIdx >= 0) ui->affEmpCombo->setCurrentIndex(empIdx);
+            const int serieIdx = ui->affSerieCombo->findData(idSerie);
+            if (serieIdx >= 0) ui->affSerieCombo->setCurrentIndex(serieIdx);
+            if (auto* posteItem = ui->affTable->item(row, 4)) {
+                const int idx = ui->affPosteCombo->findText(posteItem->text());
+                if (idx >= 0) ui->affPosteCombo->setCurrentIndex(idx);
+            }
+            if (auto* dateDebItem = ui->affTable->item(row, 5)) {
+                const QDate date = QDate::fromString(dateDebItem->text(), QStringLiteral("dd/MM/yyyy"));
+                ui->affDateDebEdit->setDate(date.isValid() ? date : QDate::currentDate());
+            }
+            const QString dateFinText = ui->affTable->item(row, 6) ? ui->affTable->item(row, 6)->text() : QString();
+            const bool openEnded = dateFinText.trimmed().isEmpty();
+            if (ui->affOpenEndedCheck) ui->affOpenEndedCheck->setChecked(openEnded);
+            if (!openEnded) {
+                const QDate date = QDate::fromString(dateFinText, QStringLiteral("dd/MM/yyyy"));
+                ui->affDateFinEdit->setDate(date.isValid() ? date : QDate::currentDate());
+            }
+            m_editingAffIdEmp = idEmp;
+            m_editingAffIdSerie = idSerie;
+            if (ui->affSaveBtn) ui->affSaveBtn->setText(tr("Modifier"));
+            if (ui->affStack) ui->affStack->setCurrentIndex(0);
+            updateAffectationRemainingInfo();
+        });
+
+        connect(deleteBtn, &QToolButton::clicked, this, [this, idEmp, idSerie]() {
+            if (QMessageBox::question(this, tr("Suppression"),
+                                      tr("Supprimer cette affectation ?")) != QMessageBox::Yes) {
+                return;
+            }
+            QSqlQuery del;
+            del.prepare(QStringLiteral(
+                "DELETE FROM EMP_MACH WHERE id_emp = :id_emp AND id_serie = :id_serie"));
+            del.bindValue(QStringLiteral(":id_emp"), idEmp);
+            del.bindValue(QStringLiteral(":id_serie"), idSerie);
+            if (!del.exec()) {
+                QMessageBox::critical(this, tr("Erreur"), del.lastError().text());
+                return;
+            }
+            loadAffectationTable();
+            updateAffectationRemainingInfo();
+        });
+    }
+
+    if (table->horizontalHeader()) {
+        table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        table->horizontalHeader()->setSectionResizeMode(8, QHeaderView::Fixed);
+        table->setColumnWidth(8, 210);
+    }
+    table->setSortingEnabled(true);
+    filterAffTable();
+}
+
+void MainWindow::filterAffTable()
+{
+    if (!ui || !ui->affTable) return;
+
+    const QString needle = ui->affSearchEdit ? ui->affSearchEdit->text().trimmed() : QString();
+    const QString status = ui->affStatusFilterCombo ? ui->affStatusFilterCombo->currentText().trimmed() : QString();
+    const bool filterActive = status.contains(QStringLiteral("ACTIVE"), Qt::CaseInsensitive);
+    const bool filterDone = status.contains(QStringLiteral("TERMINEE"), Qt::CaseInsensitive)
+                            || status.contains(QStringLiteral("Termin"), Qt::CaseInsensitive);
+
+    for (int r = 0; r < ui->affTable->rowCount(); ++r) {
+        bool textMatch = needle.isEmpty();
+        for (int c = 0; !textMatch && c < ui->affTable->columnCount() - 1; ++c) {
+            const auto* item = ui->affTable->item(r, c);
+            textMatch = item && item->text().contains(needle, Qt::CaseInsensitive);
+        }
+
+        bool statusMatch = true;
+        if (filterActive || filterDone) {
+            const QString rowStatus = ui->affTable->item(r, 7) ? ui->affTable->item(r, 7)->text() : QString();
+            statusMatch = filterActive ? rowStatus.compare(QStringLiteral("ACTIVE"), Qt::CaseInsensitive) == 0
+                                       : rowStatus.compare(QStringLiteral("TERMINEE"), Qt::CaseInsensitive) == 0;
+        }
+
+        ui->affTable->setRowHidden(r, !(textMatch && statusMatch));
+    }
+}
+
+void MainWindow::on_affNewBtn_clicked()
+{
+    populateAffCombos();
+    resetAffectationEditState();
+    if (ui->affDateDebEdit) ui->affDateDebEdit->setDate(QDate::currentDate());
+    if (ui->affDateFinEdit) ui->affDateFinEdit->setDate(QDate::currentDate().addMonths(1));
+    if (ui->affOpenEndedCheck) ui->affOpenEndedCheck->setChecked(false);
+    if (ui->affStack) ui->affStack->setCurrentIndex(0);
+    updateAffectationRemainingInfo();
+}
+
+void MainWindow::on_affCancelBtn_clicked()
+{
+    resetAffectationEditState();
+    if (ui->affStack) ui->affStack->setCurrentIndex(1);
+}
+
+void MainWindow::on_affRefreshBtn_clicked()
+{
+    populateAffCombos();
+    loadAffectationTable();
+}
+
+void MainWindow::on_affSearchEdit_textChanged(const QString&)
+{
+    filterAffTable();
+}
+
+void MainWindow::on_affSaveBtn_clicked()
+{
+    if (!ui || !ui->affEmpCombo || !ui->affSerieCombo) return;
+
+    const int empId = ui->affEmpCombo->currentData().toInt();
+    const int serieId = ui->affSerieCombo->currentData().toInt();
+    const QString poste = ui->affPosteCombo ? ui->affPosteCombo->currentText().trimmed() : QString();
+    const QDate dateDeb = ui->affDateDebEdit ? ui->affDateDebEdit->date() : QDate::currentDate();
+    const QVariant dateFinValue = (ui->affOpenEndedCheck && ui->affOpenEndedCheck->isChecked())
+                                  ? QVariant()
+                                  : QVariant(ui->affDateFinEdit ? ui->affDateFinEdit->date() : QDate::currentDate());
+
+    if (empId <= 0 || serieId <= 0) {
+        QMessageBox::warning(this, tr("Affectation"), tr("Choisissez un employé et une série."));
+        return;
+    }
+
+    const bool editMode = (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0);
+    if (!editMode && hasDuplicateAffectation(empId, serieId)) {
+        QMessageBox::warning(this, tr("Affectation"), tr("Cette affectation existe déjà."));
+        return;
+    }
+
+    if (editMode) {
+        QSqlQuery del;
+        del.prepare(QStringLiteral(
+            "DELETE FROM EMP_MACH WHERE id_emp = :id_emp AND id_serie = :id_serie"));
+        del.bindValue(QStringLiteral(":id_emp"), m_editingAffIdEmp);
+        del.bindValue(QStringLiteral(":id_serie"), m_editingAffIdSerie);
+        if (!del.exec()) {
+            QMessageBox::critical(this, tr("Erreur"), del.lastError().text());
+            return;
+        }
+    }
+
+    QSqlQuery ins;
+    prepareInsertAffectationQuery(ins, empId, serieId, poste, dateDeb, dateFinValue);
+    if (!ins.exec()) {
+        QMessageBox::critical(this, tr("Erreur"), ins.lastError().text());
+        return;
+    }
+
+    resetAffectationEditState();
+    loadAffectationTable();
+    updateAffectationRemainingInfo();
+    if (ui->affStack) ui->affStack->setCurrentIndex(1);
+}
+
+void MainWindow::resetAffectationEditState()
+{
+    m_editingAffIdEmp = -1;
+    m_editingAffIdSerie = -1;
+    if (ui && ui->affSaveBtn) ui->affSaveBtn->setText(tr("Enregistrer l'affectation"));
+}
+
+void MainWindow::setupSettingsAutoAssignOption()
+{
+    if (!ui) return;
+    m_settingsAutoAssignCheck = ui->settingsAutoAssignCheck;
+}
+
+namespace {
+QString affectationSettingsPath()
+{
+    QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (baseDir.isEmpty())
+        baseDir = QCoreApplication::applicationDirPath();
+    QDir().mkpath(baseDir);
+    return QDir(baseDir).filePath(QStringLiteral("settings.dat"));
+}
+}
+
+void MainWindow::loadAffectationSettings()
+{
+    if (!ui) return;
+    setupSettingsAutoAssignOption();
+
+    const auto applySettingsToUi = [this]() {
+        if (ui->settingsMaxAffectationsSpin)
+            ui->settingsMaxAffectationsSpin->setValue(m_maxAffectationsPerEmployee);
+        if (m_settingsAutoAssignCheck)
+            m_settingsAutoAssignCheck->setChecked(m_autoAssignFromStock);
+        if (ui->affLimitInfoLabel) {
+            ui->affLimitInfoLabel->setText(
+                tr("Limite actuelle : %1 affectation(s) max par employé.")
+                    .arg(m_maxAffectationsPerEmployee));
+        }
+        updateAffectationRemainingInfo();
+    };
+
+    QFile file(affectationSettingsPath());
+    if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
+        applySettingsToUi();
+        return;
+    }
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_6_5);
+
+    quint32 magic = 0;
+    qint32 version = 0;
+    qint32 maxAff = m_maxAffectationsPerEmployee;
+    bool autoAssign = m_autoAssignFromStock;
+
+    in >> magic >> version >> maxAff;
+    if (in.status() == QDataStream::Ok && magic == 0x534f504d && version >= 2)
+        in >> autoAssign;
+
+    if (in.status() == QDataStream::Ok && magic == 0x534f504d && version >= 1 && maxAff > 0) {
+        m_maxAffectationsPerEmployee = maxAff;
+        m_autoAssignFromStock = (version >= 2) ? autoAssign : false;
+    }
+
+    applySettingsToUi();
+}
+
+bool MainWindow::saveAffectationSettings()
+{
+    if (!ui) return false;
+
+    if (ui->settingsMaxAffectationsSpin)
+        m_maxAffectationsPerEmployee = ui->settingsMaxAffectationsSpin->value();
+    if (m_settingsAutoAssignCheck)
+        m_autoAssignFromStock = m_settingsAutoAssignCheck->isChecked();
+
+    QFile file(affectationSettingsPath());
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_6_5);
+    out << quint32(0x534f504d) << qint32(2)
+        << qint32(m_maxAffectationsPerEmployee)
+        << bool(m_autoAssignFromStock);
+
+    return out.status() == QDataStream::Ok;
+}
+
+void MainWindow::on_settingsSaveBtn_clicked()
+{
+    if (!saveAffectationSettings()) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'enregistrer les paramètres dans le fichier settings.dat."));
+        return;
+    }
+
+    if (ui->affLimitInfoLabel) {
+        ui->affLimitInfoLabel->setText(
+            tr("Limite actuelle : %1 affectation(s) max par employé.")
+                .arg(m_maxAffectationsPerEmployee));
+    }
+    updateAffectationRemainingInfo();
+    refreshStockSerieChoices();
+
+    QMessageBox::information(this, tr("Paramètres"),
+        tr("Paramètres enregistrés avec succès.\n"
+           "• Limite : %1 affectation(s) max par employé\n"
+           "• Auto affectation depuis stock : %2")
+            .arg(m_maxAffectationsPerEmployee)
+            .arg(m_autoAssignFromStock ? tr("Activée") : tr("Désactivée")));
+}
+
+void MainWindow::refreshStockSerieChoices()
+{
+    if (!ui || !ui->stockSerieCombo) return;
+
+    const QVariant previous = ui->stockSerieCombo->currentData();
+    ui->stockSerieCombo->clear();
+    ui->stockSerieCombo->addItem(tr("Aucune série"), QVariant());
+
+    QSqlQuery q(QStringLiteral(
+        "SELECT id_serie, nom_serie FROM SERIE_MACHINE ORDER BY nom_serie, id_serie"));
+    while (q.next()) {
+        const int id = q.value(0).toInt();
+        ui->stockSerieCombo->addItem(
+            QStringLiteral("%1 (ID %2)").arg(q.value(1).toString()).arg(id), id);
+    }
+
+    if (previous.isValid()) {
+        const int idx = ui->stockSerieCombo->findData(previous);
+        if (idx >= 0) ui->stockSerieCombo->setCurrentIndex(idx);
+    }
+}
+
+bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
+{
+    detailMessage.clear();
+
+    if (serieId <= 0) {
+        detailMessage = tr("série invalide.");
+        return false;
+    }
+    if (m_maxAffectationsPerEmployee <= 0) {
+        detailMessage = tr("limite d'affectation invalide.");
+        return false;
+    }
+
+    // Choose the least-loaded employee who is not already actively assigned
+    // to this series and who is still under the configured active limit.
+    QSqlQuery pick;
+    pick.prepare(QStringLiteral(
+        "SELECT id_emp FROM ("
+        "  SELECT e.id_emp, "
+        "         NVL(SUM(CASE WHEN em.date_fin IS NULL THEN 1 ELSE 0 END), 0) AS active_count "
+        "  FROM EMPLOYE e "
+        "  LEFT JOIN EMP_MACH em ON em.id_emp = e.id_emp "
+        "  WHERE NOT EXISTS ("
+        "      SELECT 1 FROM EMP_MACH em2 "
+        "      WHERE em2.id_emp = e.id_emp "
+        "        AND em2.id_serie = :serie_not_exists "
+        "        AND em2.date_fin IS NULL"
+        "  ) "
+        "  GROUP BY e.id_emp "
+        "  HAVING NVL(SUM(CASE WHEN em.date_fin IS NULL THEN 1 ELSE 0 END), 0) < :max_aff "
+        "  ORDER BY active_count ASC, e.id_emp ASC"
+        ") WHERE ROWNUM = 1"));
+    pick.bindValue(QStringLiteral(":serie_not_exists"), serieId);
+    pick.bindValue(QStringLiteral(":max_aff"), m_maxAffectationsPerEmployee);
+
+    if (!pick.exec()) {
+        detailMessage = tr("erreur de sélection employé : %1").arg(pick.lastError().text());
+        return false;
+    }
+    if (!pick.next()) {
+        detailMessage = tr("aucun employé disponible sous la limite de %1 affectation(s) active(s).")
+                            .arg(m_maxAffectationsPerEmployee);
+        return false;
+    }
+
+    const int empId = pick.value(0).toInt();
+    if (empId <= 0) {
+        detailMessage = tr("employé sélectionné invalide.");
+        return false;
+    }
+
+    if (hasDuplicateAffectation(empId, serieId)) {
+        detailMessage = tr("l'employé sélectionné est déjà affecté à cette série.");
+        return false;
+    }
+
+    QSqlQuery ins;
+    const QVariant activeEndDate = QVariant(QMetaType(QMetaType::QDate)); // typed NULL for Oracle DATE
+    prepareInsertAffectationQuery(ins, empId, serieId, tr("Auto"), QDate::currentDate(), activeEndDate);
+    if (!ins.exec()) {
+        detailMessage = tr("erreur insertion affectation : %1").arg(ins.lastError().text());
+        return false;
+    }
+
+    QString empName;
+    QSqlQuery empQuery;
+    empQuery.prepare(QStringLiteral(
+        "SELECT TRIM(nom_emp || ' ' || prenom_emp) FROM EMPLOYE WHERE id_emp = :id_emp"));
+    empQuery.bindValue(QStringLiteral(":id_emp"), empId);
+    if (empQuery.exec() && empQuery.next())
+        empName = empQuery.value(0).toString().trimmed();
+
+    detailMessage = empName.isEmpty()
+        ? tr("Affectation auto réalisée : employé ID %1 affecté à la série %2.").arg(empId).arg(serieId)
+        : tr("Affectation auto réalisée : %1 affecté(e) à la série %2.").arg(empName).arg(serieId);
+    return true;
+}
+
+void MainWindow::loadStocksTable()
+{
+    if (!ui || !ui->tableWidget_2) return;
+
+    QTableWidget* table = ui->tableWidget_2;
+    table->setSortingEnabled(false);
+    table->clearContents();
+    table->setRowCount(0);
+    table->setColumnCount(7);
+    table->setHorizontalHeaderLabels({
+        tr("Id"), tr("Nom"), tr("Catégorie"), tr("Date d'ajout"),
+        tr("Quantité (KG)"), tr("Description"), tr("Série")
+    });
+
+    QSqlQuery q(QStringLiteral(
+        "SELECT st.id_stock, st.nom_stock, st.categ_stock, TO_CHAR(st.dateajt_stock, 'DD/MM/YYYY'), "
+        "       st.qt_stock, st.descript_stock, NVL(sm.nom_serie, '-') "
+        "FROM STOCK st "
+        "LEFT JOIN SERIE_MACHINE sm ON sm.id_serie = st.id_serie "
+        "ORDER BY st.id_stock DESC"));
+    while (q.next()) {
+        const int row = table->rowCount();
+        table->insertRow(row);
+        for (int c = 0; c < 7; ++c) {
+            auto* item = new QTableWidgetItem(q.value(c).toString());
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            table->setItem(row, c, item);
+        }
+        table->setRowHeight(row, 44);
+    }
+    if (table->horizontalHeader()) table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->setSortingEnabled(true);
+}
+
+void MainWindow::on_ajouterqtoliveBtn_clicked()
+{
+    refreshStockSerieChoices();
+
+    const QString nomStock = ui->nomLineEdit_2 ? ui->nomLineEdit_2->text().trimmed() : QString();
+    const QString prenomAgri = ui->prNomLineEdit_2 ? ui->prNomLineEdit_2->text().trimmed() : QString();
+    const QString categorie = ui->Categchoix ? ui->Categchoix->currentText().trimmed() : QString();
+    const QDate dateAjout = ui->dateDEmbaucheDateEdit_2 ? ui->dateDEmbaucheDateEdit_2->date() : QDate::currentDate();
+    const QString qteText = ui->prNomLineEdit_3 ? ui->prNomLineEdit_3->text().trimmed() : QString();
+    const QString desc = ui->description ? ui->description->text().trimmed() : QString();
+    const int serieId = (ui->stockSerieCombo ? ui->stockSerieCombo->currentData().toInt() : 0);
+
+    bool okQte = false;
+    const double qte = qteText.toDouble(&okQte);
+
+    if (nomStock.isEmpty()) {
+        QMessageBox::warning(this, tr("Validation"), tr("Le nom du stock est obligatoire."));
+        return;
+    }
+    if (!okQte || qte <= 0.0) {
+        QMessageBox::warning(this, tr("Validation"), tr("La quantité doit être un nombre positif."));
+        return;
+    }
+    if (serieId <= 0) {
+        QMessageBox::warning(this, tr("Validation"), tr("Veuillez choisir une série associée."));
+        return;
+    }
+
+    // Optional agriculteur resolution from Nom + Prénom. If not found, keep NULL.
+    QVariant agriId = QVariant(QMetaType(QMetaType::Int)); // typed NULL NUMBER for Oracle
+    QSqlQuery qAgri;
+    qAgri.prepare(QStringLiteral(
+        "SELECT id_agri FROM AGRICULTEUR "
+        "WHERE UPPER(nom_agri) = UPPER(:nom) "
+        "  AND UPPER(NVL(prenom_agri, '')) = UPPER(:prenom) "
+        "  AND ROWNUM = 1"));
+    qAgri.bindValue(QStringLiteral(":nom"), nomStock);
+    qAgri.bindValue(QStringLiteral(":prenom"), prenomAgri);
+    if (qAgri.exec() && qAgri.next())
+        agriId = qAgri.value(0);
+
+    QSqlQuery q;
+    q.prepare(QStringLiteral(
+        "INSERT INTO STOCK (nom_stock, categ_stock, dateajt_stock, descript_stock, qt_stock, id_agri, id_serie) "
+        "VALUES (:nom, :categ, :dateajt, :descr, :qt, :id_agri, :id_serie)"));
+    q.bindValue(QStringLiteral(":nom"), nomStock);
+    q.bindValue(QStringLiteral(":categ"), categorie);
+    q.bindValue(QStringLiteral(":dateajt"), dateAjout);
+    q.bindValue(QStringLiteral(":descr"), desc);
+    q.bindValue(QStringLiteral(":qt"), qte);
+    q.bindValue(QStringLiteral(":id_agri"), agriId);
+    q.bindValue(QStringLiteral(":id_serie"), serieId);
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, tr("Erreur"),
+            tr("Impossible d'ajouter le stock :\n%1").arg(q.lastError().text()));
+        return;
+    }
+
+    QString autoAssignMsg;
+    if (m_autoAssignFromStock) {
+        QString detail;
+        const bool assigned = tryAutoAssignForSerie(serieId, detail);
+        autoAssignMsg = assigned
+            ? QStringLiteral("\n") + detail
+            : QStringLiteral("\n") + tr("Affectation auto non réalisée : %1").arg(detail);
+    }
+
+    if (ui->nomLineEdit_2) ui->nomLineEdit_2->clear();
+    if (ui->prNomLineEdit_2) ui->prNomLineEdit_2->clear();
+    if (ui->prNomLineEdit_3) ui->prNomLineEdit_3->clear();
+    if (ui->description) ui->description->clear();
+    if (ui->dateDEmbaucheDateEdit_2) ui->dateDEmbaucheDateEdit_2->setDate(QDate::currentDate());
+    if (ui->Categchoix) ui->Categchoix->setCurrentIndex(0);
+    if (ui->stockSerieCombo) ui->stockSerieCombo->setCurrentIndex(0);
+
+    loadStocksTable();
+    loadAffectationTable();
+    updateAffectationRemainingInfo();
+
+    if (ui->metiersstocks && ui->consulterqtolives)
+        ui->metiersstocks->setCurrentWidget(ui->consulterqtolives);
+
+    QMessageBox::information(this, tr("Succès"),
+        tr("Stock ajouté avec succès.%1").arg(autoAssignMsg));
+}
+
+void MainWindow::on_btnConsulterAgr_clicked()
+{
+    const int idx = moduleIndex(ui->module6);
+    openSidebarModule(idx, ui->metiersagriculteurs, 1, idx);
+}
+
+void MainWindow::on_btnAjouterAgr_clicked()
+{
+    const int idx = moduleIndex(ui->module6);
+    openSidebarModule(idx, ui->metiersagriculteurs, 0, idx);
+}
+
+void MainWindow::on_btnStatAgr_clicked()
+{
+    const int idx = moduleIndex(ui->module6);
+    openSidebarModule(idx, ui->metiersagriculteurs, 2, idx);
+}
+
+void MainWindow::on_btnAvanceAgr_clicked()
+{
+    const int idx = moduleIndex(ui->module6);
+    openSidebarModule(idx, ui->metiersagriculteurs, 3, idx);
+}
+
+void MainWindow::onFingerprintTerminalReadyRead()
+{
+    const QByteArray data = m_fingerprintTerminal.read_from_arduino();
+    if (!data.isEmpty())
+        qDebug() << "[FingerprintTerminal]" << QString::fromUtf8(data).trimmed();
+}
+
+QWidget* MainWindow::createStyledCard(const QString& title, const QString& accentColor)
+{
+    auto* card = new QFrame(this);
+    card->setFrameShape(QFrame::StyledPanel);
+    card->setStyleSheet(QStringLiteral(
+        "QFrame { background:#ffffff; border:1px solid #e5e7eb; border-left:4px solid %1; border-radius:10px; }")
+        .arg(accentColor.isEmpty() ? QStringLiteral("#8a9b5f") : accentColor));
+    auto* layout = new QVBoxLayout(card);
+    layout->setContentsMargins(12, 12, 12, 12);
+    auto* label = new QLabel(title, card);
+    label->setStyleSheet(QStringLiteral("font-weight:700;"));
+    layout->addWidget(label);
+    return card;
+}
+
+void MainWindow::setupToolbarsTweaks()
+{
+    // Kept for compatibility with the merged header; toolbar styling is handled in setupInteractiveHooks().
+}
+
+void MainWindow::repositionUserInfo()
+{
+    if (!ui || !ui->userInfoContainer || !ui->modules) return;
+    ui->userInfoContainer->raise();
+}
+
+void MainWindow::makeAvatarCircular()
+{
+    QLabel* avatar = findChild<QLabel*>(QStringLiteral("userAvatar"));
+    if (!avatar) avatar = findChild<QLabel*>(QStringLiteral("userAvatarLabel"));
+    if (!avatar) return;
+
+    const int side = 42;
+    avatar->setFixedSize(side, side);
+    avatar->setScaledContents(false);
+    avatar->setAlignment(Qt::AlignCenter);
+    avatar->setStyleSheet(QStringLiteral(
+        "QLabel#userAvatar { background:#6f873d; border:2px solid #dfe8c9; border-radius:21px; padding:0px; }"));
+
+    const QPixmap source = avatar->pixmap(Qt::ReturnByValue);
+    if (source.isNull()) return;
+
+    QPixmap scaled = source.scaled(side - 4, side - 4, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    QPixmap rounded(side, side);
+    rounded.fill(Qt::transparent);
+
+    QPainter painter(&rounded);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setBrush(Qt::white);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(1, 1, side - 2, side - 2);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    const int x = (side - scaled.width()) / 2;
+    const int y = (side - scaled.height()) / 2;
+    painter.drawPixmap(x, y, scaled);
+    painter.end();
+
+    avatar->setPixmap(rounded);
+}
+
+void MainWindow::repositionChatLauncher()
+{
+    if (m_chatLauncher) m_chatLauncher->raise();
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    normalizeMainModuleGeometry(ui);
+    repositionUserInfo();
+    repositionChatLauncher();
+    makeAvatarCircular();
+}
+
+void MainWindow::updateClock()
+{
+    if (!m_clockLabel) {
+        m_clockLabel = new QLabel(this);
+        if (statusBar()) statusBar()->addPermanentWidget(m_clockLabel);
+    }
+    m_clockLabel->setText(QDateTime::currentDateTime().toString(QStringLiteral("dd/MM/yyyy HH:mm:ss")));
 }

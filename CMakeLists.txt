@@ -22,9 +22,6 @@ set(PROJECT_SOURCES
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    personnel.cpp
-    personnel.h
-    personnel.ui
     qualite.cpp
     qualite.h
     qualite.ui
@@ -34,8 +31,20 @@ set(PROJECT_SOURCES
     stocks.cpp
     stocks.h
     stocks.ui
+    employe.cpp
+    employe.h
     connection.cpp
     connection.h
+    face_recognition_service.cpp
+    face_recognition_service.h
+    face_recognition_dialog.cpp
+    face_recognition_dialog.h
+    face_capture_dialog.cpp
+    face_capture_dialog.h
+    fingerprintservice.cpp
+    fingerprintservice.h
+    arduino.cpp
+    arduino.h
     style.qrc
     img.qrc
 )
@@ -71,11 +80,6 @@ install(TARGETS smartoil
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(smartoil)
-endif()
-
 
 set(OpenCV_DIR "C:/opencv/build_mingw")
 find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui dnn objdetect videoio)
@@ -116,3 +120,7 @@ add_custom_command(TARGET smartoil POST_BUILD
         "C:/opencv/build_mingw/bin/opencv_videoio_ffmpeg4120_64.dll"
         "$<TARGET_FILE_DIR:smartoil>/opencv_videoio_ffmpeg4120_64.dll"
 )
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(smartoil)
+endif()

@@ -85,3 +85,8 @@ CMakeLists.txt.user*
 /Release/
 /.vs/
 .cmake/
+out/build/
+backups/
+*.conflict-backup
+*.diff
+workproj/

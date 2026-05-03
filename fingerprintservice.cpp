@@ -21,31 +21,49 @@ FingerprintService::~FingerprintService()
 
 void FingerprintService::initialize()
 {
-    // Create Arduino wrapper if not already done
+    // Create Arduino wrapper if not already done.
     if (!m_arduino) {
-        m_arduino = new Arduino(this);
+        m_arduino = new Arduino();
     }
 
-    // Attempt connection
+    // Already connected: do not close/reopen the port on every reconnect tick.
+    if (isConnected()) {
+        if (m_reconnectTimer && m_reconnectTimer->isActive()) {
+            m_reconnectTimer->stop();
+        }
+        connect(m_arduino->getserial(), &QSerialPort::readyRead,
+                this, &FingerprintService::onArduinoDataAvailable, Qt::UniqueConnection);
+        sendCommand(QStringLiteral("LOGIN_ON"));
+        emit ready();
+        return;
+    }
+
+    // Attempt connection.
     int rc = m_arduino->connect_arduino();
     if (rc != 0) {
-        emit error(QStringLiteral("Failed to connect to Arduino (rc=%1)").arg(rc));
-        // Start reconnect timer
+        emit error(QStringLiteral("Arduino fingerprint terminal not connected (rc=%1). Check USB cable, COM port, and firmware baud rate 115200.").arg(rc));
+        // Start reconnect timer so plugging the board after app startup still works.
         if (!m_reconnectTimer) {
             m_reconnectTimer = new QTimer(this);
             connect(m_reconnectTimer, &QTimer::timeout, this, &FingerprintService::onReconnectTimeout);
         }
-        m_reconnectTimer->start(RECONNECT_INTERVAL_MS);
+        if (!m_reconnectTimer->isActive()) {
+            m_reconnectTimer->start(RECONNECT_INTERVAL_MS);
+        }
         return;
     }
 
-    // Connect to serial readyRead signal
+    if (m_reconnectTimer && m_reconnectTimer->isActive()) {
+        m_reconnectTimer->stop();
+    }
+
+    // Connect to serial readyRead signal.
     connect(m_arduino->getserial(), &QSerialPort::readyRead,
             this, &FingerprintService::onArduinoDataAvailable, Qt::UniqueConnection);
 
     qDebug() << "[FingerprintService] Connected to Arduino on" << m_arduino->getarduino_port_name();
 
-    // Send LOGIN_ON to start scanning
+    // Send LOGIN_ON to start scanning.
     sendCommand(QStringLiteral("LOGIN_ON"));
     emit ready();
 }
@@ -65,6 +83,10 @@ void FingerprintService::sendCommand(const QString &command)
 
 void FingerprintService::startScanning()
 {
+    if (!isConnected()) {
+        sendCommand(QStringLiteral("LOGIN_ON"));
+        return;
+    }
     sendCommand(QStringLiteral("LOGIN_ON"));
     m_scanning = true;
     emit scanningStateChanged(true);
@@ -72,6 +94,10 @@ void FingerprintService::startScanning()
 
 void FingerprintService::stopScanning()
 {
+    if (!isConnected()) {
+        sendCommand(QStringLiteral("LOGIN_OFF"));
+        return;
+    }
     sendCommand(QStringLiteral("LOGIN_OFF"));
     m_scanning = false;
     emit scanningStateChanged(false);
@@ -133,6 +159,13 @@ void FingerprintService::onArduinoDataAvailable()
 
 void FingerprintService::onReconnectTimeout()
 {
+    if (isConnected()) {
+        if (m_reconnectTimer) {
+            m_reconnectTimer->stop();
+        }
+        return;
+    }
+
     qDebug() << "[FingerprintService] Attempting reconnect...";
     initialize();
 }
