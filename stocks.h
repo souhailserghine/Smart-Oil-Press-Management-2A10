@@ -9,6 +9,7 @@
 #include <QWidget>
 
 class QToolBar;
+class QComboBox;
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -105,9 +106,23 @@ private:
     QString debutGraphique(const QString &titre, const QString &type);
     QString finGraphique();
 
+
+    // Auto-affectation / machine-series integration
+    // Added to the stock module itself so adding from stocks.ui triggers the same
+    // affectation behavior as the integrated MainWindow stock page.
+    void ensureStockSerieSelector();
+    void refreshStockSerieChoices();
+    void loadAffectationSettings();
+    bool tryAutoAssignForSerie(int serieId, QString& detailMessage);
+    bool tableColumnExists(const QString& tableName, const QString& columnName) const;
+
     // Data validation
     bool validerDonneesAjout();
     bool validerQuantite(double quantite);
+
+    QComboBox* m_stockSerieCombo = nullptr;
+    int m_maxAffectationsPerEmployee = 3;
+    bool m_autoAssignFromStock = false;
 };
 
 #endif // STOCKS_H

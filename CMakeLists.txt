@@ -81,44 +81,83 @@ install(TARGETS smartoil
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# =========================
+# OpenCV
+# =========================
+
 set(OpenCV_DIR "C:/opencv/build_mingw")
-find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui dnn objdetect videoio)
+
+find_package(OpenCV REQUIRED COMPONENTS
+    core
+    imgproc
+    imgcodecs
+    highgui
+    dnn
+    objdetect
+    videoio
+)
+
 target_link_libraries(smartoil PRIVATE ${OpenCV_LIBS})
 
-# Copy face recognition model files next to the executable at build time
-add_custom_command(TARGET smartoil POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/models/face_detection_yunet_2023mar.onnx"
-        "$<TARGET_FILE_DIR:smartoil>/face_detection_yunet_2023mar.onnx"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/models/face_recognition_sface_2021dec.onnx"
-        "$<TARGET_FILE_DIR:smartoil>/face_recognition_sface_2021dec.onnx"
+# Prefer the old working OpenCV bin path.
+# If it does not exist, fallback to your friend's path.
+if(EXISTS "C:/opencv/build_mingw/bin")
+    set(OPENCV_BIN_DIR "C:/opencv/build_mingw/bin")
+elseif(EXISTS "C:/opencv/build_mingw/x64/mingw/bin")
+    set(OPENCV_BIN_DIR "C:/opencv/build_mingw/x64/mingw/bin")
+else()
+    message(FATAL_ERROR "OpenCV DLL folder not found. Check C:/opencv/build_mingw/bin or C:/opencv/build_mingw/x64/mingw/bin")
+endif()
+
+message(STATUS "Using OpenCV_DIR: ${OpenCV_DIR}")
+message(STATUS "Using OPENCV_BIN_DIR: ${OPENCV_BIN_DIR}")
+
+# Copy all OpenCV runtime DLLs next to smartoil.exe.
+# This avoids hardcoding libopencv_core455.dll or libopencv_core4120.dll.
+file(GLOB OPENCV_RUNTIME_DLLS
+    "${OPENCV_BIN_DIR}/libopencv_*.dll"
+    "${OPENCV_BIN_DIR}/opencv_videoio_ffmpeg*.dll"
 )
 
-# Copy OpenCV MinGW DLLs next to the executable at build time
-foreach(_dll
-    libopencv_core455
-    libopencv_imgproc455
-    libopencv_imgcodecs455
-    libopencv_highgui455
-    libopencv_dnn455
-    libopencv_objdetect455
-    libopencv_videoio455
-    libopencv_calib3d455
-    libopencv_features2d455
-    libopencv_flann455
-)
+if(NOT OPENCV_RUNTIME_DLLS)
+    message(FATAL_ERROR "No OpenCV DLLs found in ${OPENCV_BIN_DIR}")
+endif()
+
+foreach(_dll ${OPENCV_RUNTIME_DLLS})
     add_custom_command(TARGET smartoil POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "C:/opencv/build_mingw/x64/mingw/bin/${_dll}.dll"
-            "$<TARGET_FILE_DIR:smartoil>/${_dll}.dll"
+            "${_dll}"
+            "$<TARGET_FILE_DIR:smartoil>"
     )
 endforeach()
-# ffmpeg helper DLL (different naming)
+
+# =========================
+# Face recognition models
+# =========================
+
+set(FACE_DETECTION_MODEL
+    "${CMAKE_SOURCE_DIR}/models/face_detection_yunet_2023mar.onnx"
+)
+
+set(FACE_RECOGNITION_MODEL
+    "${CMAKE_SOURCE_DIR}/models/face_recognition_sface_2021dec.onnx"
+)
+
+if(NOT EXISTS "${FACE_DETECTION_MODEL}")
+    message(FATAL_ERROR "Missing model file: ${FACE_DETECTION_MODEL}")
+endif()
+
+if(NOT EXISTS "${FACE_RECOGNITION_MODEL}")
+    message(FATAL_ERROR "Missing model file: ${FACE_RECOGNITION_MODEL}")
+endif()
+
 add_custom_command(TARGET smartoil POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "C:/opencv/build_mingw/x64/mingw/bin/opencv_videoio_ffmpeg455_64.dll"
-        "$<TARGET_FILE_DIR:smartoil>/opencv_videoio_ffmpeg455_64.dll"
+        "${FACE_DETECTION_MODEL}"
+        "$<TARGET_FILE_DIR:smartoil>/face_detection_yunet_2023mar.onnx"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FACE_RECOGNITION_MODEL}"
+        "$<TARGET_FILE_DIR:smartoil>/face_recognition_sface_2021dec.onnx"
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

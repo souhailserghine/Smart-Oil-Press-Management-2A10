@@ -44,6 +44,13 @@
 #include <QProgressBar>
 #include <QTimer>
 #include <QSizePolicy>
+#include <QStandardPaths>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QDataStream>
+#include <QMetaType>
+#include <QStringList>
 
 namespace {
 QSqlDatabase stockDb()
@@ -133,7 +140,222 @@ Stocks::Stocks(QWidget *parent) : QMainWindow(parent),
     ui->SaiQualite->clear();
     ui->SaiQualite->addItems({"Excellente", "Bonne", "Moyenne", "Médiocre"});
 
+    // Re-added without changing your friend's UI structure:
+    // the stock module needs a machine-series choice so auto-affectation
+    // knows which series should receive an employee.
+    ensureStockSerieSelector();
+    refreshStockSerieChoices();
+    loadAffectationSettings();
+
     chargerListeOlives();
+}
+
+
+// ─────────────────────────────────────────────
+//  Série machine + auto-affectation helpers
+//  These are intentionally added on top of the latest Stocks module without
+//  removing the existing statistics / advanced popup functionality.
+// ─────────────────────────────────────────────
+bool Stocks::tableColumnExists(const QString& tableName, const QString& columnName) const
+{
+    QSqlQuery q(stockDb());
+    q.prepare(QStringLiteral(
+        "SELECT COUNT(*) FROM USER_TAB_COLUMNS "
+        "WHERE TABLE_NAME = :table_name AND COLUMN_NAME = :column_name"));
+    q.bindValue(QStringLiteral(":table_name"), tableName.trimmed().toUpper());
+    q.bindValue(QStringLiteral(":column_name"), columnName.trimmed().toUpper());
+    return q.exec() && q.next() && q.value(0).toInt() > 0;
+}
+
+void Stocks::ensureStockSerieSelector()
+{
+    if (m_stockSerieCombo)
+        return;
+
+    // If a future .ui already contains the combo, reuse it.
+    m_stockSerieCombo = findChild<QComboBox*>(QStringLiteral("stockSerieCombo"));
+    if (m_stockSerieCombo)
+        return;
+
+    QFormLayout* form = findChild<QFormLayout*>(QStringLiteral("ajoutLayout"));
+    if (!form)
+        return;
+
+    auto* label = new QLabel(tr("Série machine"), ui->ajoutStock);
+    label->setObjectName(QStringLiteral("label_stockSerieCombo"));
+
+    m_stockSerieCombo = new QComboBox(ui->ajoutStock);
+    m_stockSerieCombo->setObjectName(QStringLiteral("stockSerieCombo"));
+    m_stockSerieCombo->setToolTip(tr("Série liée au stock. Utilisée par l'affectation automatique."));
+    m_stockSerieCombo->setMinimumHeight(32);
+
+    // Insert just above the Ajouter button row so the original UI remains intact.
+    const int insertRow = qMax(0, form->rowCount() - 1);
+    form->insertRow(insertRow, label, m_stockSerieCombo);
+}
+
+void Stocks::refreshStockSerieChoices()
+{
+    ensureStockSerieSelector();
+    if (!m_stockSerieCombo)
+        return;
+
+    const QVariant previous = m_stockSerieCombo->currentData();
+    m_stockSerieCombo->clear();
+    m_stockSerieCombo->addItem(tr("Choisir une série machine..."), 0);
+
+    QSqlQuery q(stockDb());
+    if (!q.exec(QStringLiteral("SELECT id_serie, nom_serie FROM SERIE_MACHINE ORDER BY nom_serie, id_serie"))) {
+        m_stockSerieCombo->addItem(tr("Erreur chargement séries"), 0);
+        m_stockSerieCombo->setToolTip(q.lastError().text());
+        return;
+    }
+
+    int restoreIndex = -1;
+    while (q.next()) {
+        const int id = q.value(0).toInt();
+        const QString name = q.value(1).toString().trimmed();
+        const QString label = name.isEmpty()
+            ? tr("Série %1").arg(id)
+            : tr("%1 (ID %2)").arg(name).arg(id);
+        m_stockSerieCombo->addItem(label, id);
+        if (previous.isValid() && previous.toInt() == id)
+            restoreIndex = m_stockSerieCombo->count() - 1;
+    }
+
+    if (restoreIndex >= 0)
+        m_stockSerieCombo->setCurrentIndex(restoreIndex);
+}
+
+void Stocks::loadAffectationSettings()
+{
+    m_maxAffectationsPerEmployee = 3;
+    m_autoAssignFromStock = false;
+
+    QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (baseDir.isEmpty())
+        baseDir = QCoreApplication::applicationDirPath();
+
+    QFile file(QDir(baseDir).filePath(QStringLiteral("settings.dat")));
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_6_5);
+
+    quint32 magic = 0;
+    qint32 version = 0;
+    qint32 maxAff = 3;
+    bool autoAssign = false;
+
+    in >> magic >> version >> maxAff;
+    if (in.status() == QDataStream::Ok && magic == 0x534f504d && version >= 2)
+        in >> autoAssign;
+
+    if (in.status() == QDataStream::Ok && magic == 0x534f504d && version >= 1 && maxAff > 0 && maxAff <= 100) {
+        m_maxAffectationsPerEmployee = maxAff;
+        m_autoAssignFromStock = (version >= 2) ? autoAssign : false;
+    }
+}
+
+bool Stocks::tryAutoAssignForSerie(int serieId, QString& detailMessage)
+{
+    detailMessage.clear();
+
+    if (serieId <= 0) {
+        detailMessage = tr("série machine invalide.");
+        return false;
+    }
+    if (m_maxAffectationsPerEmployee <= 0) {
+        detailMessage = tr("limite d'affectations invalide.");
+        return false;
+    }
+
+    const bool hasDateFin = tableColumnExists(QStringLiteral("EMP_MACH"), QStringLiteral("DATE_FIN"));
+    const QString activeJoin = hasDateFin ? QStringLiteral(" AND em.date_fin IS NULL") : QString();
+    const QString activeExists = hasDateFin ? QStringLiteral(" AND ex.date_fin IS NULL") : QString();
+
+    QSqlQuery pick(stockDb());
+    const QString sql = QStringLiteral(
+        "SELECT id_emp FROM ("
+        "  SELECT e.id_emp, COUNT(em.id_serie) AS cnt "
+        "  FROM EMPLOYE e "
+        "  LEFT JOIN EMP_MACH em ON em.id_emp = e.id_emp%1 "
+        "  WHERE NOT EXISTS ("
+        "    SELECT 1 FROM EMP_MACH ex "
+        "    WHERE ex.id_emp = e.id_emp AND ex.id_serie = :serie%2"
+        "  ) "
+        "  GROUP BY e.id_emp "
+        "  HAVING COUNT(em.id_serie) < :max_aff "
+        "  ORDER BY cnt ASC, e.id_emp ASC"
+        ") WHERE ROWNUM = 1"
+    ).arg(activeJoin, activeExists);
+
+    pick.prepare(sql);
+    pick.bindValue(QStringLiteral(":serie"), serieId);
+    pick.bindValue(QStringLiteral(":max_aff"), m_maxAffectationsPerEmployee);
+
+    if (!pick.exec()) {
+        detailMessage = tr("erreur SQL sélection employé : %1").arg(pick.lastError().text());
+        return false;
+    }
+    if (!pick.next()) {
+        detailMessage = tr("aucun employé disponible sous la limite de %1 affectation(s).").arg(m_maxAffectationsPerEmployee);
+        return false;
+    }
+
+    const int empId = pick.value(0).toInt();
+    if (empId <= 0) {
+        detailMessage = tr("employé sélectionné invalide.");
+        return false;
+    }
+
+    const bool hasPoste = tableColumnExists(QStringLiteral("EMP_MACH"), QStringLiteral("POSTE"));
+    const bool hasDateDebut = tableColumnExists(QStringLiteral("EMP_MACH"), QStringLiteral("DATE_DEBUT"));
+
+    QStringList columns{QStringLiteral("id_serie"), QStringLiteral("id_emp")};
+    QStringList values{QStringLiteral(":id_serie"), QStringLiteral(":id_emp")};
+    if (hasPoste) {
+        columns << QStringLiteral("poste");
+        values << QStringLiteral(":poste");
+    }
+    if (hasDateDebut) {
+        columns << QStringLiteral("date_debut");
+        values << QStringLiteral(":date_debut");
+    }
+    if (hasDateFin) {
+        columns << QStringLiteral("date_fin");
+        values << QStringLiteral(":date_fin");
+    }
+
+    QSqlQuery insert(stockDb());
+    insert.prepare(QStringLiteral("INSERT INTO EMP_MACH (%1) VALUES (%2)")
+                       .arg(columns.join(QStringLiteral(", ")), values.join(QStringLiteral(", "))));
+    insert.bindValue(QStringLiteral(":id_serie"), serieId);
+    insert.bindValue(QStringLiteral(":id_emp"), empId);
+    if (hasPoste)
+        insert.bindValue(QStringLiteral(":poste"), tr("Auto stock"));
+    if (hasDateDebut)
+        insert.bindValue(QStringLiteral(":date_debut"), QDate::currentDate());
+    if (hasDateFin)
+        insert.bindValue(QStringLiteral(":date_fin"), QVariant(QMetaType(QMetaType::QDate)));
+
+    if (!insert.exec()) {
+        detailMessage = tr("erreur SQL insertion affectation : %1").arg(insert.lastError().text());
+        return false;
+    }
+
+    QString empName;
+    QSqlQuery qEmp(stockDb());
+    qEmp.prepare(QStringLiteral("SELECT TRIM(nom_emp || ' ' || prenom_emp) FROM EMPLOYE WHERE id_emp = :id"));
+    qEmp.bindValue(QStringLiteral(":id"), empId);
+    if (qEmp.exec() && qEmp.next())
+        empName = qEmp.value(0).toString().trimmed();
+
+    detailMessage = empName.isEmpty()
+        ? tr("Affectation automatique réalisée pour l'employé ID %1.").arg(empId)
+        : tr("Affectation automatique réalisée : %1 affecté à la série %2.").arg(empName).arg(serieId);
+    return true;
 }
 
 Stocks::~Stocks()
@@ -322,6 +544,7 @@ void Stocks::on_btnMetiersAvances_clicked()
 
 void Stocks::on_AjoutStock_clicked()
 {
+    refreshStockSerieChoices();
     ui->metiersStock->setCurrentWidget(ui->ajoutStock);
 }
 
@@ -377,45 +600,88 @@ bool Stocks::validerDonneesAjout()
 // ─────────────────────────────────────────────
 void Stocks::on_ConAjout_clicked()
 {
+    ensureStockSerieSelector();
+    loadAffectationSettings();
+
     if (!validerDonneesAjout())
         return;
 
-    QString categorie   = ui->SaiCategorie->currentText();
-    QString description = ui->SaiDescription->toPlainText().trimmed();
-    QDate   dateAjout   = ui->SaiDateAjout->date();
-    QDate   dateMAJ     = ui->SaiDateMAJ->date();
-    double  quantite    = ui->SaiQuantite->text().toDouble();
-    QString qualite     = ui->SaiQualite->currentText();
+    const QString categorie   = ui->SaiCategorie->currentText().trimmed();
+    const QString description = ui->SaiDescription->toPlainText().trimmed();
+    const QDate   dateAjout   = ui->SaiDateAjout->date();
+    const QDate   dateMAJ     = ui->SaiDateMAJ->date();
+    const double  quantite    = ui->SaiQuantite->text().trimmed().toDouble();
+    const QString qualite     = ui->SaiQualite->currentText().trimmed();
+    const int serieId = m_stockSerieCombo ? m_stockSerieCombo->currentData().toInt() : 0;
+
+    // Preserve your friend's existing stock add behavior when auto mode is off.
+    // If auto-affectation is enabled, the selected series is required because it
+    // is the target of the EMP_MACH assignment.
+    if (m_autoAssignFromStock && serieId <= 0) {
+        QMessageBox::warning(this, tr("Série machine requise"),
+                             tr("Veuillez choisir une série machine pour lancer l'affectation automatique."));
+        if (m_stockSerieCombo)
+            m_stockSerieCombo->setFocus();
+        return;
+    }
 
     QSqlDatabase db = stockDb();
     QSqlQuery q(db);
-    q.prepare("INSERT INTO STOCK (categ_stock, descript_stock, dateajt_stock, datemaj_stock, qt_stock, nom_stock) "
-              "VALUES (:categorie, :description, :date_ajout, :date_maj, :quantite, :qualite)");
 
-    q.bindValue(":categorie",   categorie);
-    q.bindValue(":description", description);
-    q.bindValue(":date_ajout",  dateAjout);
-    q.bindValue(":date_maj",    dateMAJ);
-    q.bindValue(":quantite",    quantite);
-    q.bindValue(":qualite",     qualite);
+    const bool hasStockSerie = tableColumnExists(QStringLiteral("STOCK"), QStringLiteral("ID_SERIE"));
+    if (hasStockSerie) {
+        q.prepare(QStringLiteral(
+            "INSERT INTO STOCK (categ_stock, descript_stock, dateajt_stock, datemaj_stock, qt_stock, nom_stock, id_serie) "
+            "VALUES (:categorie, :description, :date_ajout, :date_maj, :quantite, :qualite, :id_serie)"));
+    } else {
+        q.prepare(QStringLiteral(
+            "INSERT INTO STOCK (categ_stock, descript_stock, dateajt_stock, datemaj_stock, qt_stock, nom_stock) "
+            "VALUES (:categorie, :description, :date_ajout, :date_maj, :quantite, :qualite)"));
+    }
 
-    if (q.exec())
-    {
-        QMessageBox::information(this, "Succès", "Lot d'olives ajouté avec succès");
-        ui->SaiCategorie->setCurrentIndex(0);
-        ui->SaiDescription->clear();
-        ui->SaiDateAjout->setDate(QDate::currentDate());
-        ui->SaiDateMAJ->setDate(QDate::currentDate());
-        ui->SaiQuantite->clear();
-        ui->SaiQualite->setCurrentIndex(0);
-        rafraichirListe();
-        ui->metiersStock->setCurrentWidget(ui->consulterStock);
-        statusBar()->showMessage("Lot d'olives ajouté", 3000);
+    q.bindValue(QStringLiteral(":categorie"),   categorie);
+    q.bindValue(QStringLiteral(":description"), description);
+    q.bindValue(QStringLiteral(":date_ajout"),  dateAjout);
+    q.bindValue(QStringLiteral(":date_maj"),    dateMAJ);
+    q.bindValue(QStringLiteral(":quantite"),    quantite);
+    q.bindValue(QStringLiteral(":qualite"),     qualite);
+    if (hasStockSerie) {
+        if (serieId > 0)
+            q.bindValue(QStringLiteral(":id_serie"), serieId);
+        else
+            q.bindValue(QStringLiteral(":id_serie"), QVariant(QMetaType(QMetaType::Int)));
     }
-    else
+
+    if (!q.exec())
     {
-        QMessageBox::critical(this, "Erreur SQL", q.lastError().text());
+        QMessageBox::critical(this, tr("Erreur SQL"), q.lastError().text());
+        return;
     }
+
+    QString autoAssignMsg;
+    if (m_autoAssignFromStock) {
+        QString detail;
+        const bool assigned = tryAutoAssignForSerie(serieId, detail);
+        autoAssignMsg = assigned
+            ? QStringLiteral("\n") + detail
+            : QStringLiteral("\n") + tr("Affectation auto non réalisée : %1").arg(detail);
+    }
+
+    QMessageBox::information(this, tr("Succès"),
+                             tr("Lot d'olives ajouté avec succès%1").arg(autoAssignMsg));
+
+    ui->SaiCategorie->setCurrentIndex(0);
+    ui->SaiDescription->clear();
+    ui->SaiDateAjout->setDate(QDate::currentDate());
+    ui->SaiDateMAJ->setDate(QDate::currentDate());
+    ui->SaiQuantite->clear();
+    ui->SaiQualite->setCurrentIndex(0);
+    if (m_stockSerieCombo)
+        m_stockSerieCombo->setCurrentIndex(0);
+
+    rafraichirListe();
+    ui->metiersStock->setCurrentWidget(ui->consulterStock);
+    statusBar()->showMessage(tr("Lot d'olives ajouté"), 3000);
 }
 
 // ─────────────────────────────────────────────
