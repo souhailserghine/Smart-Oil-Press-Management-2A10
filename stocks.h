@@ -4,6 +4,9 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QMap>
+#include <QDialog>
+#include <QScrollArea>
+#include <QWidget>
 
 class QToolBar;
 
@@ -29,6 +32,7 @@ private slots:
     void on_AjoutStock_clicked();
     void on_btnConsulterstc_clicked();
     void on_StatistiqueStock_clicked();
+    void on_btnMetiersAvances_clicked();
 
     // CRUD Operations
     void on_ConAjout_clicked();
@@ -45,7 +49,7 @@ private slots:
     // Statistics
     void on_X_currentIndexChanged(int index);
 
-    // Métiers avancés
+    // Métiers avancés — chaque bouton ouvre une popup IA
     void on_PredictOutput_clicked();
     void on_OptimiserReappro_clicked();
     void on_PredictDechet_clicked();
@@ -53,6 +57,9 @@ private slots:
 
 private:
     Ui::Stocks *ui;
+
+    // Zone scrollable dédiée à l'affichage des graphiques dans statStock
+    QScrollArea *m_graphiqueScroll = nullptr;
 
     // Core functions
     void setupUnifiedToolbar();
@@ -63,19 +70,35 @@ private:
 
     // Statistics functions
     void afficherStatistiques();
-    QLabel *creerStatistiquesCategorie(const QList<QString> &couleurs);
-    QLabel *creerStatistiquesQuantite(const QList<QString> &couleurs);
-    QLabel *creerStatistiquesQualite(const QList<QString> &couleurs);
-    QLabel *creerStatistiquesTemporal(const QList<QString> &couleurs);
 
-    // Métiers avancés
+    // Ces fonctions retournent un QWidget* (pas QLabel*)
+    // pour pouvoir utiliser QPainter et des layouts Qt natifs
+    QWidget *creerStatistiquesCategorie(const QList<QString> &couleurs);
+    QWidget *creerStatistiquesQuantite(const QList<QString> &couleurs);
+    QWidget *creerStatistiquesQualite(const QList<QString> &couleurs);
+    QWidget *creerStatistiquesTemporal(const QList<QString> &couleurs);
+
+    // Métiers avancés — fonctions qui construisent le HTML pour les popups
+    QString buildPredictionOutputHtml();
+    QString buildOptimisationReapproHtml();
+    QString buildPredictionDechetHtml();
+    QString buildGestionQualiteHtml();
+
+    // Helper : crée et affiche une popup IA standardisée
+    void afficherPopupIA(const QString &titre,
+                         const QString &icone,
+                         const QString &couleurGradient1,
+                         const QString &couleurGradient2,
+                         const QString &htmlContenu);
+
+    // Métiers avancés (anciens — gardés pour compatibilité interne)
     QLabel *creerPredictionOutput();
     QLabel *creerOptimisationReappro();
     QLabel *creerPredictionDechet();
     QLabel *creerGestionQualite();
 
     // Utility functions
-    void remplacerContenuAvecAnimation(QLabel *nouveauGraphique);
+    void remplacerContenuAvecAnimation(QWidget *nouveauWidget);
     void afficherMessageErreur(const QString &message);
     void afficherMessageInfo(const QString &message);
     QLabel *creerLabelGraphique(const QString &html);

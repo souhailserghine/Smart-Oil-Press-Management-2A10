@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Qt\Tools\CMake_64\bin\cmake.exe --regenerate-during-build -S"C:\Users\AYOUB\Downloads\Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)\workproj" -B"C:\Users\AYOUB\Downloads\Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)\workproj\build\Desktop_Qt_6_7_3_MinGW_64_bit-Debug"
+  command = C:\Qt\Tools\CMake_64\bin\cmake.exe --regenerate-during-build -SC:\Users\barra\OneDrive\Bureau\piqtt\Smart-Oil-Press-Management-2A10 -BC:\Users\barra\OneDrive\Bureau\piqtt\Smart-Oil-Press-Management-2A10\build\Desktop_Qt_6_7_3_MinGW_64_bit-Debug
   description = Re-running CMake...
   generator = 1
 

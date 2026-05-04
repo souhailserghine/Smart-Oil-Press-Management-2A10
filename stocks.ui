@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="ajoutStock">
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -156,64 +156,86 @@
        <widget class="QWidget" name="chartStatusContainer" native="true">
         <layout class="QVBoxLayout" name="containerLayout">
          <item>
+          <widget class="QComboBox" name="X"/>
+         </item>
+         <item>
           <widget class="QLabel" name="FaireLesStat">
            <property name="text">
             <string>Faire les statistiques de</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QComboBox" name="X"/>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="advancedButtonsLayout">
-           <item>
-            <widget class="QPushButton" name="PredictOutput">
-             <property name="text">
-              <string>Prédiction Output</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="OptimiserReappro">
-             <property name="text">
-              <string>Optimiser Réapprovisionnement</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="PredictDechet">
-             <property name="text">
-              <string>Prédiction Déchet</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="GestionQualite">
-             <property name="text">
-              <string>Gestion Qualité</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_advanced">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
         </layout>
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QWidget" name="metiersavancesstock">
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>140</y>
+        <width>684</width>
+        <height>165</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="advancedButtonsLayout">
+       <item>
+        <widget class="QPushButton" name="PredictOutput">
+         <property name="text">
+          <string>Prédiction Output</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="OptimiserReappro">
+         <property name="text">
+          <string>Optimiser Réapprovisionnement</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="PredictDechet">
+         <property name="text">
+          <string>Prédiction Déchet</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_advanced">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>30</y>
+        <width>411</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>HP Simplified</family>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Bienvenue dans la page des métiers avancées</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>

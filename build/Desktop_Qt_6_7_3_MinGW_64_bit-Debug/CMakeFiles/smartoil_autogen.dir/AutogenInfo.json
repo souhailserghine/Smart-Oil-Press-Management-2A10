@@ -1,72 +1,20 @@
 {
 	"AUTOGEN_COMMAND_LINE_LENGTH_MAX" : 32000,
-	"BUILD_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen",
-	"CMAKE_BINARY_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
-	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
-	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj",
+	"BUILD_DIR" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10",
 	"CMAKE_EXECUTABLE" : "C:/Qt/Tools/CMake_64/bin/cmake.exe",
 	"CMAKE_LIST_FILES" : 
 	[
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/CMakeLists.txt",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/auto-setup.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineSystem.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystem.cmake.in",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeNinjaFindMake.cmake",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/maintenance_tool_provider.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/CMakeLists.txt",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtcreator/cmake-helper/qtcreator-project.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtcreator/cmake-helper/package-manager.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtcreator/cmake-helper/maintenance_tool_provider.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-Initialize.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineCXXCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-Determine-CXX.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCompilerIdDetection.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/ADSP-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/ARMCC-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/ARMClang-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/AppleClang-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompilerInternal.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Borland-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompilerInternal.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Cray-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/CrayClang-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Embarcadero-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Fujitsu-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/GHS-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/HP-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/IAR-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Intel-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/MSVC-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/NVHPC-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/NVIDIA-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/OrangeC-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/PGI-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/PathScale-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/SCO-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/TI-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/TIClang-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Tasking-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/Watcom-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/XL-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindBinUtils.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/GNU-FindBinUtils.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompiler.cmake.in",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeGenericSystem.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake",
@@ -79,27 +27,11 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineRCCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeRCCompiler.cmake.in",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeRCInformation.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-windres.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeTestRCCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeTestCXXCompiler.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeTestCompilerCommon.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Internal/CMakeDetermineLinkerId.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeParseImplicitIncludeInfo.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeParseImplicitLinkInfo.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeParseLibraryArchitecture.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeTestCompilerCommon.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineCompilerSupport.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Internal/FeatureTesting.cmake",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompiler.cmake.in",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX-ABI.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
@@ -465,55 +397,92 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Dependencies.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/style.qrc",
-		"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/img.qrc"
+		"C:/opencv/build_mingw/OpenCVConfig-version.cmake",
+		"C:/opencv/build_mingw/OpenCVConfig.cmake",
+		"C:/opencv/build_mingw/x64/mingw/lib/OpenCVConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/opencv/build_mingw/x64/mingw/lib/OpenCVModules.cmake",
+		"C:/opencv/build_mingw/x64/mingw/lib/OpenCVModules-release.cmake",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/style.qrc",
+		"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/img.qrc"
 	],
-	"CMAKE_SOURCE_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj",
+	"CMAKE_SOURCE_DIR" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10",
 	"CROSS_CONFIG" : false,
-	"DEP_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/deps",
+	"DEP_FILE" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "smartoil_autogen/timestamp",
 	"HEADERS" : 
 	[
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/citernes.h",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/arduino.h",
+			"MU",
+			"EWIEGA46WW/moc_arduino.cpp",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/citernes.h",
 			"MU",
 			"EWIEGA46WW/moc_citernes.cpp",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/connection.h",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/connection.h",
 			"MU",
 			"EWIEGA46WW/moc_connection.cpp",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/mainwindow.h",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/employe.h",
+			"MU",
+			"EWIEGA46WW/moc_employe.cpp",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/face_capture_dialog.h",
+			"MU",
+			"EWIEGA46WW/moc_face_capture_dialog.cpp",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/face_recognition_dialog.h",
+			"MU",
+			"EWIEGA46WW/moc_face_recognition_dialog.cpp",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/face_recognition_service.h",
+			"MU",
+			"EWIEGA46WW/moc_face_recognition_service.cpp",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/fingerprintservice.h",
+			"MU",
+			"EWIEGA46WW/moc_fingerprintservice.cpp",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/mainwindow.h",
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/personnel.h",
-			"MU",
-			"EWIEGA46WW/moc_personnel.cpp",
-			null
-		],
-		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/qualite.h",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/qualite.h",
 			"MU",
 			"EWIEGA46WW/moc_qualite.cpp",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/stocks.h",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/stocks.h",
 			"MU",
 			"EWIEGA46WW/moc_stocks.cpp",
 			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
-	"INCLUDE_DIR" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/include",
-	"MOC_COMPILATION_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/mocs_compilation.cpp",
+	"INCLUDE_DIR" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/include",
+	"MOC_COMPILATION_FILE" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
 		"MINGW_HAS_SECURE_API=1",
@@ -524,6 +493,7 @@
 		"QT_OPENGLWIDGETS_LIB",
 		"QT_OPENGL_LIB",
 		"QT_PRINTSUPPORT_LIB",
+		"QT_QML_DEBUG",
 		"QT_SERIALPORT_LIB",
 		"QT_SQL_LIB",
 		"QT_WIDGETS_LIB",
@@ -554,6 +524,7 @@
 		"C:/Qt/6.7.3/mingw_64/include/QtOpenGLWidgets",
 		"C:/Qt/6.7.3/mingw_64/include/QtPrintSupport",
 		"C:/Qt/6.7.3/mingw_64/include/QtSerialPort",
+		"C:/opencv/build_mingw/include",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward",
@@ -572,60 +543,77 @@
 	],
 	"MOC_OPTIONS" : [],
 	"MOC_PATH_PREFIX" : false,
-	"MOC_PREDEFS_CMD" : 
-	[
-		"C:/Qt/Tools/mingw1120_64/bin/g++.exe",
-		"-std=gnu++17",
-		"-dM",
-		"-E",
-		"-c",
-		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp"
-	],
-	"MOC_PREDEFS_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil_autogen/moc_predefs.h",
+	"MOC_PREDEFS_CMD" : [],
+	"MOC_PREDEFS_FILE" : "",
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : [],
 	"MULTI_CONFIG" : false,
-	"PARALLEL" : 10,
-	"PARSE_CACHE_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir/ParseCache.txt",
+	"PARALLEL" : 2,
+	"PARSE_CACHE_FILE" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/moc.exe",
 	"QT_UIC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/uic.exe",
 	"QT_VERSION_MAJOR" : 6,
 	"QT_VERSION_MINOR" : 7,
-	"SETTINGS_FILE" : "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE" : "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/citernes.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/arduino.cpp",
 			"MU",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/connection.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/citernes.cpp",
 			"MU",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/main.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/connection.cpp",
 			"MU",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/mainwindow.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/employe.cpp",
 			"MU",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/personnel.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/face_capture_dialog.cpp",
 			"MU",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/qualite.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/face_recognition_dialog.cpp",
 			"MU",
 			null
 		],
 		[
-			"C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/stocks.cpp",
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/face_recognition_service.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/fingerprintservice.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/mainwindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/qualite.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/stocks.cpp",
 			"MU",
 			null
 		]
