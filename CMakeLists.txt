@@ -97,28 +97,28 @@ add_custom_command(TARGET smartoil POST_BUILD
 
 # Copy OpenCV MinGW DLLs next to the executable at build time
 foreach(_dll
-    libopencv_core4120
-    libopencv_imgproc4120
-    libopencv_imgcodecs4120
-    libopencv_highgui4120
-    libopencv_dnn4120
-    libopencv_objdetect4120
-    libopencv_videoio4120
-    libopencv_calib3d4120
-    libopencv_features2d4120
-    libopencv_flann4120
+    libopencv_core455
+    libopencv_imgproc455
+    libopencv_imgcodecs455
+    libopencv_highgui455
+    libopencv_dnn455
+    libopencv_objdetect455
+    libopencv_videoio455
+    libopencv_calib3d455
+    libopencv_features2d455
+    libopencv_flann455
 )
     add_custom_command(TARGET smartoil POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "C:/opencv/build_mingw/bin/${_dll}.dll"
+            "C:/opencv/build_mingw/x64/mingw/bin/${_dll}.dll"
             "$<TARGET_FILE_DIR:smartoil>/${_dll}.dll"
     )
 endforeach()
 # ffmpeg helper DLL (different naming)
 add_custom_command(TARGET smartoil POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "C:/opencv/build_mingw/bin/opencv_videoio_ffmpeg4120_64.dll"
-        "$<TARGET_FILE_DIR:smartoil>/opencv_videoio_ffmpeg4120_64.dll"
+        "C:/opencv/build_mingw/x64/mingw/bin/opencv_videoio_ffmpeg455_64.dll"
+        "$<TARGET_FILE_DIR:smartoil>/opencv_videoio_ffmpeg455_64.dll"
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj
+# Install script for directory: C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil.exe")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/smartoil.exe")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/smartoil.exe" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/smartoil.exe")
     if(CMAKE_INSTALL_DO_STRIP)
@@ -62,6 +62,6 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-  file(WRITE "C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

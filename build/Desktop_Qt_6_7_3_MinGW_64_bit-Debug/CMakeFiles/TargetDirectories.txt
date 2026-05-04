@@ -1,9 +1,9 @@
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen_timestamp_deps.dir
-C:/Users/AYOUB/Downloads/Smart-Oil-Press-Management_machine_advanced_plus_arduino_fix (1)/workproj/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen_timestamp_deps.dir
+C:/Users/barra/OneDrive/Bureau/piqtt/Smart-Oil-Press-Management-2A10/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/smartoil_autogen.dir
