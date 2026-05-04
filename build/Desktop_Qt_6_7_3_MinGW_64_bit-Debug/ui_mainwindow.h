@@ -9,6 +9,7 @@
 #ifndef UI_MAINWINDOW_H
 #define UI_MAINWINDOW_H
 
+#include <QtCharts/QChartView>
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
@@ -62,7 +63,9 @@ public:
     QWidget *consulterpersonnel;
     QVBoxLayout *consulterLayout;
     QHBoxLayout *horizontalLayout;
-    QLineEdit *lineEdit;
+    QLineEdit *rech;
+    QComboBox *comboRech;
+    QPushButton *btnRech;
     QLabel *label_12;
     QComboBox *comboTri;
     QComboBox *comboOrdre;
@@ -74,9 +77,8 @@ public:
     QToolButton *toolButton_3;
     QToolButton *toolButton;
     QTableWidget *tableau;
+    QPushButton *btnDetection;
     QHBoxLayout *exportRow;
-    QSpacerItem *horizontalSpacer_export;
-    QPushButton *pushButton;
     QWidget *modifier;
     QLabel *nomLabel_2;
     QLineEdit *Mnom;
@@ -118,6 +120,10 @@ public:
     QPushButton *btn_retour;
     QLabel *label_6;
     QDateEdit *dateRecolteH;
+    QPushButton *btnStat;
+    QLabel *labelMoyenne;
+    QLabel *labelTotal;
+    QLabel *labelPerformance;
     QWidget *page;
     QLineEdit *typeH_2;
     QLineEdit *nbArbreH_2;
@@ -141,7 +147,17 @@ public:
     QComboBox *choixtri;
     QLabel *label_5;
     QPushButton *btnok;
+    QChartView *chartView;
+    QPushButton *retourstat;
+    QWidget *page_2;
+    QLabel *label_26;
+    QTableWidget *tableaudetec;
+    QPushButton *retourdet;
     QWidget *metieravancee;
+    QLabel *label_25;
+    QChartView *chartViewPrediction;
+    QPushButton *btn_retour_prediction;
+    QLabel *labelPrediction;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -154,7 +170,7 @@ public:
         centralwidget->setObjectName("centralwidget");
         metierspersonnel = new QStackedWidget(centralwidget);
         metierspersonnel->setObjectName("metierspersonnel");
-        metierspersonnel->setGeometry(QRect(150, 30, 931, 691));
+        metierspersonnel->setGeometry(QRect(120, 10, 931, 681));
         ajoutpersonnel = new QWidget();
         ajoutpersonnel->setObjectName("ajoutpersonnel");
         nom = new QLineEdit(ajoutpersonnel);
@@ -247,10 +263,24 @@ public:
         consulterLayout->setObjectName("consulterLayout");
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
-        lineEdit = new QLineEdit(consulterpersonnel);
-        lineEdit->setObjectName("lineEdit");
+        rech = new QLineEdit(consulterpersonnel);
+        rech->setObjectName("rech");
 
-        horizontalLayout->addWidget(lineEdit);
+        horizontalLayout->addWidget(rech);
+
+        comboRech = new QComboBox(consulterpersonnel);
+        comboRech->addItem(QString());
+        comboRech->addItem(QString());
+        comboRech->addItem(QString());
+        comboRech->addItem(QString());
+        comboRech->setObjectName("comboRech");
+
+        horizontalLayout->addWidget(comboRech);
+
+        btnRech = new QPushButton(consulterpersonnel);
+        btnRech->setObjectName("btnRech");
+
+        horizontalLayout->addWidget(btnRech);
 
         label_12 = new QLabel(consulterpersonnel);
         label_12->setObjectName("label_12");
@@ -373,19 +403,15 @@ public:
 
         consulterLayout->addWidget(tableau);
 
+        btnDetection = new QPushButton(consulterpersonnel);
+        btnDetection->setObjectName("btnDetection");
+        btnDetection->setIcon(icon);
+        btnDetection->setIconSize(QSize(18, 18));
+
+        consulterLayout->addWidget(btnDetection);
+
         exportRow = new QHBoxLayout();
         exportRow->setObjectName("exportRow");
-        horizontalSpacer_export = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        exportRow->addItem(horizontalSpacer_export);
-
-        pushButton = new QPushButton(consulterpersonnel);
-        pushButton->setObjectName("pushButton");
-        pushButton->setIcon(icon);
-        pushButton->setIconSize(QSize(18, 18));
-
-        exportRow->addWidget(pushButton);
-
 
         consulterLayout->addLayout(exportRow);
 
@@ -538,6 +564,21 @@ public:
         dateRecolteH = new QDateEdit(historique);
         dateRecolteH->setObjectName("dateRecolteH");
         dateRecolteH->setGeometry(QRect(240, 300, 281, 26));
+        btnStat = new QPushButton(historique);
+        btnStat->setObjectName("btnStat");
+        btnStat->setGeometry(QRect(270, 640, 131, 29));
+        labelMoyenne = new QLabel(historique);
+        labelMoyenne->setObjectName("labelMoyenne");
+        labelMoyenne->setGeometry(QRect(40, 580, 361, 20));
+        labelTotal = new QLabel(historique);
+        labelTotal->setObjectName("labelTotal");
+        labelTotal->setGeometry(QRect(40, 610, 361, 20));
+        labelPerformance = new QLabel(historique);
+        labelPerformance->setObjectName("labelPerformance");
+        labelPerformance->setGeometry(QRect(630, 130, 251, 151));
+        QFont font1;
+        font1.setPointSize(15);
+        labelPerformance->setFont(font1);
         metierspersonnel->addWidget(historique);
         page = new QWidget();
         page->setObjectName("page");
@@ -595,24 +636,62 @@ public:
         chartStatusContainer->setObjectName("chartStatusContainer");
         groupBox = new QGroupBox(chartStatusContainer);
         groupBox->setObjectName("groupBox");
-        groupBox->setGeometry(QRect(80, 80, 481, 401));
+        groupBox->setGeometry(QRect(80, 20, 791, 461));
         choixtri = new QComboBox(groupBox);
         choixtri->addItem(QString());
         choixtri->addItem(QString());
+        choixtri->addItem(QString());
         choixtri->setObjectName("choixtri");
-        choixtri->setGeometry(QRect(30, 80, 271, 31));
+        choixtri->setGeometry(QRect(30, 80, 611, 31));
         label_5 = new QLabel(groupBox);
         label_5->setObjectName("label_5");
         label_5->setGeometry(QRect(20, 39, 201, 21));
         btnok = new QPushButton(groupBox);
         btnok->setObjectName("btnok");
-        btnok->setGeometry(QRect(320, 80, 91, 31));
+        btnok->setGeometry(QRect(650, 80, 91, 31));
+        chartView = new QChartView(groupBox);
+        chartView->setObjectName("chartView");
+        chartView->setGeometry(QRect(50, 131, 691, 311));
+        retourstat = new QPushButton(chartStatusContainer);
+        retourstat->setObjectName("retourstat");
+        retourstat->setGeometry(QRect(600, 490, 93, 29));
 
         statPersonnelLayout->addWidget(chartStatusContainer);
 
         metierspersonnel->addWidget(statPersonnel);
+        page_2 = new QWidget();
+        page_2->setObjectName("page_2");
+        label_26 = new QLabel(page_2);
+        label_26->setObjectName("label_26");
+        label_26->setGeometry(QRect(60, 20, 651, 71));
+        QFont font2;
+        font2.setPointSize(17);
+        label_26->setFont(font2);
+        tableaudetec = new QTableWidget(page_2);
+        tableaudetec->setObjectName("tableaudetec");
+        tableaudetec->setGeometry(QRect(50, 90, 821, 441));
+        retourdet = new QPushButton(page_2);
+        retourdet->setObjectName("retourdet");
+        retourdet->setGeometry(QRect(710, 580, 93, 29));
+        metierspersonnel->addWidget(page_2);
         metieravancee = new QWidget();
         metieravancee->setObjectName("metieravancee");
+        label_25 = new QLabel(metieravancee);
+        label_25->setObjectName("label_25");
+        label_25->setGeometry(QRect(90, 60, 391, 51));
+        label_25->setFont(font2);
+        chartViewPrediction = new QChartView(metieravancee);
+        chartViewPrediction->setObjectName("chartViewPrediction");
+        chartViewPrediction->setGeometry(QRect(30, 110, 881, 511));
+        btn_retour_prediction = new QPushButton(metieravancee);
+        btn_retour_prediction->setObjectName("btn_retour_prediction");
+        btn_retour_prediction->setGeometry(QRect(780, 640, 93, 29));
+        labelPrediction = new QLabel(metieravancee);
+        labelPrediction->setObjectName("labelPrediction");
+        labelPrediction->setGeometry(QRect(280, 70, 511, 31));
+        QFont font3;
+        font3.setPointSize(12);
+        labelPrediction->setFont(font3);
         metierspersonnel->addWidget(metieravancee);
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -625,7 +704,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        metierspersonnel->setCurrentIndex(2);
+        metierspersonnel->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -657,11 +736,18 @@ public:
         ajouterEmpBtn->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
         errorRegion->setText(QString());
         label_4->setText(QCoreApplication::translate("MainWindow", "Ajouter agriculteur :", nullptr));
+        comboRech->setItemText(0, QCoreApplication::translate("MainWindow", "Aucun", nullptr));
+        comboRech->setItemText(1, QCoreApplication::translate("MainWindow", "R\303\251gion", nullptr));
+        comboRech->setItemText(2, QCoreApplication::translate("MainWindow", "Nom", nullptr));
+        comboRech->setItemText(3, QCoreApplication::translate("MainWindow", "Numero", nullptr));
+
+        comboRech->setPlaceholderText(QCoreApplication::translate("MainWindow", "Rechercher", nullptr));
+        btnRech->setText(QCoreApplication::translate("MainWindow", "Rechercher", nullptr));
         label_12->setText(QCoreApplication::translate("MainWindow", "Trier par :  ", nullptr));
         comboTri->setItemText(0, QCoreApplication::translate("MainWindow", "Aucun", nullptr));
-        comboTri->setItemText(1, QCoreApplication::translate("MainWindow", "Rendement Moyen", nullptr));
-        comboTri->setItemText(2, QCoreApplication::translate("MainWindow", "Quantit\303\251 apport\303\251", nullptr));
-        comboTri->setItemText(3, QCoreApplication::translate("MainWindow", "Region", nullptr));
+        comboTri->setItemText(1, QCoreApplication::translate("MainWindow", "Quantit\303\251 olives", nullptr));
+        comboTri->setItemText(2, QCoreApplication::translate("MainWindow", "R\303\251gion", nullptr));
+        comboTri->setItemText(3, QCoreApplication::translate("MainWindow", "Rendement moyen", nullptr));
 
         comboTri->setPlaceholderText(QCoreApplication::translate("MainWindow", "Trier", nullptr));
         comboOrdre->setItemText(0, QCoreApplication::translate("MainWindow", "Ascendant", nullptr));
@@ -717,7 +803,7 @@ public:
         ___qtablewidgetitem18->setText(QCoreApplication::translate("MainWindow", "Ben arous", nullptr));
         tableau->setSortingEnabled(__sortingEnabled);
 
-        pushButton->setText(QCoreApplication::translate("MainWindow", "Exporter", nullptr));
+        btnDetection->setText(QCoreApplication::translate("MainWindow", "detection", nullptr));
         nomLabel_2->setText(QCoreApplication::translate("MainWindow", "Nom", nullptr));
         Mnom->setPlaceholderText(QCoreApplication::translate("MainWindow", "Nom", nullptr));
         errorMNom->setText(QString());
@@ -764,6 +850,10 @@ public:
         label_17->setText(QCoreApplication::translate("MainWindow", "Ann\303\251e :", nullptr));
         btn_retour->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "Date recolte :", nullptr));
+        btnStat->setText(QCoreApplication::translate("MainWindow", "Statistique", nullptr));
+        labelMoyenne->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        labelTotal->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        labelPerformance->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         label_18->setText(QCoreApplication::translate("MainWindow", "Type :", nullptr));
         label_19->setText(QCoreApplication::translate("MainWindow", "Quantite :", nullptr));
         label_20->setText(QCoreApplication::translate("MainWindow", "Ann\303\251e :", nullptr));
@@ -774,11 +864,18 @@ public:
         retour_2->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
         modifier_2->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "STATISTIQUE", nullptr));
-        choixtri->setItemText(0, QCoreApplication::translate("MainWindow", "Quantit\303\251 totale par agriculteur ", nullptr));
-        choixtri->setItemText(1, QCoreApplication::translate("MainWindow", "Rendement moyen par agriculteur ", nullptr));
+        choixtri->setItemText(0, QCoreApplication::translate("MainWindow", "Arbres", nullptr));
+        choixtri->setItemText(1, QCoreApplication::translate("MainWindow", "Quantit\303\251", nullptr));
+        choixtri->setItemText(2, QCoreApplication::translate("MainWindow", "Note", nullptr));
 
         label_5->setText(QCoreApplication::translate("MainWindow", "Faire la statistique selon :", nullptr));
         btnok->setText(QCoreApplication::translate("MainWindow", "ok", nullptr));
+        retourstat->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
+        label_26->setText(QCoreApplication::translate("MainWindow", "D\303\251tection intelligente des agriculteurs \303\240 risque :", nullptr));
+        retourdet->setText(QCoreApplication::translate("MainWindow", "RETOUR", nullptr));
+        label_25->setText(QCoreApplication::translate("MainWindow", "Prediction :", nullptr));
+        btn_retour_prediction->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
+        labelPrediction->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
     } // retranslateUi
 
 };

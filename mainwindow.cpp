@@ -8,17 +8,44 @@
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QRegularExpressionValidator>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
+
+
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    connect(ui->btnStat, &QPushButton::clicked, this, [=]() {
+        ui->metierspersonnel->setCurrentIndex(5); // page statistiques
+    });
+    connect(ui->btnok, &QPushButton::clicked, this, [=]() {
 
+        QString choix = ui->choixtri->currentText();
+
+        if(idSelectionne == -1)
+        {
+            QMessageBox::warning(this, "Erreur", "Sélectionne un agriculteur !");
+            return;
+        }
+
+        afficherCourbe(idSelectionne, choix);
+    });
+    connect(ui->retourstat, &QPushButton::clicked,
+            this, &MainWindow::on_retourstat_clicked);
+    connect(ui->btnDetection, &QPushButton::clicked, this, &MainWindow::on_btnDetection_clicked);
     ui->tableau->setHorizontalHeaderLabels({
         "ID","Nom","Prenom","Numero","Adresse",
         "Nb Arbres","Type","Mail","Region","Action"
     });
-    // NOM / PRENOM / REGION (lettres seulement)
     QRegularExpression rxNom("^[A-Za-z ]+$");
     ui->nom->setValidator(new QRegularExpressionValidator(rxNom, this));
     ui->Prenom->setValidator(new QRegularExpressionValidator(rxNom, this));
@@ -26,10 +53,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->MnbArbre->setReadOnly(true);
     ui->Mtypeolive->setReadOnly(true);
 
-    // NUMERO (chiffres)
     QRegularExpression rxNum("^[0-9]+$");
     ui->Numero->setValidator(new QRegularExpressionValidator(rxNum, this));
     afficherTableau();
+    afficherTableauDetection();
 }
 
 void MainWindow::on_ajouterEmpBtn_clicked()
@@ -43,7 +70,6 @@ void MainWindow::on_ajouterEmpBtn_clicked()
 
     bool valid = true;
 
-    // RESET erreurs
     ui->errorNom->setText("");
     ui->errorPrenom->setText("");
     ui->errorNumero->setText("");
@@ -51,21 +77,18 @@ void MainWindow::on_ajouterEmpBtn_clicked()
     ui->errorRegion->setText("");
     ui->errorAdresse->setText("");
 
-    // NOM
     if(nom.isEmpty())
     {
         ui->errorNom->setText("Nom obligatoire");
         valid = false;
     }
 
-    // PRENOM
     if(prenom.isEmpty())
     {
         ui->errorPrenom->setText("Prenom obligatoire");
         valid = false;
     }
 
-    // NUMERO
     if(numero.isEmpty())
     {
         ui->errorNumero->setText("Numero obligatoire");
@@ -76,21 +99,17 @@ void MainWindow::on_ajouterEmpBtn_clicked()
         ui->errorNumero->setText("Numero invalide");
         valid = false;
     }
-
-    // MAIL
     if(!mail.contains("@"))
     {
         ui->errorMail->setText("Email invalide");
         valid = false;
     }
-    // ADRESSE
     if(adresse.isEmpty())
     {
         ui->errorAdresse->setText("Adresse obligatoire");
         valid = false;
     }
 
-    // REGION
     if(region.isEmpty())
     {
         ui->errorRegion->setText("Region obligatoire");
@@ -131,8 +150,6 @@ void MainWindow::on_btn_valider_modif_clicked()
     QString region = ui->Mregion->text();
 
     bool valid = true;
-
-    // RESET erreurs
     ui->errorMNom->setText("");
     ui->errorMPrenom->setText("");
     ui->errorMNumero->setText("");
@@ -140,21 +157,18 @@ void MainWindow::on_btn_valider_modif_clicked()
     ui->errorMMail->setText("");
     ui->errorMRegion->setText("");
 
-    // NOM
     if(nom.isEmpty())
     {
         ui->errorMNom->setText("Nom obligatoire");
         valid = false;
     }
 
-    // PRENOM
     if(prenom.isEmpty())
     {
         ui->errorMPrenom->setText("Prenom obligatoire");
         valid = false;
     }
 
-    // NUMERO
     if(numero.isEmpty())
     {
         ui->errorMNumero->setText("Numero obligatoire");
@@ -166,21 +180,18 @@ void MainWindow::on_btn_valider_modif_clicked()
         valid = false;
     }
 
-    // ADRESSE
     if(adresse.isEmpty())
     {
         ui->errorMAdresse->setText("Adresse obligatoire");
         valid = false;
     }
 
-    // MAIL
     if(!mail.contains("@"))
     {
         ui->errorMMail->setText("Email invalide");
         valid = false;
     }
 
-    // REGION
     if(region.isEmpty())
     {
         ui->errorMRegion->setText("Region obligatoire");
@@ -190,7 +201,6 @@ void MainWindow::on_btn_valider_modif_clicked()
     if(!valid)
         return;
 
-    // UPDATE SQL
     QSqlQuery query;
     query.prepare("UPDATE AGRICULTEUR SET "
                   "nom_agri=:nom, "
@@ -229,8 +239,10 @@ void MainWindow::afficherTableauAvecQuery(QString queryStr)
     ui->tableau->setHorizontalHeaderLabels({
         "ID","Nom","Prenom","Numero","Adresse",
         "Nb Arbres","Type","Mail","Region",
-        "Quantité Stock","Date Stock","Action"
+        "Stock","Date",
+        "Action"
     });
+
 
     QSqlQuery query;
     if(!query.exec(queryStr))
@@ -246,6 +258,28 @@ void MainWindow::afficherTableauAvecQuery(QString queryStr)
         ui->tableau->insertRow(i);
 
         int id = query.value("ID_AGRI").toInt();
+        float qt = query.value("QT_STOCK").toFloat();
+        float qtPrec = query.value("QTOLIVES_ANNEEPREC").toFloat();
+        float rendement = query.value("RENDE_MOY").toFloat();
+        float note = query.value("NOTE_QUALTMOY").toFloat();
+        int nb = query.value("NB_ARBRES").toInt();
+
+        Agriculteur agri(
+            id,
+            query.value("NOM_AGRI").toString(),
+            query.value("PRENOM_AGRI").toString(),
+            "",
+            query.value("NUM_AGRI").toString(),
+            query.value("MAIL_AGRI").toString(),
+            query.value("REGION_AGRI").toString(),
+            nb,
+            query.value("TYPE_OLIVES").toString(),
+            qt,
+            qtPrec,
+            rendement,
+            "",
+            note
+            );
 
         ui->tableau->setItem(i, 0, new QTableWidgetItem(QString::number(id)));
         ui->tableau->setItem(i, 1, new QTableWidgetItem(query.value("NOM_AGRI").toString()));
@@ -274,19 +308,29 @@ void MainWindow::afficherTableauAvecQuery(QString queryStr)
         ui->tableau->setItem(i, 9, new QTableWidgetItem(qtStock));
         ui->tableau->setItem(i, 10, new QTableWidgetItem(dateStock));
 
+
         QPushButton *btnSupprimer = new QPushButton("Supprimer");
         QPushButton *btnModifier = new QPushButton("Modifier");
         QPushButton *btnHistorique = new QPushButton("Historique");
-
+        QPushButton *btnPrediction = new QPushButton("Prediction");
         QWidget *widget = new QWidget();
         QHBoxLayout *layout = new QHBoxLayout(widget);
 
         layout->addWidget(btnSupprimer);
         layout->addWidget(btnModifier);
         layout->addWidget(btnHistorique);
+        layout->addWidget(btnPrediction);
         layout->setContentsMargins(0,0,0,0);
 
         ui->tableau->setCellWidget(i, 11, widget);
+        connect(btnPrediction, &QPushButton::clicked, this, [=]() {
+
+            idSelectionne = id;
+
+            afficherPrediction(id);
+
+            ui->metierspersonnel->setCurrentIndex(7); // page prediction
+        });
         connect(btnHistorique, &QPushButton::clicked, this, [=]() {
             idSelectionne = id;
 
@@ -347,12 +391,17 @@ void MainWindow::afficherTableauAvecQuery(QString queryStr)
         i++;
     }
 }
+void MainWindow::on_btn_retour_prediction_clicked()
+{
+    ui->metierspersonnel->setCurrentIndex(1); // tableau principal
+}
 void MainWindow::afficherTableau()
 {
     QString query =
         "SELECT A.ID_AGRI, A.NOM_AGRI, A.PRENOM_AGRI, A.NUM_AGRI, A.ADRESSE_AGRI, "
         "A.NB_ARBRES, A.TYPE_OLIVES, A.MAIL_AGRI, A.REGION_AGRI, "
-        "S.QT_STOCK, S.DATEMAJ_STOCK "
+        "S.QT_STOCK, S.DATEMAJ_STOCK, "
+        "(SELECT AVG(QUANTITE) FROM HISTORIQUE_OLIVES H WHERE H.ID_AGRI = A.ID_AGRI) AS MOY_HIST "
         "FROM AGRICULTEUR A "
         "LEFT JOIN ("
         "    SELECT ID_AGRI, QT_STOCK, DATEMAJ_STOCK "
@@ -379,6 +428,24 @@ void MainWindow::afficherHistorique(int idAgri)
         ui->nbArbreH->setText(q.value(0).toString());
         ui->typeH->setText(q.value(1).toString());
     }
+    QSqlQuery stats;
+    stats.prepare(
+        "SELECT AVG(QUANTITE), SUM(QUANTITE) "
+        "FROM HISTORIQUE_OLIVES WHERE ID_AGRI = :id"
+        );
+    stats.bindValue(":id", idAgri);
+    stats.exec();
+
+    float moyenne = 0;
+    float total = 0;
+
+    if(stats.next())
+    {
+        moyenne = stats.value(0).toFloat();
+        total = stats.value(1).toFloat();
+    }
+    ui->labelMoyenne->setText("Rendement moyen : " + QString::number(moyenne));
+    ui->labelTotal->setText("Quantité totale : " + QString::number(total));
 
     QSqlQuery query;
 
@@ -391,10 +458,10 @@ void MainWindow::afficherHistorique(int idAgri)
         );
     query.bindValue(":id", idAgri);
     query.exec();
-    ui->tableHistorique->setColumnCount(7);
+    ui->tableHistorique->setColumnCount(8);
 
     ui->tableHistorique->setHorizontalHeaderLabels({
-        "Année","Quantité","Nb arbres","Type","Note","Date","Action"
+        "Année","Quantité","Nb arbres","Type","Note","Date","Evolution","Action"
     });
 
 
@@ -403,7 +470,7 @@ void MainWindow::afficherHistorique(int idAgri)
     {
         ui->tableHistorique->insertRow(i);
 
-        int idHist = query.value(0).toInt(); // on garde mais on affiche pas
+        int idHist = query.value(0).toInt();
 
         QString annee = query.value(1).toString();
         QString quantite = query.value(2).toString();
@@ -418,6 +485,22 @@ void MainWindow::afficherHistorique(int idAgri)
         ui->tableHistorique->setItem(i, 3, new QTableWidgetItem(type));
         ui->tableHistorique->setItem(i, 4, new QTableWidgetItem(note));
         ui->tableHistorique->setItem(i, 5, new QTableWidgetItem(dateStock));
+        if(i > 0)
+        {
+            float actuel = quantite.toFloat();
+            float precedent = ui->tableHistorique->item(i-1,1)->text().toFloat();
+
+            QString evo;
+
+            if(actuel > precedent)
+                evo = "📈";
+            else if(actuel < precedent)
+                evo = "📉";
+            else
+                evo = "➡️";
+
+            ui->tableHistorique->setItem(i, 6, new QTableWidgetItem(evo));
+        }
 
         QPushButton *btnSupprimer = new QPushButton("Supprimer");
         QPushButton *btnModifier = new QPushButton("Modifier");
@@ -429,7 +512,7 @@ void MainWindow::afficherHistorique(int idAgri)
         layout->addWidget(btnSupprimer);
         layout->setContentsMargins(0,0,0,0);
 
-        ui->tableHistorique->setCellWidget(i, 6, widget);
+        ui->tableHistorique->setCellWidget(i, 7, widget);
 
         connect(btnSupprimer, &QPushButton::clicked, this, [=]() {
             QSqlQuery q;
@@ -452,7 +535,30 @@ void MainWindow::afficherHistorique(int idAgri)
 
             ui->metierspersonnel->setCurrentIndex(4);
         });
+        float scoreGlobal = 0;
 
+        if(moyenne > 0)
+        {
+            QSqlQuery qScore;
+            qScore.prepare(
+                "SELECT AVG(NOTE) FROM HISTORIQUE_OLIVES WHERE ID_AGRI = :id"
+                );
+            qScore.bindValue(":id", idAgri);
+            qScore.exec();
+
+            float noteMoy = 0;
+            if(qScore.next())
+                noteMoy = qScore.value(0).toFloat();
+
+            // formule simple (tu peux l’améliorer après)
+            scoreGlobal = (moyenne * 0.7) + (noteMoy * 0.3);
+        }
+
+        ui->labelPerformance->setText(
+            "Score global : " +
+            QString::number(scoreGlobal, 'f', 1) +
+            " / 10"
+            );
         i++;
     }
     QSqlQuery qStock;
@@ -518,7 +624,6 @@ void MainWindow::on_btnAjouterHistorique_clicked()
     QString noteStr = ui->noteH->text();
     QDate dateRec = ui->dateRecolteH->date();
 
-    // 🔴 CONTROLE DE SAISIE
     if(anneeStr.isEmpty() || qtStr.isEmpty() || nbStr.isEmpty() || type.isEmpty() || noteStr.isEmpty())
     {
         QMessageBox::warning(this, "Erreur", "Tous les champs sont obligatoires !");
@@ -542,7 +647,6 @@ void MainWindow::on_btnAjouterHistorique_clicked()
         return;
     }
 
-    // 🔵 1. INSERT HISTORIQUE
     QSqlQuery queryHist;
     queryHist.prepare("INSERT INTO HISTORIQUE_OLIVES "
                       "(ID_AGRI, ANNEE, NB_ARBRES, TYPE_OLIVES, QUANTITE, NOTE, DATERECOLTE) "
@@ -560,8 +664,54 @@ void MainWindow::on_btnAjouterHistorique_clicked()
         qDebug() << "Erreur HISTORIQUE:" << queryHist.lastError().text();
         return;
     }
+    QSqlQuery qMoy;
+    qMoy.prepare(
+        "SELECT AVG(QUANTITE) FROM HISTORIQUE_OLIVES WHERE ID_AGRI = :id"
+        );
+    qMoy.bindValue(":id", idSelectionne);
+    qMoy.exec();
 
-    // 🟢 2. INSERT STOCK
+    float moyenne = 0;
+
+    if(qMoy.next())
+    {
+        moyenne = qMoy.value(0).toFloat();
+    }
+    QSqlQuery updateRendement;
+    updateRendement.prepare(
+        "UPDATE AGRICULTEUR SET RENDE_MOY = :moy WHERE ID_AGRI = :id"
+        );
+
+    updateRendement.bindValue(":moy", moyenne);
+    updateRendement.bindValue(":id", idSelectionne);
+
+    if(!updateRendement.exec())
+    {
+        qDebug() << "Erreur update rendement:" << updateRendement.lastError().text();
+    }
+    QSqlQuery qNote;
+    qNote.prepare(
+        "SELECT AVG(NOTE) FROM HISTORIQUE_OLIVES WHERE ID_AGRI = :id"
+        );
+    qNote.bindValue(":id", idSelectionne);
+    qNote.exec();
+
+    float noteMoy = 0;
+
+    if(qNote.next())
+    {
+        noteMoy = qNote.value(0).toFloat();
+    }
+
+    QSqlQuery updateNote;
+    updateNote.prepare(
+        "UPDATE AGRICULTEUR SET NOTE_QUALTMOY = :note WHERE ID_AGRI = :id"
+        );
+
+    updateNote.bindValue(":note", noteMoy);
+    updateNote.bindValue(":id", idSelectionne);
+    updateNote.exec();
+
     QSqlQuery queryStock;
     queryStock.prepare(
         "INSERT INTO STOCK "
@@ -613,21 +763,320 @@ void MainWindow::on_btnTrier_clicked()
 
     QString orderSql = (ordre == "Ascendant") ? "ASC" : "DESC";
 
-    QString queryStr = "SELECT * FROM AGRICULTEUR";
+    QString query =
+        "SELECT A.ID_AGRI, A.NOM_AGRI, A.PRENOM_AGRI, A.NUM_AGRI, A.ADRESSE_AGRI, "
+        "A.NB_ARBRES, A.TYPE_OLIVES, A.MAIL_AGRI, A.REGION_AGRI, "
+        "A.RENDE_MOY, A.NOTE_QUALTMOY, "
+        "S.QT_STOCK, S.DATEMAJ_STOCK, "
+        "(SELECT AVG(QUANTITE) FROM HISTORIQUE_OLIVES H WHERE H.ID_AGRI = A.ID_AGRI) AS MOY_HIST "
+        "FROM AGRICULTEUR A "
+        "LEFT JOIN ("
+        "    SELECT ID_AGRI, QT_STOCK, DATEMAJ_STOCK "
+        "    FROM STOCK "
+        "    WHERE (ID_AGRI, DATEMAJ_STOCK) IN ("
+        "        SELECT ID_AGRI, MAX(DATEMAJ_STOCK) "
+        "        FROM STOCK "
+        "        GROUP BY ID_AGRI"
+        "    )"
+        ") S ON A.ID_AGRI = S.ID_AGRI ";
 
+    // 🔥 TRI
     if(choix == "Rendement moyen")
-        queryStr += " ORDER BY RENDE_MOY " + orderSql;
+        query += "ORDER BY A.RENDE_MOY " + orderSql;
     else if(choix == "Quantité olives")
-        queryStr += " ORDER BY QTOLIVES_ANNEEPREC " + orderSql;
+        query += "ORDER BY NVL(S.QT_STOCK, 0) "  + orderSql;
     else if(choix == "Région")
-        queryStr += " ORDER BY REGION_AGRI " + orderSql;
+        query += "ORDER BY A.REGION_AGRI " + orderSql;
+    else if(choix == "Score")
+        query += "ORDER BY A.NOTE_QUALTMOY " + orderSql;
+    else if(choix == "Quantité olives")
+        query += "ORDER BY NVL(S.QT_STOCK, 0) " + orderSql;
 
-    afficherTableauAvecQuery(queryStr);
+    afficherTableauAvecQuery(query);
 }
 void MainWindow::on_retour_clicked()
 {
     afficherTableau(); // refresh
-    ui->metierspersonnel->setCurrentIndex(1); // revenir à consulter
+    ui->metierspersonnel->setCurrentIndex(1);
+}
+void MainWindow::on_btnRech_clicked()
+{
+    QString texte = ui->rech->text();
+    QString choix = ui->comboRech->currentText();
+
+    if(texte.isEmpty())
+    {
+        afficherTableau();
+        return;
+    }
+
+    QString query =
+        "SELECT A.ID_AGRI, A.NOM_AGRI, A.PRENOM_AGRI, A.NUM_AGRI, A.ADRESSE_AGRI, "
+        "A.NB_ARBRES, A.TYPE_OLIVES, A.MAIL_AGRI, A.REGION_AGRI, "
+        "A.RENDE_MOY, A.NOTE_QUALTMOY, "
+        "S.QT_STOCK, S.DATEMAJ_STOCK "
+        "FROM AGRICULTEUR A "
+        "LEFT JOIN ("
+        "    SELECT ID_AGRI, QT_STOCK, DATEMAJ_STOCK "
+        "    FROM STOCK "
+        "    WHERE (ID_AGRI, DATEMAJ_STOCK) IN ("
+        "        SELECT ID_AGRI, MAX(DATEMAJ_STOCK) "
+        "        FROM STOCK GROUP BY ID_AGRI"
+        "    )"
+        ") S ON A.ID_AGRI = S.ID_AGRI ";
+    if(choix == "Nom")
+        query += "WHERE LOWER(A.NOM_AGRI) LIKE LOWER('%" + texte + "%')";
+    else if(choix == "Numero")
+        query += "WHERE A.NUM_AGRI LIKE '%" + texte + "%'";
+    else if(choix == "Région")
+        query += "WHERE LOWER(A.REGION_AGRI) LIKE LOWER('%" + texte + "%')";
+
+    afficherTableauAvecQuery(query);
+}
+void MainWindow::afficherCourbe(int idAgri, QString type)
+{
+    QLineSeries *series = new QLineSeries();
+
+    QSqlQuery query;
+
+    if(type == "Note")
+    {
+        query.prepare("SELECT ANNEE, NOTE FROM HISTORIQUE_OLIVES WHERE ID_AGRI=:id ORDER BY ANNEE");
+    }
+    else if(type == "Arbres")
+    {
+        query.prepare("SELECT ANNEE, NB_ARBRES FROM HISTORIQUE_OLIVES WHERE ID_AGRI=:id ORDER BY ANNEE");
+    }
+    else if(type == "Quantité")
+    {
+        query.prepare(
+            "SELECT ANNEE, QUANTITE "
+            "FROM HISTORIQUE_OLIVES "
+            "WHERE ID_AGRI=:id "
+            "ORDER BY ANNEE"
+            );
+    }
+
+    query.bindValue(":id", idAgri);
+    query.exec();
+
+    while(query.next())
+    {
+        int x = query.value(0).toInt();
+        float y = query.value(1).toFloat();
+
+        series->append(x, y);
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Evolution - " + type);
+
+    QValueAxis *axisX = new QValueAxis();
+    axisX->setTitleText("Année");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setTitleText(type);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    ui->chartView->setChart(chart);
+}
+void MainWindow::on_btnok_clicked()
+{
+    QString choix = ui->choixtri->currentText();
+
+    if(idSelectionne == -1)
+    {
+        QMessageBox::warning(this, "Erreur", "Sélectionne un agriculteur !");
+        return;
+    }
+
+    afficherCourbe(idSelectionne, choix);
+}
+void MainWindow::afficherPrediction(int id)
+{
+    QLineSeries *historique = new QLineSeries();
+    QLineSeries *prediction = new QLineSeries();
+
+    QVector<double> x, y;
+
+    QSqlQuery query;
+    query.prepare("SELECT ANNEE, QUANTITE FROM HISTORIQUE_OLIVES WHERE ID_AGRI=:id ORDER BY ANNEE");
+    query.bindValue(":id", id);
+    query.exec();
+
+    int lastYear = 0;
+
+    while(query.next())
+    {
+        int annee = query.value(0).toInt();
+        double qt = query.value(1).toDouble();
+
+        historique->append(annee, qt);
+
+        x.push_back(annee);
+        y.push_back(qt);
+
+        lastYear = annee;
+    }
+    if(x.size() < 2)
+    {
+        QMessageBox::warning(this, "Erreur", "Pas assez de données pour la prédiction !");
+        return;
+    }
+    double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    int n = x.size();
+
+    for(int i = 0; i < n; i++)
+    {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumX2 += x[i] * x[i];
+    }
+
+    double a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    double b = (sumY - a * sumX) / n;
+    double lastPred = 0;
+
+    for(int i = 1; i <= 5; i++)
+    {
+        int year = lastYear + i;
+        double pred = a * year + b;
+
+        if(pred < 0) pred = 0;
+
+        prediction->append(year, pred);
+
+        lastPred = pred; // garder dernière valeur
+    }
+    QChart *chart = new QChart();
+    chart->addSeries(historique);
+    chart->addSeries(prediction);
+
+    chart->setTitle("Prédiction intelligente de récolte");
+    QPen penHist(Qt::blue);
+    penHist.setWidth(2);
+    historique->setPen(penHist);
+    historique->setName("Historique");
+
+    QPen penPred(Qt::red);
+    penPred.setStyle(Qt::DashLine);
+    penPred.setWidth(2);
+    prediction->setPen(penPred);
+    prediction->setName("Prédiction");
+    QValueAxis *axisX = new QValueAxis();
+    axisX->setTitleText("Année");
+    axisX->setRange(x.first(), lastYear + 5);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setTitleText("Quantité");
+
+    double maxY = 0;
+    for(double v : y) maxY = std::max(maxY, v);
+
+    axisY->setRange(0, maxY * 1.2);
+
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    historique->attachAxis(axisX);
+    historique->attachAxis(axisY);
+
+    prediction->attachAxis(axisX);
+    prediction->attachAxis(axisY);
+
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    ui->chartViewPrediction->setChart(chart);
+
+    ui->labelPrediction->setText(
+        "Prédiction IA : " +
+        QString::number(lastPred, 'f', 2) +
+        " olives en " +
+        QString::number(lastYear + 5)
+        );
+}
+void MainWindow::afficherTableauDetection()
+{
+    ui->tableaudetec->setRowCount(0);
+    ui->tableaudetec->setColumnCount(7);
+
+    ui->tableaudetec->setHorizontalHeaderLabels({
+        "ID", "Nom", "Quantité", "Score", "Risque", "Détection", "Recommandation"
+    });
+
+    QSqlQuery query;
+    query.exec(
+        "SELECT A.ID_AGRI, A.NOM_AGRI, "
+        "NVL(S.QT_STOCK,0) AS QT, "
+        "A.RENDE_MOY, A.NOTE_QUALTMOY, "
+        "(SELECT AVG(QUANTITE) FROM HISTORIQUE_OLIVES H WHERE H.ID_AGRI = A.ID_AGRI) AS MOY_HIST "
+        "FROM AGRICULTEUR A "
+        "LEFT JOIN ("
+        " SELECT ID_AGRI, QT_STOCK "
+        " FROM STOCK "
+        " WHERE (ID_AGRI, DATEMAJ_STOCK) IN ("
+        "   SELECT ID_AGRI, MAX(DATEMAJ_STOCK) FROM STOCK GROUP BY ID_AGRI"
+        " )"
+        ") S ON A.ID_AGRI = S.ID_AGRI"
+        );
+
+    int i = 0;
+
+    while(query.next())
+    {
+        ui->tableaudetec->insertRow(i);
+
+        int id = query.value("ID_AGRI").toInt();
+        QString nom = query.value("NOM_AGRI").toString();
+        float qt = query.value("QT").toFloat();
+        float rendement = query.value("RENDE_MOY").toFloat();
+        float note = query.value("NOTE_QUALTMOY").toFloat();
+        float moyHist = query.value("MOY_HIST").toFloat();
+        Agriculteur agri(
+            id, nom, "", "", "", "", "",
+            0, "", qt, 0, rendement, "", note
+            );
+
+        float score = agri.calculScore();
+        float risque = agri.calculRisque();
+        QString detection = agri.detectionIntelligente(moyHist);
+        QString reco = agri.recommandation();
+
+        ui->tableaudetec->setItem(i, 0, new QTableWidgetItem(QString::number(id)));
+        ui->tableaudetec->setItem(i, 1, new QTableWidgetItem(nom));
+        ui->tableaudetec->setItem(i, 2, new QTableWidgetItem(QString::number(qt)));
+        ui->tableaudetec->setItem(i, 3,
+                                  new QTableWidgetItem(QString::number(score, 'f', 1) + " / 10"));
+        ui->tableaudetec->setItem(i, 4, new QTableWidgetItem(QString::number(risque)));
+        ui->tableaudetec->setItem(i, 5, new QTableWidgetItem(detection));
+        ui->tableaudetec->setItem(i, 6, new QTableWidgetItem(reco));
+
+        i++;
+    }
+}
+void MainWindow::on_btnDetection_clicked()
+{
+    afficherTableauDetection();
+    ui->metierspersonnel->setCurrentIndex(6);
+}
+void MainWindow::on_retourdet_clicked()
+{
+    afficherTableau();
+    ui->metierspersonnel->setCurrentIndex(1);
+}
+void MainWindow::on_retourstat_clicked()
+{
+    if(idSelectionne != -1)
+    {
+        afficherHistorique(idSelectionne);
+        ui->metierspersonnel->setCurrentIndex(3);
+    }
 }
 void MainWindow::on_btn_retour_clicked()
 {

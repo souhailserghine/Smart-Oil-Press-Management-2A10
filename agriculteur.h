@@ -35,8 +35,11 @@ public:
     QString getType();
     QString getMail();
     QString getRegion();
+    float calculRisque();
+    QString recommandation();
     void setNumero(QString);
     void setAdresse(QString);
+    float calculNoteGlobale(float moyenneHistorique);
     void setNbArbres(int);
     void setType(QString);
     void setMail(QString);
@@ -45,7 +48,13 @@ public:
     void setPrenom(QString);
     float calculPrediction();
     float calculScore();
+    QString prioriteTraitement();
+    bool productiviteAnormale(float moyenneHistorique);
     bool estEnRisque();
+    float getQtOlives();
+    QString detectionIntelligente(float moyenneHistorique);
+    float getQtOlivesPrec();
+    float getNote();
 };
 
 #endif
