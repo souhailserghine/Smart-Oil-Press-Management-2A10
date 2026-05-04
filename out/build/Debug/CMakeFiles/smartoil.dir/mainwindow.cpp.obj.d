@@ -367,204 +367,12 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstackedwidget.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtablewidget.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtableview.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractscrollarea.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qabstractitemmodel.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qitemselectionmodel.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyleoption.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qlocale.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qslider.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyle.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtabbar.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtoolbutton.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
- C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\arduino.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
- C:/Users/ADMINI~1/DOCUME~1/SMARTO~1/SMART-~1/out/build/Debug/SMARTO~1/include/ui_mainwindow.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QVariant \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qvariant.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QIcon \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qicon.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QApplication \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qapplication.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreapplication.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreevent.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdeadlinetimer.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qelapsedtimer.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qeventloop.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qnativeinterface.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreapplication_platform.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qguiapplication.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qinputmethod.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qguiapplication_platform.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCheckBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcheckbox.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcombobox.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCommandLinkButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcommandlinkbutton.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDateEdit \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdatetimeedit.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qtimezone.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdatetime.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qcalendar.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDoubleSpinBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qspinbox.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFormLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qformlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayoutitem.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qboxlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgridlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGridLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgridlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGroupBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgroupbox.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHBoxLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qboxlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qheaderview.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLabel \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlabel.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpicture.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevice.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qtextdocument.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qurl.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLineEdit \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlineedit.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextcursor.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextformat.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpen.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextoption.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMainWindow \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMenuBar \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmenubar.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmenu.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPlainTextEdit \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qplaintextedit.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtextedit.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qabstracttextdocumentlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextlayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qevent.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qeventpoint.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qvector2d.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qvectornd.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpointingdevice.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qinputdevice.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qscreen.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QList \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qlist.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QObject \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qrect.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qsize.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QSizeF \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTransform \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtransform.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qscreen_platform.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qglyphrun.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qrawfont.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qfontdatabase.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpacerItem \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayoutitem.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpinBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStatusBar \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstatusbar.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QVBoxLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QWidget \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qwidget.h \
- C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\employe.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlDatabase \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqldatabase.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlglobal.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qtsql-config.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlexports.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlError \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlerror.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlQuery \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlquery.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqldatabase.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlQueryModel \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlquerymodel.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QString \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qstring.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QDate \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdatetime.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFileDialog \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qfiledialog.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdir.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qfile.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qfiledevice.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/filesystem \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_fwd.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_path.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/locale \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cwctype \
- C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wctype.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/ctype_base.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/ctype_inline.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets.tcc \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets_nonio.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/time_members.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/messages_members.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/codecvt.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets_nonio.tcc \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_conv.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/iomanip \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/quoted_string.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/sstream \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/istream \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ios \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.tcc \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ostream \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/ostream.tcc \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/istream.tcc \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/sstream.tcc \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/codecvt \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_dir.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_ops.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qfileinfo.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QFile \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qfile.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QPixmap \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpixmap.h \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QChartView \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/qchartview.h \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QAbstractAxis \
@@ -577,6 +385,9 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpen.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/QFont \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qfont.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QVariant \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qvariant.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QObject \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QAbstractSeries \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/qabstractseries.h \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QChart \
@@ -586,6 +397,34 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsWidget \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicswidget.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicslayoutitem.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qevent.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreevent.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qeventpoint.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qvector2d.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qvectornd.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpointingdevice.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qinputdevice.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qscreen.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QList \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qlist.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qrect.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qsize.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QSizeF \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QTransform \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qtransform.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qnativeinterface.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qscreen_platform.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qguiapplication.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreapplication.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdeadlinetimer.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qelapsedtimer.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qeventloop.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreapplication_platform.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qinputmethod.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qlocale.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qguiapplication_platform.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpainterpath.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/QBrush \
@@ -595,91 +434,43 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsView \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicsview.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpainter.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qtextoption.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpen.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollarea.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractscrollarea.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicsscene.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QPieSeries \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qpieseries.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QPieSlice \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qpieslice.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QBarSeries \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qbarseries.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QHorizontalBarSeries \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qhorizontalbarseries.h \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QAbstractBarSeries \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/qabstractbarseries.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qstringlist.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QBarSet \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qbarset.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qchartglobal.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QBarCategoryAxis \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qbarcategoryaxis.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QLineSeries \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qlineseries.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QXYSeries \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qxyseries.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QImage \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qimage.h \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/QValueAxis \
- C:/Qt/6.7.3/mingw_64/include/QtCharts/qvalueaxis.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QVBoxLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHBoxLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGridLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmessagebox.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QIcon \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSizePolicy \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsizepolicy.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QAbstractItemView \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QAbstractButton \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLabel \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QEvent \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreevent.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QMouseEvent \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qevent.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QPainter \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpainter.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QPainterPath \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpainterpath.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QScrollArea \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollarea.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFrame \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QFont \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QPdfWriter \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpdfwriter.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpagedpaintdevice.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpagelayout.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpagesize.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qpageranges.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTextDocument \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextdocument.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTextCursor \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextcursor.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTextTable \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtexttable.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextobject.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTextTableFormat \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qtextformat.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTextCharFormat \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QTextBlockFormat \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMenu \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmenu.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QDir \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdir.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/QCursor \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qcursor.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsDropShadowEffect \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicseffect.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFormLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCheckBox \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
- C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\face_recognition_service.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QString \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qstring.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QVariantList \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qvariantlist.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlRecord \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlrecord.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qtsql-config.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlexports.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QColor \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qcolor.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+ C:/opencv/sources/modules/objdetect/include/opencv2/objdetect.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core/cvdef.h \
  C:/opencv/sources/modules/core/include/opencv2/core/version.hpp \
@@ -711,6 +502,21 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/opencv/sources/modules/core/include/opencv2/core/operations.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core/cvstd.inl.hpp \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/complex \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/sstream \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/istream \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ios \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cwctype \
+ C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wctype.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/ctype_base.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/ctype_inline.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets.tcc \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.tcc \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ostream \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/ostream.tcc \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/istream.tcc \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/sstream.tcc \
  C:/opencv/sources/modules/core/include/opencv2/core/utility.hpp \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/mutex \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_mutex.h \
@@ -718,7 +524,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/opencv/sources/modules/core/include/opencv2/core/optim.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core/ovx.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core/cvdef.h \
- C:/opencv/sources/modules/objdetect/include/opencv2/objdetect.hpp \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/aruco_detector.hpp \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/aruco_dictionary.hpp \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/aruco_board.hpp \
@@ -727,19 +532,275 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/face.hpp \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/charuco_detector.hpp \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/barcode.hpp \
- C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\face_recognition_dialog.h \
- C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\face_capture_dialog.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\arduino.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
+ C:/Users/ADMINI~1/DOCUME~1/SMARTO~1/SMART-~1/out/build/Debug/SMARTO~1/include/ui_mainwindow.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QIcon \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qicon.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QApplication \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qapplication.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCheckBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcheckbox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcombobox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyleoption.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qslider.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyle.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtabbar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qabstractitemmodel.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCommandLinkButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcommandlinkbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDateEdit \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdatetimeedit.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qtimezone.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdatetime.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcalendar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDoubleSpinBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qspinbox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFormLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qformlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayoutitem.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qboxlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgridlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGridLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgridlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGroupBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgroupbox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHBoxLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qboxlayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qheaderview.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qitemselectionmodel.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLabel \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLineEdit \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlineedit.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qtextcursor.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qtextformat.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMainWindow \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMenuBar \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmenubar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmenu.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpacerItem \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qlayoutitem.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpinBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStatusBar \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstatusbar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtablewidget.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtableview.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtoolbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QVBoxLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QWidget \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qwidget.h \
+ C:/Users/ADMINI~1/DOCUME~1/SMARTO~1/SMART-~1/agriculteurmodule.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QWidget \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QStack \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qstack.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\citernes.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QList \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QTimer \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qtimer.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qbasictimer.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QDateTime \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdatetime.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QProgressBar \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qprogressbar.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\stocks.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QScrollArea \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollarea.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\employe.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlDatabase \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqldatabase.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlError \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlerror.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlQuery \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlquery.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqldatabase.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlQueryModel \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlquerymodel.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDate \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\face_capture_dialog.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\face_recognition_dialog.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\face_recognition_service.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\fingerprintservice.h \
+ C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\agriculteurmodule.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QPieSeries \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qpieseries.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QPieSlice \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qpieslice.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QBarSeries \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qbarseries.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QBarSet \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qbarset.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qchartglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QBarCategoryAxis \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qbarcategoryaxis.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QLineSeries \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qlineseries.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QXYSeries \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qxyseries.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QImage \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qimage.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/QValueAxis \
+ C:/Qt/6.7.3/mingw_64/include/QtCharts/qvalueaxis.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QVBoxLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHBoxLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmessagebox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QIcon \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSizePolicy \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsizepolicy.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QAbstractItemView \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QAbstractButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QAction \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qaction.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QBrush \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QFont \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLayoutItem \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QPainter \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpainter.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QPixmap \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpixmap.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QBuffer \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qbuffer.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QImage \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QImageReader \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qimagereader.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qimageiohandler.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qplugin.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpointer.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qjsonobject.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qjsonvalue.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcborvalue.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcborcommon.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/quuid.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/q20algorithm.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qfactoryinterface.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpacerItem \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QVector \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qvector.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QPair \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpair.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QToolButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsOpacityEffect \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicseffect.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QPropertyAnimation \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyanimation.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qvariantanimation.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qabstractanimation.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qeasingcurve.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QEasingCurve \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qeasingcurve.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QParallelAnimationGroup \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qparallelanimationgroup.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qanimationgroup.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QGuiApplication \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qguiapplication.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QScreen \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qscreen.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QColorDialog \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcolordialog.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidgetItem \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QRegularExpression \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QFile \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qfile.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qfiledevice.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/filesystem \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_fwd.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_path.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/locale \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets_nonio.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/time_members.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/messages_members.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/codecvt.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_facets_nonio.tcc \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/locale_conv.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/iomanip \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/quoted_string.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/codecvt \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_dir.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/fs_ops.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDir \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdir.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qfile.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qfileinfo.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QDataStream \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qdatastream.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QCoreApplication \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qcoreapplication.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QStandardPaths \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qstandardpaths.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlRecord \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlrecord.h
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QMetaType \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qmetatype.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMenu \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmenu.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QTextStream \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qtextstream.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFileDialog \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qfiledialog.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdir.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFormLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGridLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGroupBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDateEdit \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLineEdit \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpinBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDoubleSpinBox \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QDoubleValidator \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QScrollBar \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollbar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/QPrinter \
+ C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qprinter.h \
+ C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupport-config.h \
+ C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupportexports.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpagedpaintdevice.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpagelayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpagesize.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpageranges.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QTextDocument \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qtextdocument.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QPen \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QPageSize \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpagesize.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QPageLayout \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qpagelayout.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCheckBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QFrame \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStatusBar \
+ C:/opencv/sources/modules/imgcodecs/include/opencv2/imgcodecs.hpp \
+ C:/opencv/sources/modules/videoio/include/opencv2/videoio.hpp

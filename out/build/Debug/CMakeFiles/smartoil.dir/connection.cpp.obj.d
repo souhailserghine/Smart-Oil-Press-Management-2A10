@@ -275,23 +275,24 @@ CMakeFiles/smartoil.dir/connection.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qstringbuilder.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qstringconverter.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qstringconverter_base.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlError \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlerror.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qtextstream.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevicebase.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qscopedpointer.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qcontiguouscache.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/climits \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qsharedpointer.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qshareddata.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qhashfunctions.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/numeric \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_numeric.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/pstl/glue_numeric_defs.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlQuery \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlquery.h \
- C:/Qt/6.7.3/mingw_64/include/QtSql/qsqldatabase.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qvariant.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qsharedpointer_impl.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmetatype.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qcompare.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qcomparehelpers.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qdatastream.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qscopedpointer.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qiodevicebase.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qfloat16.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmath.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qalgorithms.h \
@@ -310,12 +311,6 @@ CMakeFiles/smartoil.dir/connection.cpp.obj: \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_tree.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_map.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_multimap.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qtextstream.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qcontiguouscache.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/climits \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qsharedpointer.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qsharedpointer_impl.h \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/chrono \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ratio \
  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ctime \
@@ -329,7 +324,5 @@ CMakeFiles/smartoil.dir/connection.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qset.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qhash.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qvarlengtharray.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/q23utility.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qobject.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qobject_impl.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qbindingstorage.h
+ C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlError \
+ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlerror.h

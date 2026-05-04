@@ -7,6 +7,7 @@
 #include "face_recognition_dialog.h"
 #include "face_recognition_service.h"
 #include "fingerprintservice.h"
+#include "agriculteurmodule.h"
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
@@ -234,7 +235,7 @@ void applyRuntimeUxPolish(Ui::MainWindow* ui)
         title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
-    for (QTableWidget* table : { ui->tableEmp, ui->tableWidget_2, ui->ListeCiterne, ui->tableWidget_4, ui->tablemachine, ui->tableWidget_5, ui->affTable }) {
+    for (QTableWidget* table : { ui->tableEmp, ui->tableWidget_2, ui->ListeCiterne, ui->tableWidget_4, ui->tablemachine, ui->affTable }) {
         if (table) setReferenceTableMetrics(table);
     }
 
@@ -381,8 +382,7 @@ void normalizeMainModuleGeometry(Ui::MainWindow* ui)
     }
     if (ui->ajoutpersonnel_3 && ui->formLayoutWidget_6)
         centerFixedChild(ui->ajoutpersonnel_3, ui->formLayoutWidget_6, 760, 560, 28);
-    if (ui->ajoutagriculteur && ui->formLayoutWidget_7)
-        centerFixedChild(ui->ajoutagriculteur, ui->formLayoutWidget_7, 760, 660, 22);
+    // Module 6 is now handled by embedded AgriculteurModule widgets.
 
     // Advanced Citernes page contains a small absolute widget; keep it centered.
     if (ui->AvCiterne) {
@@ -890,6 +890,13 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Embedded Agriculteur module: keep the latest beautiful MainWindow UI and
+    // replace only module 6 content with the agriculteur-specific implementation.
+    if (ui->agriculteurModuleAdd) ui->agriculteurModuleAdd->showAddPage();
+    if (ui->agriculteurModuleConsult) ui->agriculteurModuleConsult->showConsultPage();
+    if (ui->agriculteurModuleStats) ui->agriculteurModuleStats->showStatsPage();
+    if (ui->agriculteurModuleAdvanced) ui->agriculteurModuleAdvanced->showAdvancedPage();
 
     // Always start from the login page. Some merged .ui files keep a design-time
     // currentIndex that skips the login page.
@@ -8333,24 +8340,37 @@ void MainWindow::on_ajouterqtoliveBtn_clicked()
 void MainWindow::on_btnConsulterAgr_clicked()
 {
     const int idx = moduleIndex(ui->module6);
+    if (ui->agriculteurModuleConsult) {
+        ui->agriculteurModuleConsult->refreshAll();
+        ui->agriculteurModuleConsult->showConsultPage();
+    }
     openSidebarModule(idx, ui->metiersagriculteurs, 1, idx);
 }
 
 void MainWindow::on_btnAjouterAgr_clicked()
 {
     const int idx = moduleIndex(ui->module6);
+    if (ui->agriculteurModuleAdd) ui->agriculteurModuleAdd->showAddPage();
     openSidebarModule(idx, ui->metiersagriculteurs, 0, idx);
 }
 
 void MainWindow::on_btnStatAgr_clicked()
 {
     const int idx = moduleIndex(ui->module6);
+    if (ui->agriculteurModuleStats) {
+        ui->agriculteurModuleStats->refreshAll();
+        ui->agriculteurModuleStats->showStatsPage();
+    }
     openSidebarModule(idx, ui->metiersagriculteurs, 2, idx);
 }
 
 void MainWindow::on_btnAvanceAgr_clicked()
 {
     const int idx = moduleIndex(ui->module6);
+    if (ui->agriculteurModuleAdvanced) {
+        ui->agriculteurModuleAdvanced->refreshAll();
+        ui->agriculteurModuleAdvanced->showAdvancedPage();
+    }
     openSidebarModule(idx, ui->metiersagriculteurs, 3, idx);
 }
 

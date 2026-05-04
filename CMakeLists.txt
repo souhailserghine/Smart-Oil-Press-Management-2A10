@@ -31,6 +31,10 @@ set(PROJECT_SOURCES
     stocks.cpp
     stocks.h
     stocks.ui
+    agriculteur.cpp
+    agriculteur.h
+    agriculteurmodule.cpp
+    agriculteurmodule.h
     employe.cpp
     employe.h
     connection.cpp
@@ -64,6 +68,11 @@ target_link_libraries(smartoil PRIVATE
     Qt${QT_VERSION_MAJOR}::Charts
     Qt${QT_VERSION_MAJOR}::PrintSupport
     Qt${QT_VERSION_MAJOR}::SerialPort
+)
+
+target_include_directories(smartoil PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 set_target_properties(smartoil PROPERTIES

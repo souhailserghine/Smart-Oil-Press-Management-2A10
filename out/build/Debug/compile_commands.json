@@ -1,73 +1,103 @@
 [
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\smartoil_autogen\\mocs_compilation.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\Debug\\smartoil_autogen\\mocs_compilation.cpp\"",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\smartoil_autogen\\mocs_compilation.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\Debug\\smartoil_autogen\\mocs_compilation.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug/smartoil_autogen/mocs_compilation.cpp",
   "output": "CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\main.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\main.cpp\"",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\main.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\main.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/main.cpp",
   "output": "CMakeFiles/smartoil.dir/main.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\mainwindow.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\mainwindow.cpp\"",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\mainwindow.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\mainwindow.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/mainwindow.cpp",
   "output": "CMakeFiles/smartoil.dir/mainwindow.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\face_recognition_service.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\face_recognition_service.cpp\"",
-  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_recognition_service.cpp",
-  "output": "CMakeFiles/smartoil.dir/face_recognition_service.cpp.obj"
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\qualite.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\qualite.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/qualite.cpp",
+  "output": "CMakeFiles/smartoil.dir/qualite.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\face_recognition_dialog.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\face_recognition_dialog.cpp\"",
-  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_recognition_dialog.cpp",
-  "output": "CMakeFiles/smartoil.dir/face_recognition_dialog.cpp.obj"
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\citernes.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\citernes.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/citernes.cpp",
+  "output": "CMakeFiles/smartoil.dir/citernes.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\face_capture_dialog.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\face_capture_dialog.cpp\"",
-  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_capture_dialog.cpp",
-  "output": "CMakeFiles/smartoil.dir/face_capture_dialog.cpp.obj"
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\stocks.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\stocks.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/stocks.cpp",
+  "output": "CMakeFiles/smartoil.dir/stocks.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\fingerprintservice.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\fingerprintservice.cpp\"",
-  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/fingerprintservice.cpp",
-  "output": "CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj"
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\agriculteur.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\agriculteur.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/agriculteur.cpp",
+  "output": "CMakeFiles/smartoil.dir/agriculteur.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\arduino.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\arduino.cpp\"",
-  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/arduino.cpp",
-  "output": "CMakeFiles/smartoil.dir/arduino.cpp.obj"
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\agriculteurmodule.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\agriculteurmodule.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/agriculteurmodule.cpp",
+  "output": "CMakeFiles/smartoil.dir/agriculteurmodule.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\connection.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\connection.cpp\"",
-  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/connection.cpp",
-  "output": "CMakeFiles/smartoil.dir/connection.cpp.obj"
-},
-{
-  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\employe.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\employe.cpp\"",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\employe.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\employe.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/employe.cpp",
   "output": "CMakeFiles/smartoil.dir/employe.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\smartoil_autogen\\EWIEGA46WW\\qrc_style.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\Debug\\smartoil_autogen\\EWIEGA46WW\\qrc_style.cpp\"",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\connection.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\connection.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/connection.cpp",
+  "output": "CMakeFiles/smartoil.dir/connection.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\face_recognition_service.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\face_recognition_service.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_recognition_service.cpp",
+  "output": "CMakeFiles/smartoil.dir/face_recognition_service.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\face_recognition_dialog.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\face_recognition_dialog.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_recognition_dialog.cpp",
+  "output": "CMakeFiles/smartoil.dir/face_recognition_dialog.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\face_capture_dialog.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\face_capture_dialog.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/face_capture_dialog.cpp",
+  "output": "CMakeFiles/smartoil.dir/face_capture_dialog.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\fingerprintservice.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\fingerprintservice.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/fingerprintservice.cpp",
+  "output": "CMakeFiles/smartoil.dir/fingerprintservice.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\arduino.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\arduino.cpp\"",
+  "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/arduino.cpp",
+  "output": "CMakeFiles/smartoil.dir/arduino.cpp.obj"
+},
+{
+  "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\smartoil_autogen\\EWIEGA46WW\\qrc_style.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\Debug\\smartoil_autogen\\EWIEGA46WW\\qrc_style.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug/smartoil_autogen/EWIEGA46WW/qrc_style.cpp",
   "output": "CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_style.cpp.obj"
 },
 {
   "directory": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug",
-  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\smartoil_autogen\\EWIEGA46WW\\qrc_img.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\Debug\\smartoil_autogen\\EWIEGA46WW\\qrc_img.cpp\"",
+  "command": "C:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CHARTS_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_PRINTSUPPORT_LIB -DQT_SERIALPORT_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 @CMakeFiles/smartoil.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\smartoil.dir\\smartoil_autogen\\EWIEGA46WW\\qrc_img.cpp.obj -c \"C:\\Users\\Administrator\\Documents\\Smart Oil Press Management\\Smart-Oil-Press-Management-2A10\\out\\build\\Debug\\smartoil_autogen\\EWIEGA46WW\\qrc_img.cpp\"",
   "file": "C:/Users/Administrator/Documents/Smart Oil Press Management/Smart-Oil-Press-Management-2A10/out/build/Debug/smartoil_autogen/EWIEGA46WW/qrc_img.cpp",
   "output": "CMakeFiles/smartoil.dir/smartoil_autogen/EWIEGA46WW/qrc_img.cpp.obj"
 }
