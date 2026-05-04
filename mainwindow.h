@@ -3,11 +3,11 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QTimer>       // ← ajout pour la connexion différée non-bloquante
+#include "arduino.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -26,30 +26,34 @@ private slots:
     void on_btnAdvEmp_clicked();
     void on_faceBtn_clicked();
 
-    // Sidebar module navigation
-    void on_btnmod1_clicked(); // Personnel (module1)
-    void on_btnmod2_clicked(); // Module 2
-    void on_btnmod3_clicked(); // Module 3
-    void on_btnmod4_clicked(); // Module 4
-    void on_btnmod5_clicked(); // Module 5
-    void on_btnmod6_clicked(); // Module 6
+    void on_btnmod1_clicked();
+    void on_btnmod2_clicked();
+    void on_btnmod3_clicked();
+    void on_btnmod4_clicked();
+    void on_btnmod5_clicked();
+    void on_btnmod6_clicked();
+
+    // ← Slot déclenché après le délai de stabilisation Arduino
+    void finishArduinoConnect();
 
 private:
     Ui::MainWindow *ui;
-    
-    // Helper methods
+
+    Arduino* m_arduino          = nullptr;
+    bool     m_sidebarCollapsed = false;
+
     void setupPersonnelChart();
     void setupPersonnelTable();
     void addActionButtonsToRow(int row);
-    int findRowForButton(QObject* button) const;
+    int  findRowForButton(QObject* button) const;
     void setActiveModuleButton(int index);
-
-    // UX enhancements
     void crossFadeToIndex(QStackedWidget* stack, int newIndex);
     void animateSidebarToggle(bool collapse);
     void setupInteractiveHooks();
     void filterPersonnelTable();
 
-    bool m_sidebarCollapsed = false;
+    // ← Lance la détection Arduino sans bloquer l'UI
+    void connectArduinoAsync();
 };
+
 #endif // MAINWINDOW_H

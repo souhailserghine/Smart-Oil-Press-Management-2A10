@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>img/.gitignore</file>
         <file>img/olife.png</file>
+        <file>img/logo.png</file>
         <file>img/edit.svg</file>
         <file>img/delete.svg</file>
         <file>img/login.svg</file>

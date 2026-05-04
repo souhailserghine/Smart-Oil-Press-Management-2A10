@@ -1,69 +1,68 @@
-cmake_minimum_required(VERSION 3.16)
-
-project(smartoil VERSION 0.1 LANGUAGES CXX)
-
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
+cmake_minimum_required(VERSION 3.16...3.28)
+project(smartoil
+    VERSION 0.1
+    DESCRIPTION "Smart Oil Management Application"
+    LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Charts)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts)
+# Activation automatique des outils Qt (moc, uic, rcc)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
+# Trouver Qt (priorise Qt6, fallback Qt5)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport SerialPort)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Charts PrintSupport SerialPort)
+
+# Liste complète des sources
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    connection.h
+    connection.cpp
+    citernes.h
+    citernes.cpp
+    citernes.ui
+    arduino.cpp
+    arduino.h
+    style.qrc
+    img.qrc
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+# Création de l'exécutable
+if(QT_VERSION_MAJOR GREATER_EQUAL 6)
     qt_add_executable(smartoil
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-
-
-
-        style.qrc
-        img.qrc
-
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET smartoil APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
-    if(ANDROID)
-        add_library(smartoil SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(smartoil
-            ${PROJECT_SOURCES}
-        )
-    endif()
+    add_executable(smartoil ${PROJECT_SOURCES})
 endif()
 
-target_link_libraries(smartoil PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Charts)
+# Liens avec les modules Qt
+target_link_libraries(smartoil PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Sql
+    Qt${QT_VERSION_MAJOR}::Charts
+    Qt${QT_VERSION_MAJOR}::PrintSupport
+    Qt${QT_VERSION_MAJOR}::SerialPort
+)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.smartoil)
-endif()
+# Propriétés pour les bundles (macOS, iOS, Windows)
 set_target_properties(smartoil PROPERTIES
-    ${BUNDLE_ID_OPTION}
+    MACOSX_BUNDLE_GUI_IDENTIFIER "com.example.smartoil"
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
 
+# Installation
 include(GNUInstallDirs)
 install(TARGETS smartoil
     BUNDLE DESTINATION .
@@ -71,6 +70,7 @@ install(TARGETS smartoil
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# Finalisation pour Qt 6
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(smartoil)
 endif()

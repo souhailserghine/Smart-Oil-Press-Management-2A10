@@ -18,13 +18,13 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>-10</y>
+      <y>0</y>
       <width>1280</width>
       <height>720</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="loginpage">
      <widget class="QLabel" name="logintext">
@@ -210,7 +210,7 @@ border-top-left-radius : 50px;</string>
             <x>30</x>
             <y>120</y>
             <width>621</width>
-            <height>367</height>
+            <height>378</height>
            </rect>
           </property>
           <layout class="QFormLayout" name="formLayout">
@@ -301,6 +301,40 @@ border-top-left-radius : 50px;</string>
               <string>Nom</string>
              </property>
             </widget>
+           </item>
+           <item row="5" column="1">
+            <layout class="QHBoxLayout" name="qjouterEmpRow">
+             <item>
+              <spacer name="horizontalSpacer_ajouteremp">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="ajouterEmpBtn">
+               <property name="text">
+                <string>Ajouter</string>
+               </property>
+               <property name="icon">
+                <iconset resource="img.qrc">
+                 <normaloff>:/img/export.svg</normaloff>:/img/export.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>18</width>
+                 <height>18</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -607,15 +641,27 @@ border-top-left-radius : 50px;</string>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>-10</y>
-         <width>160</width>
-         <height>684</height>
+         <x>0</x>
+         <y>0</y>
+         <width>200</width>
+         <height>720</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
          <number>39</number>
+        </property>
+        <property name="leftMargin">
+         <number>12</number>
+        </property>
+        <property name="topMargin">
+         <number>12</number>
+        </property>
+        <property name="rightMargin">
+         <number>12</number>
+        </property>
+        <property name="bottomMargin">
+         <number>12</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="logoandnamesidebar">
@@ -630,15 +676,42 @@ border-top-left-radius : 50px;</string>
           </property>
           <item>
            <widget class="QLabel" name="sidebarlogo">
+            <property name="minimumSize">
+             <size>
+              <width>48</width>
+              <height>48</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>96</width>
+              <height>96</height>
+             </size>
+            </property>
             <property name="text">
-             <string>X</string>
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="img.qrc">:/img/logo.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="namesidebar">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>SmartOil</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
