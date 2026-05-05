@@ -1,0 +1,52 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 16,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "qt-mingw-debug",
+      "displayName": "Qt 6.7.3 MinGW Debug",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/out/build/Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.7.3/mingw_64/lib/cmake",
+        "CMAKE_C_COMPILER": "C:/Qt/Tools/mingw1120_64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1120_64/bin/g++.exe",
+        "CMAKE_MAKE_PROGRAM": "C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe"
+      },
+      "environment": {
+        "PATH": "C:/Qt/Tools/mingw1120_64/bin;C:/Qt/6.7.3/mingw_64/bin;$penv{PATH}"
+      }
+    },
+    {
+      "name": "qt-mingw-release",
+      "displayName": "Qt 6.7.3 MinGW Release",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/out/build/Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.7.3/mingw_64/lib/cmake",
+        "CMAKE_C_COMPILER": "C:/Qt/Tools/mingw1120_64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1120_64/bin/g++.exe",
+        "CMAKE_MAKE_PROGRAM": "C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe"
+      },
+      "environment": {
+        "PATH": "C:/Qt/Tools/mingw1120_64/bin;C:/Qt/6.7.3/mingw_64/bin;$penv{PATH}"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "qt-mingw-debug",
+      "configurePreset": "qt-mingw-debug"
+    },
+    {
+      "name": "qt-mingw-release",
+      "configurePreset": "qt-mingw-release"
+    }
+  ]
+}
