@@ -1,0 +1,3739 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "citernes.h"
+#include "stocks.h"
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartGlobal>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QHorizontalBarSeries>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QIcon>
+#include <QSize>
+#include <QSizePolicy>
+#include <QAbstractItemView>
+#include <QString>
+#include <QDialog>
+#include <QLabel>
+#include <QToolButton>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QSqlQuery>
+#include <QColorDialog>
+#include <QSqlError>
+#include <QTableWidgetItem>
+#include <QDate>
+#include <QRegularExpression>
+#include <QDebug>
+#include <QFile>
+#include <QMenu>
+#include <QTextStream>
+#include <QFileDialog>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QHorizontalBarSeries>
+#include <QtCharts/QPieSlice>
+#include <QSqlDatabase>
+#include <QFormLayout>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QDateEdit>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QDoubleValidator>
+#include <QScrollArea>
+#include <QPrinter>
+#include <QTextDocument>
+#include <QDateTime>
+#include <QMap>
+#include <QPen>
+#include <QPageSize>
+#include <QPageLayout>
+#include <algorithm>
+
+// Qt 6: Charts classes are accessible without a QtCharts namespace when linked
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+
+    // Bridge UI for Stocks advanced page so the integrated interface is not empty
+    if (ui->metieravancee_2 && !ui->metieravancee_2->layout()) {
+        auto *bridgeLayout = new QVBoxLayout(ui->metieravancee_2);
+        bridgeLayout->setContentsMargins(24, 24, 24, 24);
+        bridgeLayout->setSpacing(16);
+
+        auto *title = new QLabel("Métiers avancés du stock", ui->metieravancee_2);
+        title->setStyleSheet("font-size: 20px; font-weight: 700; color: #8a9b5f;");
+        bridgeLayout->addWidget(title);
+
+        auto *desc = new QLabel("Ce module est intégré dans une fenêtre Stocks harmonisée avec l'interface principale. Utilisez les actions ci-dessous pour ouvrir directement la section voulue.", ui->metieravancee_2);
+        desc->setWordWrap(true);
+        desc->setStyleSheet("color: #5a5d60; font-size: 11pt;");
+        bridgeLayout->addWidget(desc);
+
+        auto *row = new QHBoxLayout();
+        auto *btnAdd = new QPushButton(QIcon(":/img/add.svg"), "Ajouter", ui->metieravancee_2);
+        auto *btnConsult = new QPushButton(QIcon(":/img/search.svg"), "Consulter", ui->metieravancee_2);
+        auto *btnStats = new QPushButton(QIcon(":/img/chart.svg"), "Statistiques", ui->metieravancee_2);
+        auto *btnAdv = new QPushButton(QIcon(":/img/settings.svg"), "Avancé", ui->metieravancee_2);
+        for (auto *b : {btnAdd, btnConsult, btnStats, btnAdv}) {
+            b->setProperty("type", "primary");
+            row->addWidget(b);
+        }
+        row->addStretch();
+        bridgeLayout->addLayout(row);
+        bridgeLayout->addStretch();
+
+        QObject::connect(btnAdd, &QPushButton::clicked, this, [this]() { openStocksWindow(0); });
+        QObject::connect(btnConsult, &QPushButton::clicked, this, [this]() { openStocksWindow(1); });
+        QObject::connect(btnStats, &QPushButton::clicked, this, [this]() { openStocksWindow(2); });
+        QObject::connect(btnAdv, &QPushButton::clicked, this, [this]() { openStocksWindow(3); });
+    }
+
+    // Layout the sidebar and modules side-by-side to avoid overlap
+    {
+        auto mainLayout = new QHBoxLayout(ui->mainprogram);
+        mainLayout->setContentsMargins(0, 0, 0, 0);
+        mainLayout->setSpacing(0);
+        // Respect intended sidebar width constraints and prevent layout from squashing it
+        ui->sidebar->setMinimumWidth(200);
+        ui->sidebar->setMaximumWidth(220);
+        ui->sidebar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        mainLayout->addWidget(ui->sidebar);
+
+        // Wrap the modules in a content area that applies offsets (drop + right shift)
+        auto* contentArea = new QWidget(ui->mainprogram);
+        auto* contentLayout = new QVBoxLayout(contentArea);
+        qreal dpiX = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchX() : 96.0;
+        qreal dpiY = QGuiApplication::primaryScreen() ? QGuiApplication::primaryScreen()->logicalDotsPerInchY() : 96.0;
+        int leftMarginPx = static_cast<int>((20.0 / 25.4) * dpiX); // 20 mm ~ 2 cm
+        int topMarginPx  = static_cast<int>((10.0 / 25.4) * dpiY); // 10 mm ~ 1 cm
+        contentLayout->setContentsMargins(leftMarginPx, topMarginPx, 0, 0);
+        contentLayout->setSpacing(0);
+        contentLayout->addWidget(ui->modules);
+        mainLayout->addWidget(contentArea);
+    }
+
+    // Sidebar buttons: make checkable for active state highlight
+    if (ui->sidebar) {
+        ui->btnmod1->setCheckable(true);
+        ui->btnmod2->setCheckable(true);
+        ui->btnmod3->setCheckable(true);
+        ui->btnmod4->setCheckable(true);
+        ui->btnmod5->setCheckable(true);
+        ui->btnmod6->setCheckable(true);
+        setActiveModuleButton(0);
+    }
+
+    // Initialize the personnel statistics chart
+    setupPersonnelChart();
+    setupStatHuilePage();
+    // Initialize the personnel table with action buttons
+    setupPersonnelTable();
+    // Add sidebar toggle button (hamburger) and interaction hooks
+    setupInteractiveHooks();
+    connect(ui->btnStatHuile, &QToolButton::clicked, this, &MainWindow::on_btnStatHuile_clicked);
+    setupModule5();
+    // Palette de couleur — QLineEdit ne supporte pas clicked(), connexion manuelle
+    connect(ui->codecouleurLineEdit, &QLineEdit::selectionChanged, this, [this]() {
+        // ne rien faire ici
+    });
+    ui->codecouleurLineEdit->installEventFilter(this);
+
+    // Citernes module: ouvre la tache integree dans une fenetre dediee
+    QObject::connect(ui->AjoutCiterne, &QToolButton::clicked, this, [this]() { openCiternesWindow(0); });
+    QObject::connect(ui->ConsulterCiterne, &QToolButton::clicked, this, [this]() { openCiternesWindow(1); });
+    QObject::connect(ui->StatistiqueCiterne, &QToolButton::clicked, this, [this]() { openCiternesWindow(2); });
+    QObject::connect(ui->MetierAvanceCiterne, &QToolButton::clicked, this, [this]() { openCiternesWindow(3); });
+    if (ui->exporterListeCiterne) {
+        QObject::connect(ui->exporterListeCiterne, &QPushButton::clicked, this, [this]() { openCiternesWindow(1); });
+    }
+}
+
+void MainWindow::openCiternesWindow(int pageIndex)
+{
+    if (!m_citernesWindow) {
+        m_citernesWindow = new Citernes(this);
+        m_citernesWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+        m_citernesWindow->setWindowTitle("Gestion des citernes");
+    }
+
+    if (pageIndex >= 0) {
+        if (auto* stack = m_citernesWindow->findChild<QStackedWidget*>(QStringLiteral("metiersCiternes"))) {
+            int safeIndex = std::clamp(pageIndex, 0, stack->count() - 1);
+            stack->setCurrentIndex(safeIndex);
+        }
+    }
+
+    m_citernesWindow->show();
+    m_citernesWindow->raise();
+    m_citernesWindow->activateWindow();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  LOGIN
+// ════════════════════════════════════════════════════════════════════════════
+
+void MainWindow::on_loginbtn_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  PERSONNEL NAV
+// ════════════════════════════════════════════════════════════════════════════
+
+void MainWindow::on_btnAjouterEmp_clicked()
+{
+    if (ui->modules->currentIndex() != 0)
+        crossFadeToIndex(ui->modules, 0);
+    crossFadeToIndex(ui->metierspersonnel, 0);
+}
+
+void MainWindow::on_btnConsulterEmp_clicked()
+{
+    if (ui->modules->currentIndex() != 0)
+        crossFadeToIndex(ui->modules, 0);
+    crossFadeToIndex(ui->metierspersonnel, 1);
+}
+
+void MainWindow::on_btnStatEmp_clicked()
+{
+    if (ui->modules->currentIndex() != 0)
+        crossFadeToIndex(ui->modules, 0);
+    crossFadeToIndex(ui->metierspersonnel, 2);
+}
+
+void MainWindow::on_btnAdvEmp_clicked()
+{
+    if (ui->modules->currentIndex() != 0)
+        crossFadeToIndex(ui->modules, 0);
+    crossFadeToIndex(ui->metierspersonnel, 3);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  SIDEBAR MODULE NAVIGATION
+// ════════════════════════════════════════════════════════════════════════════
+
+
+void MainWindow::openStocksWindow(int pageIndex)
+{
+    if (!m_stocksWindow) {
+        m_stocksWindow = new Stocks(this);
+        m_stocksWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+    }
+    m_stocksWindow->navigateToSection(pageIndex);
+    m_stocksWindow->show();
+    m_stocksWindow->raise();
+    m_stocksWindow->activateWindow();
+}
+
+void MainWindow::on_btnmod1_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+    ui->modules->setCurrentIndex(0);
+    setActiveModuleButton(0);
+}
+
+void MainWindow::on_btnmod2_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+    ui->modules->setCurrentIndex(5);
+    ui->metiersstocks->setCurrentIndex(3);
+    setActiveModuleButton(5);
+    openStocksWindow(1);
+}
+
+
+void MainWindow::on_btnAjouterstc_clicked()
+{
+    if (ui->modules->currentIndex() != 5)
+        crossFadeToIndex(ui->modules, 5);
+    crossFadeToIndex(ui->metiersstocks, 3);
+    openStocksWindow(0);
+}
+
+void MainWindow::on_btnConsulterstc_clicked()
+{
+    if (ui->modules->currentIndex() != 5)
+        crossFadeToIndex(ui->modules, 5);
+    crossFadeToIndex(ui->metiersstocks, 3);
+    openStocksWindow(1);
+}
+
+void MainWindow::on_btnStatstc_clicked()
+{
+    if (ui->modules->currentIndex() != 5)
+        crossFadeToIndex(ui->modules, 5);
+    crossFadeToIndex(ui->metiersstocks, 3);
+    openStocksWindow(2);
+}
+
+void MainWindow::on_toolButton_5_clicked()
+{
+    if (ui->modules->currentIndex() != 5)
+        crossFadeToIndex(ui->modules, 5);
+    crossFadeToIndex(ui->metiersstocks, 3);
+    openStocksWindow(3);
+}
+
+void MainWindow::on_btnmod3_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+    ui->modules->setCurrentIndex(1);
+    setActiveModuleButton(1);
+    openCiternesWindow(1);
+}
+
+void MainWindow::on_btnmod4_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+    ui->modules->setCurrentIndex(2);
+    setActiveModuleButton(2);
+}
+
+void MainWindow::on_btnmod5_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+    ui->modules->setCurrentIndex(3);
+    setActiveModuleButton(3);
+}
+
+void MainWindow::on_btnmod6_clicked()
+{
+    ui->MainStacked->setCurrentIndex(1);
+    ui->modules->setCurrentIndex(4);
+    setActiveModuleButton(4);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  HUILE MODULE — NAVBAR
+// ════════════════════════════════════════════════════════════════════════════
+
+void MainWindow::on_btnAjouterQualite_clicked()
+{
+    // L'ID lot est gere automatiquement cote base (sequence + trigger)
+    ui->idlotLineEdit->clear();
+    ui->idlotLineEdit->setPlaceholderText("Automatique");
+    ui->idlotLineEdit->setReadOnly(true);
+    ui->idlotLineEdit->setStyleSheet("background-color: #f0f0f0; color: #888;");
+
+    m_editingIdLot = -1;
+    ui->ajouterHuileBtn->setText("Ajouter");
+    ui->ajouterHuileBtn->disconnect();
+    QObject::connect(ui->ajouterHuileBtn, &QPushButton::clicked,
+                     this, &MainWindow::on_ajouterHuileBtn_clicked);
+
+    ui->metiershuile->setCurrentIndex(0);
+}
+void MainWindow::on_btnConsulterQualite_clicked()
+{
+    ui->metiershuile->setCurrentIndex(1);
+
+    QSqlQuery query;
+    query.prepare("SELECT id_lot, responsable_controle, date_production, "
+                  "quantite_produite, ph, acidite, amerture, statut_qualite, "
+                  "id_stock, code_couleur "
+                  "FROM QUALITE ORDER BY id_lot");
+
+    ui->tableWidget_4->setRowCount(0);
+
+    if (!query.exec()) {
+        qDebug() << "Select error:" << query.lastError().text();
+        return;
+    }
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidget_4->insertRow(row);
+        ui->tableWidget_4->setItem(row, 0, new QTableWidgetItem(query.value("id_lot").toString()));
+        ui->tableWidget_4->setItem(row, 1, new QTableWidgetItem(query.value("responsable_controle").toString()));
+        ui->tableWidget_4->setItem(row, 2, new QTableWidgetItem(query.value("date_production").toString()));
+        ui->tableWidget_4->setItem(row, 3, new QTableWidgetItem(query.value("quantite_produite").toString()));
+        ui->tableWidget_4->setItem(row, 4, new QTableWidgetItem(query.value("ph").toString()));
+        ui->tableWidget_4->setItem(row, 5, new QTableWidgetItem(query.value("acidite").toString()));
+        ui->tableWidget_4->setItem(row, 6, new QTableWidgetItem(query.value("amerture").toString()));
+        ui->tableWidget_4->setItem(row, 7, new QTableWidgetItem(query.value("statut_qualite").toString()));
+        ui->tableWidget_4->setItem(row, 8, new QTableWidgetItem(query.value("id_stock").toString()));  // ← NOUVEAU
+        ui->tableWidget_4->setItem(row, 9, new QTableWidgetItem(query.value("code_couleur").toString()));
+        addHuileActionButtonsToRow(row);
+        row++;
+    }
+}
+void MainWindow::on_amertureLineEdit_textChanged(const QString &text)
+{
+    bool ok;
+    QString normalized = text;
+    normalized.replace(',', '.');
+    double val = normalized.toDouble(&ok);
+
+    if (!ok || text.trimmed().isEmpty()) {
+        ui->typeamerture->setText("");
+        return;
+    }
+
+    if (val <= 0.10) {
+        ui->typeamerture->setText("amertume faible");
+        ui->typeamerture->setStyleSheet("color: green; font-weight: bold;");
+    } else if (val >= 0.20 && val <= 0.30) {
+        ui->typeamerture->setText("amertume moyenne");
+        ui->typeamerture->setStyleSheet("color: orange; font-weight: bold;");
+    } else if (val >= 0.35) {
+        ui->typeamerture->setText("amertume forte");
+        ui->typeamerture->setStyleSheet("color: red; font-weight: bold;");
+    } else {
+        ui->typeamerture->setText("");
+    }
+}
+// ════════════════════════════════════════════════════════════════════════════
+//  HUILE MODULE — INSERT AVEC CONTRÔLES DE SAISIE
+// ════════════════════════════════════════════════════════════════════════════
+
+namespace {
+static double aciditeComboToValue(const QString &text)
+{
+    const QString v = text.trimmed().toLower();
+    if (v == "acide") return 0.8;
+    if (v == "neutre") return 0.5;
+    if (v == "basique") return 0.2;
+
+    bool ok = false;
+    const double parsed = text.toDouble(&ok);
+    return ok ? parsed : 0.0;
+}
+}
+
+void MainWindow::on_ajouterHuileBtn_clicked()
+{
+    // --- Récupération des valeurs ---
+    QString nomResp     = ui->nomresponsableLineEdit->text().trimmed();
+    QString dateStr     = ui->dateprodDateEdit->date().toString("yyyy-MM-dd");
+    QString statut      = ui->statutComboBox->currentText();
+    QString quantite    = ui->quantiteLineEdit->text().trimmed();
+    QString maxqt       = ui->maxqtLineEdit->text().trimmed();
+    QString ph          = ui->phLineEdit->text().trimmed();
+    QString idStock     = ui->idstockLineEdit->text().trimmed();  // ← NOUVEAU
+    QString aciditeText = ui->aciditeComboBox->currentText();
+    double aciditeVal   = aciditeComboToValue(aciditeText);
+    QString codeCouleur = ui->codecouleurLineEdit->text().trimmed();
+    QString amerture    = ui->amertureLineEdit->text().trimmed();
+
+    // --- CONTROLE 1 : Champs vides ---
+    if (nomResp.isEmpty() || quantite.isEmpty() ||
+        maxqt.isEmpty() || ph.isEmpty() || idStock.isEmpty() ||  // ← idStock obligatoire
+        codeCouleur.isEmpty() || amerture.isEmpty())
+    {
+        QMessageBox::warning(this, "Champs vides", "Veuillez remplir tous les champs.");
+        return;
+    }
+
+    // --- Vérifier que l'ID Stock existe ---
+    QSqlQuery checkStock;
+    checkStock.prepare("SELECT id_stock FROM STOCK WHERE id_stock = ?");
+    checkStock.addBindValue(idStock.toInt());
+    if (!checkStock.exec() || !checkStock.next()) {
+        QMessageBox::warning(this, "ID Stock invalide",
+                             "L'ID Stock n'existe pas dans la table STOCK.\n"
+                             "Veuillez entrer un ID valide.");
+        ui->idstockLineEdit->setFocus();
+        ui->idstockLineEdit->setStyleSheet("border: 2px solid red;");
+        return;
+    }
+    ui->idstockLineEdit->setStyleSheet("");
+
+    // --- CONTROLE 2 : Date de production <= aujourd'hui ---
+    QDate dateProd = ui->dateprodDateEdit->date();
+    if (dateProd > QDate::currentDate()) {
+        QMessageBox::warning(this, "Date invalide", "La date ne peut pas être dans le futur.");
+        ui->dateprodDateEdit->setFocus();
+        return;
+    }
+
+    // --- CONTROLE 3 : Quantité positive ---
+    bool okQt;
+    double qtVal = quantite.toDouble(&okQt);
+    if (!okQt || qtVal <= 0) {
+        QMessageBox::warning(this, "Quantité invalide", "La quantité doit être un nombre positif.");
+        ui->quantiteLineEdit->setFocus();
+        return;
+    }
+
+    // --- CONTROLE 4 : Quantité <= Max quantite ---
+    bool okMaxQt;
+    double maxQtVal = maxqt.toDouble(&okMaxQt);
+    if (!okMaxQt || maxQtVal <= 0) {
+        QMessageBox::warning(this, "Max quantité invalide", "La max quantité doit être un nombre positif.");
+        ui->maxqtLineEdit->setFocus();
+        return;
+    }
+    if (qtVal > maxQtVal) {
+        QMessageBox::warning(this, "Dépassement", QString("Quantité (%1 L) > capacité max (%2 L)").arg(qtVal).arg(maxQtVal));
+        ui->quantiteLineEdit->setFocus();
+        return;
+    }
+
+    // --- CONTROLE 5 : pH entre 0 et 14 ---
+    bool okPh;
+    double phVal = ph.toDouble(&okPh);
+    if (!okPh || phVal < 0.0 || phVal > 14.0) {
+        QMessageBox::warning(this, "pH invalide", "Le pH doit être entre 0 et 14.");
+        ui->phLineEdit->setFocus();
+        return;
+    }
+
+    // --- CONTROLE 6 : Amerture entre 0 et 1 ---
+    bool okAm;
+    double amVal = amerture.toDouble(&okAm);
+    if (!okAm || amVal < 0.0 || amVal > 1.0) {
+        QMessageBox::warning(this, "Amerture invalide", "L'amerture doit être entre 0 et 1.");
+        ui->amertureLineEdit->setFocus();
+        return;
+    }
+
+    // --- INSERT avec id_stock ---
+    QSqlQuery query;
+    query.prepare("INSERT INTO QUALITE "
+                  "(date_production, quantite_produite, "
+                  "ph, acidite, amerture, code_couleur, statut_qualite, "
+                  "responsable_controle, max_quantite, id_stock) "
+                  "VALUES "
+                  "(TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    query.addBindValue(dateStr);
+    query.addBindValue(quantite.toDouble());
+    query.addBindValue(ph.toDouble());
+    query.addBindValue(aciditeVal);
+    query.addBindValue(amVal);
+    query.addBindValue(codeCouleur);
+    query.addBindValue(statut);
+    query.addBindValue(nomResp);
+    query.addBindValue(maxqt.toDouble());
+    query.addBindValue(idStock.toInt());  // ← NOUVEAU
+
+    if (query.exec()) {
+        QMessageBox::information(this, "Succès", "Huile ajoutée avec succès !");
+
+        // Vider les champs
+        ui->idlotLineEdit->clear();
+        ui->idlotLineEdit->setPlaceholderText("Automatique");
+        ui->nomresponsableLineEdit->clear();
+        ui->quantiteLineEdit->clear();
+        ui->phLineEdit->clear();
+        ui->idstockLineEdit->clear();  // ← NOUVEAU
+        ui->codecouleurLineEdit->clear();
+        ui->amertureLineEdit->clear();
+        ui->maxqtLineEdit->clear();
+        ui->typeamerture->clear();
+        ui->dateprodDateEdit->setDate(QDate(2000, 1, 1));
+        ui->statutComboBox->setCurrentIndex(0);
+        ui->aciditeComboBox->setCurrentIndex(0);
+
+        on_btnConsulterQualite_clicked();
+    } else {
+        QMessageBox::critical(this, "Erreur", "Échec de l'ajout :\n" + query.lastError().text());
+        qDebug() << "SQL Error:" << query.lastError().text();
+    }
+}
+void MainWindow::setActiveModuleButton(int index)
+{
+    QPushButton* buttons[6] = { ui->btnmod1, ui->btnmod2, ui->btnmod3,
+                               ui->btnmod4, ui->btnmod5, ui->btnmod6 };
+    for (auto* b : buttons)
+        b->setChecked(false);
+
+    switch (index) {
+    case 0: ui->btnmod1->setChecked(true); break;
+    case 1: ui->btnmod3->setChecked(true); break;
+    case 2: ui->btnmod4->setChecked(true); break;
+    case 3: ui->btnmod5->setChecked(true); break;
+    case 4: ui->btnmod6->setChecked(true); break;
+    case 5: ui->btnmod2->setChecked(true); break;
+    default: ui->btnmod1->setChecked(true); break;
+    }
+}
+
+void MainWindow::crossFadeToIndex(QStackedWidget* stack, int newIndex)
+{
+    if (!stack || newIndex < 0 || newIndex >= stack->count())
+        return;
+
+    QWidget* current = stack->currentWidget();
+    QWidget* next = stack->widget(newIndex);
+    if (current == next) return;
+
+    auto* outEffect = new QGraphicsOpacityEffect(current);
+    current->setGraphicsEffect(outEffect);
+    auto* outAnim = new QPropertyAnimation(outEffect, "opacity", current);
+    outAnim->setDuration(180);
+    outAnim->setStartValue(1.0);
+    outAnim->setEndValue(0.0);
+    outAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    QObject::connect(outAnim, &QPropertyAnimation::finished, this, [this, stack, newIndex, current]() {
+        current->setGraphicsEffect(nullptr);
+        stack->setCurrentIndex(newIndex);
+        QWidget* incoming = stack->currentWidget();
+        auto* inEffect = new QGraphicsOpacityEffect(incoming);
+        incoming->setGraphicsEffect(inEffect);
+        auto* inAnim = new QPropertyAnimation(inEffect, "opacity", incoming);
+        inAnim->setDuration(180);
+        inAnim->setStartValue(0.0);
+        inAnim->setEndValue(1.0);
+        inAnim->setEasingCurve(QEasingCurve::OutCubic);
+        QObject::connect(inAnim, &QPropertyAnimation::finished, incoming, [incoming]() {
+            incoming->setGraphicsEffect(nullptr);
+        });
+        inAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    });
+    outAnim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void MainWindow::animateSidebarToggle(bool collapse)
+{
+    int from = ui->sidebar->width();
+    int to = collapse ? 48 : 200;
+    auto* anim = new QPropertyAnimation(ui->sidebar, "minimumWidth", this);
+    anim->setDuration(220);
+    anim->setStartValue(from);
+    anim->setEndValue(to);
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+    QObject::connect(anim, &QPropertyAnimation::valueChanged, this, [this](const QVariant&) {
+        ui->sidebar->setMaximumWidth(ui->sidebar->minimumWidth());
+    });
+    QObject::connect(anim, &QPropertyAnimation::finished, this, [this, collapse]() {
+        m_sidebarCollapsed = collapse;
+    });
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void MainWindow::setupInteractiveHooks()
+{
+    if (auto* headerLayout = ui->centralwidget->findChild<QHBoxLayout*>(QStringLiteral("logoandnamesidebar"))) {
+        auto* toggleBtn = new QToolButton(ui->sidebar);
+        toggleBtn->setAutoRaise(true);
+        toggleBtn->setToolTip(tr("Collapse/Expand sidebar"));
+        toggleBtn->setIcon(QIcon(QStringLiteral(":/img/menu.svg")));
+        toggleBtn->setIconSize(QSize(18, 18));
+        headerLayout->addStretch();
+        headerLayout->addWidget(toggleBtn);
+        QObject::connect(toggleBtn, &QToolButton::clicked, this, [this]() {
+            animateSidebarToggle(!m_sidebarCollapsed);
+        });
+    }
+
+    if (ui->lineEdit && ui->comboBox && ui->tableWidget_4) {
+        QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, [this](const QString&) { filterPersonnelTable(); });
+        QObject::connect(ui->comboBox, &QComboBox::currentTextChanged, this, [this](const QString&) { filterPersonnelTable(); });
+    }
+}
+
+void MainWindow::filterPersonnelTable()
+{
+    if (!ui->tableWidget_4 || !ui->comboBox) return;
+    QString needle = ui->lineEdit ? ui->lineEdit->text().trimmed() : QString();
+    QString mode = ui->comboBox->currentText();
+    int col = 0;
+    if (mode.compare(QStringLiteral("Name"), Qt::CaseInsensitive) == 0 ||
+        mode.compare(QStringLiteral("Nom"), Qt::CaseInsensitive) == 0) col = 1;
+    else if (mode.compare(QStringLiteral("Status"), Qt::CaseInsensitive) == 0) col = 2;
+    else col = 0;
+
+    for (int r = 0; r < ui->tableWidget_4->rowCount(); ++r) {
+        auto* item = ui->tableWidget_4->item(r, col);
+        bool match = needle.isEmpty() || (item && item->text().contains(needle, Qt::CaseInsensitive));
+        ui->tableWidget_4->setRowHidden(r, !match);
+    }
+}
+
+void MainWindow::setupPersonnelChart()
+{
+    QPieSeries *series = new QPieSeries();
+    series->append("Actifs", 42);
+    series->append("En congé", 8);
+    series->append("Suspendus", 3);
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Répartition des employés");
+    chart->legend()->setAlignment(Qt::AlignRight);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(ui->chartStatusContainer->layout());
+    if (!layout) {
+        layout = new QVBoxLayout(ui->chartStatusContainer);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(12);
+    }
+    layout->addWidget(chartView);
+
+    QBarSet *setActifs = new QBarSet("Actifs");
+    QBarSet *setConge  = new QBarSet("En congé");
+    QBarSet *setSusp   = new QBarSet("Suspendus");
+    *setActifs << 18 << 15 << 9;
+    *setConge  << 3  << 2  << 3;
+    *setSusp   << 1  << 1  << 1;
+
+    QBarSeries *barSeries = new QBarSeries();
+    barSeries->append(setActifs);
+    barSeries->append(setConge);
+    barSeries->append(setSusp);
+
+    QChart *barChart = new QChart();
+    barChart->addSeries(barSeries);
+    barChart->setTitle("Statut par département");
+    barChart->setAnimationOptions(QChart::AllAnimations);
+    QStringList categories;
+    categories << "Production" << "Qualité" << "Support";
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, 20);
+    axisY->setTitleText("Employés");
+    barChart->addAxis(axisX, Qt::AlignBottom);
+    barChart->addAxis(axisY, Qt::AlignLeft);
+    barSeries->attachAxis(axisX);
+    barSeries->attachAxis(axisY);
+    barChart->legend()->setVisible(true);
+    barChart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *barView = new QChartView(barChart);
+    barView->setRenderHint(QPainter::Antialiasing);
+    layout->addWidget(barView);
+
+    QLineSeries *lineSeries = new QLineSeries();
+    lineSeries->setName("Effectif total");
+    lineSeries->append(0, 38);
+    lineSeries->append(1, 39);
+    lineSeries->append(2, 40);
+    lineSeries->append(3, 41);
+    lineSeries->append(4, 43);
+    lineSeries->append(5, 45);
+
+    QChart *lineChart = new QChart();
+    lineChart->addSeries(lineSeries);
+    lineChart->setTitle("Tendance de l'effectif (semestre)");
+    lineChart->setAnimationOptions(QChart::AllAnimations);
+
+    QValueAxis *xAxis = new QValueAxis();
+    xAxis->setLabelFormat("%d");
+    xAxis->setTitleText("Mois");
+    xAxis->setTickCount(7);
+    xAxis->setRange(0, 5);
+    QValueAxis *yAxis = new QValueAxis();
+    yAxis->setTitleText("Employés");
+    yAxis->setRange(35, 50);
+    lineChart->addAxis(xAxis, Qt::AlignBottom);
+    lineChart->addAxis(yAxis, Qt::AlignLeft);
+    lineSeries->attachAxis(xAxis);
+    lineSeries->attachAxis(yAxis);
+    lineChart->legend()->setVisible(false);
+
+    QChartView *lineView = new QChartView(lineChart);
+    lineView->setRenderHint(QPainter::Antialiasing);
+    layout->addWidget(lineView);
+}
+
+void MainWindow::setupPersonnelTable()
+{
+    if (!ui->tableWidget_4)
+        return;
+
+    QTableWidget* table = ui->tableWidget_4;
+
+    if (table->columnCount() > 0) {
+        int last = table->columnCount() - 1;
+        auto* hLast = table->horizontalHeaderItem(last);
+        if (hLast && hLast->text().trimmed().compare(QStringLiteral("Actions"), Qt::CaseInsensitive) == 0) {
+            for (int r = 0; r < table->rowCount(); ++r) {
+                if (!table->cellWidget(r, last)) addActionButtonsToRow(r);
+            }
+            return;
+        }
+    }
+
+    int actionsCol = table->columnCount();
+    table->insertColumn(actionsCol);
+
+    QStringList headers;
+    for (int c = 0; c < table->columnCount(); ++c) {
+        if (c == actionsCol) {
+            headers << QStringLiteral("Actions");
+        } else {
+            auto* item = table->horizontalHeaderItem(c);
+            headers << (item ? item->text() : QString("Col %1").arg(c));
+        }
+    }
+    table->setHorizontalHeaderLabels(headers);
+
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    if (table->verticalHeader())
+        table->verticalHeader()->setDefaultSectionSize(32);
+
+    for (int r = 0; r < table->rowCount(); ++r)
+        addActionButtonsToRow(r);
+
+    if (table->horizontalHeader()) {
+        table->horizontalHeader()->setStretchLastSection(false);
+        int last = table->columnCount() - 1;
+        for (int c = 0; c < last; ++c)
+            table->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+        table->horizontalHeader()->setSectionResizeMode(last, QHeaderView::ResizeToContents);
+        table->setColumnWidth(last, 90);
+    }
+}
+
+void MainWindow::addActionButtonsToRow(int row)
+{
+    if (!ui->tableWidget_4) return;
+    auto* table = ui->tableWidget_4;
+
+    QWidget* container = new QWidget(table);
+    auto* h = new QHBoxLayout(container);
+    h->setContentsMargins(0, 0, 0, 0);
+    h->setSpacing(6);
+    h->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    QPushButton* btnModify = new QPushButton(QString(), container);
+    btnModify->setProperty("type", "warning");
+    btnModify->setProperty("size", "small");
+    btnModify->setObjectName("modifyBtn");
+    btnModify->setFocusPolicy(Qt::NoFocus);
+    btnModify->setToolTip(tr("Modifier"));
+    btnModify->setIcon(QIcon(QStringLiteral(":/img/edit.svg")));
+    btnModify->setIconSize(QSize(16, 16));
+    btnModify->setFixedSize(28, 24);
+
+    QPushButton* btnDelete = new QPushButton(QString(), container);
+    btnDelete->setProperty("type", "danger");
+    btnDelete->setProperty("size", "small");
+    btnDelete->setObjectName("deleteBtn");
+    btnDelete->setFocusPolicy(Qt::NoFocus);
+    btnDelete->setToolTip(tr("Supprimer"));
+    btnDelete->setIcon(QIcon(QStringLiteral(":/img/delete.svg")));
+    btnDelete->setIconSize(QSize(16, 16));
+    btnDelete->setFixedSize(28, 24);
+
+    h->addWidget(btnModify);
+    h->addWidget(btnDelete);
+    container->setLayout(h);
+
+    table->setCellWidget(row, table->columnCount() - 1, container);
+    table->setRowHeight(row, 34);
+
+    connect(btnModify, &QPushButton::clicked, this, [this]() {
+        int row = findRowForButton(sender());
+        if (row < 0) return;
+        ui->tableWidget_4->selectRow(row);
+        QMessageBox::information(this, tr("Modifier"), tr("Modifier la ligne %1").arg(row + 1));
+    });
+
+    connect(btnDelete, &QPushButton::clicked, this, [this]() {
+        int row = findRowForButton(sender());
+        if (row < 0) return;
+        auto reply = QMessageBox::question(this, tr("Supprimer"), tr("Supprimer la ligne %1 ?").arg(row + 1));
+        if (reply == QMessageBox::Yes)
+            ui->tableWidget_4->removeRow(row);
+    });
+}
+
+int MainWindow::findRowForButton(QObject* button) const
+{
+    if (!button || !ui->tableWidget_4) return -1;
+    auto* table = ui->tableWidget_4;
+
+    for (int r = 0; r < table->rowCount(); ++r) {
+        QWidget* cell = table->cellWidget(r, table->columnCount() - 1);
+        if (!cell) continue;
+        auto* mod = cell->findChild<QPushButton*>("modifyBtn");
+        auto* del = cell->findChild<QPushButton*>("deleteBtn");
+        if (mod == button || del == button)
+            return r;
+    }
+    return -1;
+}
+
+void MainWindow::on_faceBtn_clicked()
+{
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Facial Recognition"));
+    dlg.resize(640, 420);
+
+    auto* root = new QVBoxLayout(&dlg);
+    root->setContentsMargins(16, 16, 16, 16);
+    root->setSpacing(12);
+
+    auto* heading = new QLabel(tr("Facial Recognition"), &dlg);
+    heading->setProperty("type", "heading");
+    root->addWidget(heading);
+
+    auto* preview = new QWidget(&dlg);
+    preview->setObjectName("facePreview");
+    preview->setMinimumSize(560, 300);
+    root->addWidget(preview, 1);
+
+    auto* footer = new QHBoxLayout();
+    auto* status = new QLabel(tr("Camera idle"), &dlg);
+    status->setProperty("type", "subheading");
+    auto* spacer = new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    auto* btnStart = new QPushButton(tr("Start"), &dlg);
+    auto* btnClose = new QPushButton(tr("Close"), &dlg);
+    btnStart->setProperty("type", "primary");
+
+    footer->addWidget(status);
+    footer->addItem(spacer);
+    footer->addWidget(btnStart);
+    footer->addWidget(btnClose);
+    root->addLayout(footer);
+
+    bool running = false;
+    QObject::connect(btnStart, &QPushButton::clicked, &dlg, [&, status, btnStart]() mutable {
+        running = !running;
+        status->setText(running ? tr("Camera running…") : tr("Camera idle"));
+        btnStart->setText(running ? tr("Stop") : tr("Start"));
+    });
+    QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::reject);
+
+    dlg.exec();
+}
+// ════════════════════════════════════════════════════════════════════════════
+//  HUILE — BOUTONS ACTION (séparé du module Personnel)
+// ════════════════════════════════════════════════════════════════════════════
+
+int MainWindow::findRowForHuileButton(QObject* button) const
+{
+    if (!button || !ui->tableWidget_4) return -1;
+    auto* table = ui->tableWidget_4;
+    for (int r = 0; r < table->rowCount(); ++r) {
+        QWidget* cell = table->cellWidget(r, table->columnCount() - 1);
+        if (!cell) continue;
+        auto* mod = cell->findChild<QPushButton*>("huileModifyBtn");
+        auto* del = cell->findChild<QPushButton*>("huileDeleteBtn");
+        if (mod == button || del == button)
+            return r;
+    }
+    return -1;
+}
+
+void MainWindow::addHuileActionButtonsToRow(int row)
+{
+    if (!ui->tableWidget_4) return;
+    auto* table = ui->tableWidget_4;
+    int actionsCol = table->columnCount() - 1;
+
+    QWidget* container = new QWidget(table);
+    auto* h = new QHBoxLayout(container);
+    h->setContentsMargins(2, 2, 2, 2);
+    h->setSpacing(4);
+    h->setAlignment(Qt::AlignCenter);
+    ui->idstockLineEdit->setText(table->item(row, 8)->text());
+    // Bouton Modifier (orange)
+    QPushButton* btnModify = new QPushButton(container);
+    btnModify->setObjectName("huileModifyBtn");
+    btnModify->setText(QString::fromUtf8("Modifier"));
+    btnModify->setFixedSize(100, 30);
+    btnModify->setToolTip("Modifier");
+    btnModify->setStyleSheet(
+        "QPushButton#huileModifyBtn { background-color: #e6a817; color: #ffffff; border-radius: 4px; font-size: 11px; font-weight: bold; padding: 0px 4px; }"
+        "QPushButton#huileModifyBtn:hover { background-color: #c8911a; }"
+        );
+
+    // Bouton Supprimer (rouge)
+    QPushButton* btnDelete = new QPushButton(container);
+    btnDelete->setObjectName("huileDeleteBtn");
+    btnDelete->setText(QString::fromUtf8("Supprimer"));
+    btnDelete->setFixedSize(100, 30);
+    btnDelete->setToolTip("Supprimer");
+    btnDelete->setStyleSheet(
+        "QPushButton#huileDeleteBtn { background-color: #e53935; color: #ffffff; border-radius: 4px; font-size: 11px; font-weight: bold; padding: 0px 4px; }"
+        "QPushButton#huileDeleteBtn:hover { background-color: #b71c1c; }"
+        );
+
+    h->addWidget(btnModify);
+    h->addWidget(btnDelete);
+    container->setLayout(h);
+    table->setCellWidget(row, actionsCol, container);
+    table->setRowHeight(row, 50);
+
+    // ── SUPPRIMER ───────────────────────────────────────────────
+    connect(btnDelete, &QPushButton::clicked, this, [this, table]() {
+        int row = findRowForHuileButton(sender());
+        if (row < 0) return;
+
+        QString idLot = table->item(row, 0)->text();
+
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("Confirmation de suppression");
+        msgBox.setText("Voulez-vous vraiment supprimer cette huile ?");
+        msgBox.setIcon(QMessageBox::Warning);
+        QPushButton* ouiBtn = msgBox.addButton("  Oui  ", QMessageBox::YesRole);
+        QPushButton* nonBtn = msgBox.addButton("  Non  ", QMessageBox::NoRole);
+        ouiBtn->setStyleSheet(
+            "background-color: #e53935; color: white; padding: 5px 15px; border-radius: 4px;");
+        nonBtn->setStyleSheet(
+            "background-color: #9e9e9e; color: white; padding: 5px 15px; border-radius: 4px;");
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == ouiBtn) {
+            QSqlQuery query;
+            query.prepare("DELETE FROM QUALITE WHERE id_lot = ?");
+            query.addBindValue(idLot.toInt());
+            if (query.exec()) {
+                table->removeRow(row);
+                QMessageBox::information(this, "Succès", "Suppression avec succès !");
+            } else {
+                QMessageBox::critical(this, "Erreur",
+                                      "Échec de la suppression :\n" + query.lastError().text());
+            }
+        }
+    });
+
+    // ── MODIFIER ────────────────────────────────────────────────
+    connect(btnModify, &QPushButton::clicked, this, [this, table]() {
+        int row = findRowForHuileButton(sender());
+        if (row < 0) return;
+
+        m_editingIdLot = table->item(row, 0)->text().toInt();
+
+        ui->idlotLineEdit->setText(table->item(row, 0)->text());
+        ui->nomresponsableLineEdit->setText(table->item(row, 1)->text());
+
+        QString dateStr = table->item(row, 2)->text();
+        QDate date = QDate::fromString(dateStr.left(10), "yyyy-MM-dd");
+        if (!date.isValid()) date = QDate(2000, 1, 1);
+        ui->dateprodDateEdit->setDate(date);
+
+        ui->quantiteLineEdit->setText(table->item(row, 3)->text());
+        ui->phLineEdit->setText(table->item(row, 4)->text());
+
+        QString acidite = table->item(row, 5)->text();
+        int acidIdx = ui->aciditeComboBox->findText(acidite, Qt::MatchContains);
+        if (acidIdx >= 0) ui->aciditeComboBox->setCurrentIndex(acidIdx);
+
+        ui->amertureLineEdit->setText(table->item(row, 6)->text());
+
+        QString statut = table->item(row, 7)->text();
+        int statIdx = ui->statutComboBox->findText(statut, Qt::MatchContains);
+        if (statIdx >= 0) ui->statutComboBox->setCurrentIndex(statIdx);
+
+        ui->idstockLineEdit->setText(table->item(row, 8)->text());
+        ui->codecouleurLineEdit->setText(table->item(row, 9)->text());
+
+        // Récupère max_quantite depuis la base car non affiché dans le tableau
+        QSqlQuery qMax;
+        qMax.prepare("SELECT max_quantite FROM QUALITE WHERE id_lot = ?");
+        qMax.addBindValue(m_editingIdLot);
+        if (qMax.exec() && qMax.next())
+            ui->maxqtLineEdit->setText(qMax.value("max_quantite").toString());
+        else
+            ui->maxqtLineEdit->clear();
+
+        // Change Ajouter -> Sauvegarder
+        ui->ajouterHuileBtn->setText("Sauvegarder");
+        ui->ajouterHuileBtn->disconnect();
+        connect(ui->ajouterHuileBtn, &QPushButton::clicked,
+                this, &MainWindow::sauvegarderHuile);
+
+        ui->metiershuile->setCurrentIndex(0);
+    });
+}
+void MainWindow::sauvegarderHuile()
+{
+    QString nomResp     = ui->nomresponsableLineEdit->text().trimmed();
+    QString dateStr     = ui->dateprodDateEdit->date().toString("yyyy-MM-dd");
+    QString statut      = ui->statutComboBox->currentText();
+    QString quantite    = ui->quantiteLineEdit->text().trimmed();
+    QString maxqt       = ui->maxqtLineEdit->text().trimmed();
+    QString ph          = ui->phLineEdit->text().trimmed();
+    QString idStock     = ui->idstockLineEdit->text().trimmed();  // ← NOUVEAU
+    QString aciditeText = ui->aciditeComboBox->currentText();
+    double aciditeVal   = aciditeComboToValue(aciditeText);
+    QString codeCouleur = ui->codecouleurLineEdit->text().trimmed();
+    QString amerture    = ui->amertureLineEdit->text().trimmed();
+
+    // Validation
+    if (nomResp.isEmpty() || quantite.isEmpty() || maxqt.isEmpty() ||
+        ph.isEmpty() || idStock.isEmpty() || codeCouleur.isEmpty() || amerture.isEmpty())
+    {
+        QMessageBox::warning(this, "Champs vides", "Veuillez remplir tous les champs.");
+        return;
+    }
+
+    // Vérifier l'ID Stock
+    QSqlQuery checkStock;
+    checkStock.prepare("SELECT id_stock FROM STOCK WHERE id_stock = ?");
+    checkStock.addBindValue(idStock.toInt());
+    if (!checkStock.exec() || !checkStock.next()) {
+        QMessageBox::warning(this, "ID Stock invalide", "Cet ID Stock n'existe pas.");
+        return;
+    }
+
+    // UPDATE
+    QSqlQuery query;
+    query.prepare("UPDATE QUALITE SET "
+                  "date_production = TO_DATE(?, 'YYYY-MM-DD'), "
+                  "quantite_produite = ?, "
+                  "ph = ?, "
+                  "acidite = ?, "
+                  "amerture = ?, "
+                  "code_couleur = ?, "
+                  "statut_qualite = ?, "
+                  "responsable_controle = ?, "
+                  "max_quantite = ?, "
+                  "id_stock = ? "
+                  "WHERE id_lot = ?");
+
+    query.addBindValue(dateStr);
+    query.addBindValue(quantite.toDouble());
+    query.addBindValue(ph.toDouble());
+    query.addBindValue(aciditeVal);
+    query.addBindValue(amerture.toDouble());
+    query.addBindValue(codeCouleur);
+    query.addBindValue(statut);
+    query.addBindValue(nomResp);
+    query.addBindValue(maxqt.toDouble());
+    query.addBindValue(idStock.toInt());  // ← NOUVEAU
+    query.addBindValue(m_editingIdLot);
+
+    if (query.exec()) {
+        QMessageBox::information(this, "Succès", "Modification avec succès !");
+        // ... reset des champs ...
+        on_btnConsulterQualite_clicked();
+    } else {
+        QMessageBox::critical(this, "Erreur", "Échec de la modification :\n" + query.lastError().text());
+    }
+}
+void MainWindow::on_pushButton_3_clicked()
+{
+    if (!ui->tableWidget_4 || ui->tableWidget_4->rowCount() == 0) {
+        QMessageBox::warning(this, "Export", "Aucune donnée à exporter.");
+        return;
+    }
+
+    // Demande à l'utilisateur où sauvegarder le fichier
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        "Exporter les données",
+        "qualite_huile.csv",
+        "Fichiers CSV (*.csv)"
+        );
+
+    if (filePath.isEmpty()) return; // L'utilisateur a annulé
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Erreur", "Impossible de créer le fichier.");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringConverter::Utf8);
+
+    // Écriture des en-têtes (sans la colonne Actions)
+    QStringList headers;
+    int colCount = ui->tableWidget_4->columnCount() - 1; // -1 pour ignorer Actions
+    for (int c = 0; c < colCount; c++) {
+        auto* header = ui->tableWidget_4->horizontalHeaderItem(c);
+        headers << (header ? header->text() : QString("Col%1").arg(c));
+    }
+    out << headers.join(";") << "\n";
+
+    // Écriture des données
+    for (int r = 0; r < ui->tableWidget_4->rowCount(); r++) {
+        QStringList rowData;
+        for (int c = 0; c < colCount; c++) {
+            auto* item = ui->tableWidget_4->item(r, c);
+            QString val = item ? item->text() : "";
+            // Si la valeur contient un point-virgule, entourer de guillemets
+            if (val.contains(";")) val = "\"" + val + "\"";
+            rowData << val;
+        }
+        out << rowData.join(";") << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "Succès",
+                             "Export réussi !\nFichier sauvegardé :\n" + filePath);
+}
+void MainWindow::on_recherchelot_textChanged(const QString &text)
+{
+    if (!ui->tableWidget_4) return;
+
+    QString needle = text.trimmed();
+    QString critere = ui->comboBoxrecherche->currentText();
+
+    // Mapping critere -> colonne du tableau
+    // col 0=ID lot, col 1=Nom responsable, col 2=Date production
+    int col = -1; // -1 = cherche dans toutes les colonnes
+    if (critere == "ID")
+        col = 0;
+    else if (critere == "Nom resp")
+        col = 1;
+    else if (critere == "Date prod")
+        col = 2;
+
+    for (int r = 0; r < ui->tableWidget_4->rowCount(); ++r) {
+        bool found = false;
+
+        if (needle.isEmpty()) {
+            found = true;
+        } else if (col >= 0) {
+            // Recherche dans la colonne specifique
+            auto* item = ui->tableWidget_4->item(r, col);
+            found = item && item->text().contains(needle, Qt::CaseInsensitive);
+        } else {
+            // Recherche dans toutes les colonnes
+            int colCount = ui->tableWidget_4->columnCount() - 1;
+            for (int c = 0; c < colCount; ++c) {
+                auto* item = ui->tableWidget_4->item(r, c);
+                if (item && item->text().contains(needle, Qt::CaseInsensitive)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        ui->tableWidget_4->setRowHidden(r, !found);
+    }
+}
+
+void MainWindow::on_comboBoxrecherche_currentTextChanged(const QString &)
+{
+    // Quand le critere change, relance la recherche avec le texte actuel
+    on_recherchelot_textChanged(ui->recherchelot->text());
+}
+// ════════════════════════════════════════════════════════════════════════════
+//  STATISTIQUES HUILE
+// ════════════════════════════════════════════════════════════════════════════
+
+
+void MainWindow::setupStatHuilePage()
+{
+    QWidget *statWidget = new QWidget();
+    QVBoxLayout *pageLayout = new QVBoxLayout(statWidget);
+    pageLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto *scroll = new QScrollArea(statWidget);
+    scroll->setWidgetResizable(true);
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    auto *container = new QWidget();
+    auto *mainLayout = new QVBoxLayout(container);
+    mainLayout->setContentsMargins(26, 24, 26, 24);
+    mainLayout->setSpacing(18);
+
+    auto createCardFrame = [](const QString &bgColor, const QString &borderColor) {
+        auto *frame = new QFrame();
+        frame->setStyleSheet(QString(
+            "QFrame { background:%1; border:1px solid %2; border-radius:18px; }"
+        ).arg(bgColor, borderColor));
+        return frame;
+    };
+
+    auto *hero = createCardFrame("#f8fbf2", "#dbe6c3");
+    hero->setMinimumHeight(120);
+    auto *heroLayout = new QVBoxLayout(hero);
+    heroLayout->setContentsMargins(24, 20, 24, 20);
+    heroLayout->setSpacing(10);
+
+    auto *heroTitle = new QLabel("Tableau de bord qualité de l'huile", hero);
+    heroTitle->setStyleSheet("font-size:28px; font-weight:800; color:#253418; border:none; background:transparent;");
+    heroTitle->setWordWrap(true);
+    heroLayout->addWidget(heroTitle);
+
+    auto *heroSub = new QLabel("Suivi visuel de la conformité, des quantités produites, du pH, de l'acidité et de la température de production des lots.", hero);
+    heroSub->setStyleSheet("font-size:14px; color:#5f6f48; border:none; background:transparent;");
+    heroSub->setWordWrap(true);
+    heroLayout->addWidget(heroSub);
+    mainLayout->addWidget(hero);
+
+    auto createStatCard = [](const QString &title, QLabel **valueLabel, const QString &accent, const QString &bg, const QString &subText) {
+        auto *card = new QFrame();
+        card->setMinimumSize(270, 140);
+        card->setStyleSheet(QString(
+            "QFrame { background:%1; border:1px solid #d7e2c5; border-radius:18px; }"
+        ).arg(bg));
+        auto *layout = new QVBoxLayout(card);
+        layout->setContentsMargins(18, 16, 18, 16);
+        layout->setSpacing(8);
+
+        auto *topRow = new QHBoxLayout();
+        topRow->setSpacing(8);
+
+        auto *titleLabel = new QLabel(title, card);
+        titleLabel->setWordWrap(true);
+        titleLabel->setStyleSheet("font-size:15px; font-weight:700; color:#243418; border:none; background:transparent;");
+        topRow->addWidget(titleLabel, 1);
+
+        auto *badge = new QLabel("KPI", card);
+        badge->setAlignment(Qt::AlignCenter);
+        badge->setFixedSize(46, 28);
+        badge->setStyleSheet(QString(
+            "QLabel { background:%1; color:white; font-size:12px; font-weight:700; border:none; border-radius:14px; }"
+        ).arg(accent));
+        topRow->addWidget(badge, 0, Qt::AlignTop);
+        layout->addLayout(topRow);
+
+        *valueLabel = new QLabel("0", card);
+        (*valueLabel)->setStyleSheet("font-size:34px; font-weight:800; color:#1f2d15; border:none; background:transparent;");
+        (*valueLabel)->setWordWrap(true);
+        layout->addWidget(*valueLabel);
+
+        auto *subLabel = new QLabel(subText, card);
+        subLabel->setWordWrap(true);
+        subLabel->setStyleSheet("font-size:13px; color:#6d7b56; border:none; background:transparent;");
+        layout->addWidget(subLabel);
+
+        return card;
+    };
+
+    auto *cardsGrid = new QGridLayout();
+    cardsGrid->setHorizontalSpacing(16);
+    cardsGrid->setVerticalSpacing(16);
+    cardsGrid->addWidget(createStatCard("Total des lots", &m_huileTotalLotsValue, "#556B2F", "#f4f8eb", "Nombre total des lots enregistrés dans le module qualité."), 0, 0);
+    cardsGrid->addWidget(createStatCard("Lots acceptés", &m_huileAcceptedValue, "#2f8f63", "#eef9f3", "Lots conformes et prêts à être valorisés."), 0, 1);
+    cardsGrid->addWidget(createStatCard("Lots en cours", &m_huileEnCoursValue, "#d4af37", "#fff9ea", "Lots encore en contrôle ou en analyse."), 1, 0);
+    cardsGrid->addWidget(createStatCard("Lots rejetés", &m_huileRejectedValue, "#b2413e", "#fff1f1", "Lots non conformes nécessitant une action rapide."), 1, 1);
+    cardsGrid->addWidget(createStatCard("Quantité totale", &m_huileTotalQuantiteValue, "#7f5b3b", "#f9f3ee", "Somme des quantités produites sur l'ensemble des lots."), 2, 0);
+    cardsGrid->addWidget(createStatCard("Taux de conformité", &m_huileConformiteValue, "#4c83c3", "#f1f6ff", "Part des lots acceptés par rapport au total."), 2, 1);
+    cardsGrid->addWidget(createStatCard("pH moyen", &m_huileAvgPhValue, "#6b4f3f", "#fbf6f2", "Indicateur global de l'équilibre chimique des lots."), 3, 0);
+    cardsGrid->addWidget(createStatCard("Acidité moyenne", &m_huileAvgAciditeValue, "#8a6f30", "#fff8ef", "Mesure moyenne de l'acidité observée sur les lots."), 3, 1);
+
+    auto *cardsWidget = new QWidget(container);
+    cardsWidget->setLayout(cardsGrid);
+    mainLayout->addWidget(cardsWidget);
+
+    auto createChartSection = [](const QString &title, const QString &subtitle, QChartView **viewPtr, int minHeight) {
+        auto *frame = new QFrame();
+        frame->setStyleSheet("QFrame { background:#ffffff; border:1px solid #dbe6c8; border-radius:20px; }");
+        frame->setMinimumHeight(minHeight);
+        auto *layout = new QVBoxLayout(frame);
+        layout->setContentsMargins(18, 18, 18, 18);
+        layout->setSpacing(10);
+
+        auto *titleLabel = new QLabel(title, frame);
+        titleLabel->setStyleSheet("font-size:17px; font-weight:800; color:#2a391f; border:none; background:transparent;");
+        titleLabel->setWordWrap(true);
+        layout->addWidget(titleLabel);
+
+        auto *subLabel = new QLabel(subtitle, frame);
+        subLabel->setStyleSheet("font-size:13px; color:#6d7b56; border:none; background:transparent;");
+        subLabel->setWordWrap(true);
+        layout->addWidget(subLabel);
+
+        *viewPtr = new QChartView(frame);
+        (*viewPtr)->setRenderHint(QPainter::Antialiasing);
+        (*viewPtr)->setMinimumHeight(minHeight - 95);
+        (*viewPtr)->setStyleSheet("background:transparent; border:none;");
+        layout->addWidget(*viewPtr, 1);
+        return frame;
+    };
+
+    auto *chartsRow = new QHBoxLayout();
+    chartsRow->setSpacing(16);
+    chartsRow->addWidget(createChartSection(
+        "Répartition par statut",
+        "Vue globale des lots acceptés, en cours et rejetés pour repérer rapidement le niveau de conformité.",
+        &m_pieChartView,
+        330), 1);
+    chartsRow->addWidget(createChartSection(
+        "Top lots par quantité",
+        "Classement des lots les plus volumineux pour suivre la production et la traçabilité.",
+        &m_barChartView,
+        330), 1);
+
+    auto *chartsRowWidget = new QWidget(container);
+    chartsRowWidget->setLayout(chartsRow);
+    mainLayout->addWidget(chartsRowWidget);
+
+    mainLayout->addWidget(createChartSection(
+        "Profil qualité par lot",
+        "Comparaison du pH, de l'acidité et de la température de production pour chaque lot.",
+        &m_lineChartView,
+        360));
+
+    auto *insightFrame = createCardFrame("#fdfdf8", "#dbe6c8");
+    auto *insightLayout = new QVBoxLayout(insightFrame);
+    insightLayout->setContentsMargins(20, 18, 20, 18);
+    insightLayout->setSpacing(8);
+
+    auto *insightTitle = new QLabel("Lecture rapide", insightFrame);
+    insightTitle->setStyleSheet("font-size:16px; font-weight:800; color:#556B2F; border:none; background:transparent;");
+    insightLayout->addWidget(insightTitle);
+
+    m_huileInsightLabel = new QLabel("Les indicateurs qualité de l'huile s'affichent ici après chargement des données.", insightFrame);
+    m_huileInsightLabel->setWordWrap(true);
+    m_huileInsightLabel->setStyleSheet("font-size:14px; color:#4c5840; border:none; background:transparent;");
+    insightLayout->addWidget(m_huileInsightLabel);
+    mainLayout->addWidget(insightFrame);
+    mainLayout->addStretch(1);
+
+    scroll->setWidget(container);
+    pageLayout->addWidget(scroll);
+
+    QStackedWidget *metiersHuile = ui->metiershuile;
+    if (metiersHuile && metiersHuile->count() > 2) {
+        QWidget *oldWidget = metiersHuile->widget(2);
+        metiersHuile->removeWidget(oldWidget);
+        metiersHuile->insertWidget(2, statWidget);
+        delete oldWidget;
+    }
+}
+
+void MainWindow::chargerStatistiquesHuile()
+{
+    auto setHuileDefaults = [this]() {
+        if (m_huileTotalLotsValue) m_huileTotalLotsValue->setText("0");
+        if (m_huileAcceptedValue) m_huileAcceptedValue->setText("0");
+        if (m_huileEnCoursValue) m_huileEnCoursValue->setText("0");
+        if (m_huileRejectedValue) m_huileRejectedValue->setText("0");
+        if (m_huileTotalQuantiteValue) m_huileTotalQuantiteValue->setText("0 L");
+        if (m_huileConformiteValue) m_huileConformiteValue->setText("0 %");
+        if (m_huileAvgPhValue) m_huileAvgPhValue->setText("0.00");
+        if (m_huileAvgAciditeValue) m_huileAvgAciditeValue->setText("0.00");
+        if (m_huileInsightLabel) m_huileInsightLabel->setText("Aucune donnée qualité disponible pour le moment.");
+    };
+
+    setHuileDefaults();
+
+    if (!m_pieChartView || !m_barChartView || !m_lineChartView)
+        return;
+
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isValid() || !db.isOpen()) {
+        if (m_huileInsightLabel) {
+            m_huileInsightLabel->setText("La base Oracle n'est pas connectée. Ouvre la connexion puis recharge les statistiques.");
+        }
+        return;
+    }
+
+    auto normalizeStatus = [](QString value) {
+        value = value.trimmed().toLower();
+        value.replace("é", "e");
+        value.replace("è", "e");
+        value.replace("ê", "e");
+        value.replace("à", "a");
+        value.replace("ù", "u");
+        value.replace("î", "i");
+        return value;
+    };
+
+    int totalLots = 0;
+    int acceptedLots = 0;
+    int enCoursLots = 0;
+    int rejectedLots = 0;
+    double totalQuantite = 0.0;
+    double avgPh = 0.0;
+    double avgAcidite = 0.0;
+
+    QSqlQuery queryAgg;
+    queryAgg.prepare("SELECT COUNT(*) AS total_lots, NVL(SUM(quantite_produite),0) AS total_quantite, NVL(AVG(ph),0) AS avg_ph, NVL(AVG(acidite),0) AS avg_acidite FROM QUALITE");
+    if (queryAgg.exec() && queryAgg.next()) {
+        totalLots = queryAgg.value("total_lots").toInt();
+        totalQuantite = queryAgg.value("total_quantite").toDouble();
+        avgPh = queryAgg.value("avg_ph").toDouble();
+        avgAcidite = queryAgg.value("avg_acidite").toDouble();
+    }
+
+    QMap<QString, int> statusCounts;
+    QSqlQuery queryStatus;
+    queryStatus.prepare("SELECT NVL(statut_qualite, 'Non défini') AS statut, COUNT(*) AS count FROM QUALITE GROUP BY statut_qualite");
+    if (queryStatus.exec()) {
+        while (queryStatus.next()) {
+            const QString rawStatus = queryStatus.value("statut").toString();
+            const int count = queryStatus.value("count").toInt();
+            statusCounts.insert(rawStatus, count);
+
+            const QString normalized = normalizeStatus(rawStatus);
+            if (normalized.contains("accept") || normalized.contains("valid"))
+                acceptedLots += count;
+            else if (normalized.contains("rejet") || normalized.contains("refus"))
+                rejectedLots += count;
+            else
+                enCoursLots += count;
+        }
+    }
+
+    const double conformityRate = totalLots > 0 ? (acceptedLots * 100.0 / totalLots) : 0.0;
+
+    if (m_huileTotalLotsValue) m_huileTotalLotsValue->setText(QString::number(totalLots));
+    if (m_huileAcceptedValue) m_huileAcceptedValue->setText(QString::number(acceptedLots));
+    if (m_huileEnCoursValue) m_huileEnCoursValue->setText(QString::number(enCoursLots));
+    if (m_huileRejectedValue) m_huileRejectedValue->setText(QString::number(rejectedLots));
+    if (m_huileTotalQuantiteValue) m_huileTotalQuantiteValue->setText(QString::number(totalQuantite, 'f', totalQuantite < 1000 ? 1 : 0) + " L");
+    if (m_huileConformiteValue) m_huileConformiteValue->setText(QString::number(conformityRate, 'f', 1) + " %");
+    if (m_huileAvgPhValue) m_huileAvgPhValue->setText(QString::number(avgPh, 'f', 2));
+    if (m_huileAvgAciditeValue) m_huileAvgAciditeValue->setText(QString::number(avgAcidite, 'f', 2));
+
+    // 1) Diagramme donut - répartition par statut
+    auto *pieSeries = new QPieSeries();
+    pieSeries->setHoleSize(0.45);
+    const QVector<QPair<QString, QColor>> preferredColors = {
+        {"Accepté", QColor("#4e9f6d")},
+        {"En cours", QColor("#d4af37")},
+        {"Rejeté", QColor("#c1514b")},
+        {"Non défini", QColor("#7d8b67")}
+    };
+
+    bool hasStatusData = false;
+    for (auto it = statusCounts.constBegin(); it != statusCounts.constEnd(); ++it) {
+        if (it.value() <= 0)
+            continue;
+        hasStatusData = true;
+        auto *slice = pieSeries->append(it.key() + " (" + QString::number(it.value()) + ")", it.value());
+        slice->setLabelVisible(true);
+        slice->setLabelArmLengthFactor(0.15);
+        const QString normalized = normalizeStatus(it.key());
+        QColor color("#7d8b67");
+        if (normalized.contains("accept") || normalized.contains("valid")) color = QColor("#4e9f6d");
+        else if (normalized.contains("rejet") || normalized.contains("refus")) color = QColor("#c1514b");
+        else if (normalized.contains("cours") || normalized.contains("anal")) color = QColor("#d4af37");
+        slice->setBrush(color);
+        slice->setPen(QPen(Qt::white, 2));
+    }
+    if (!hasStatusData) {
+        auto *slice = pieSeries->append("Aucune donnée", 1);
+        slice->setBrush(QColor("#dce6ca"));
+        slice->setLabelVisible(true);
+    }
+
+    auto *pieChart = new QChart();
+    pieChart->addSeries(pieSeries);
+    pieChart->legend()->setAlignment(Qt::AlignBottom);
+    pieChart->legend()->setLabelColor(QColor("#415033"));
+    pieChart->setBackgroundVisible(false);
+    pieChart->setMargins(QMargins(6, 6, 6, 6));
+    pieChart->setAnimationOptions(QChart::SeriesAnimations);
+    m_pieChartView->setChart(pieChart);
+
+    // 2) Top lots par quantité
+    auto *barSet = new QBarSet("Quantité (L)");
+    barSet->setColor(QColor("#8aa14a"));
+    QStringList categories;
+    QSqlQuery queryTopLots;
+    queryTopLots.prepare(
+        "SELECT id_lot, quantite_produite FROM ("
+        "SELECT id_lot, NVL(quantite_produite,0) AS quantite_produite FROM QUALITE ORDER BY quantite_produite DESC, id_lot"
+        ") WHERE ROWNUM <= 8"
+    );
+    if (queryTopLots.exec()) {
+        while (queryTopLots.next()) {
+            categories << ("Lot " + queryTopLots.value("id_lot").toString());
+            *barSet << queryTopLots.value("quantite_produite").toDouble();
+        }
+    }
+    if (categories.isEmpty()) {
+        categories << "Aucun lot";
+        *barSet << 0;
+    }
+
+    auto *barSeries = new QHorizontalBarSeries();
+    barSeries->append(barSet);
+
+    auto *barChart = new QChart();
+    barChart->addSeries(barSeries);
+    barChart->setBackgroundVisible(false);
+    barChart->setMargins(QMargins(12, 12, 12, 12));
+    barChart->legend()->hide();
+    barChart->setAnimationOptions(QChart::SeriesAnimations);
+
+    auto *axisY = new QBarCategoryAxis();
+    axisY->append(categories);
+    auto *axisX = new QValueAxis();
+    axisX->setLabelFormat("%.0f");
+    axisX->setTitleText("Litres");
+    axisX->setGridLineColor(QColor("#e6ecd8"));
+    axisX->setLinePenColor(QColor("#74855c"));
+    axisX->setLabelsColor(QColor("#556B2F"));
+
+    barChart->addAxis(axisY, Qt::AlignLeft);
+    barChart->addAxis(axisX, Qt::AlignBottom);
+    barSeries->attachAxis(axisY);
+    barSeries->attachAxis(axisX);
+    m_barChartView->setChart(barChart);
+
+    // 3) Profil qualité par lot
+    auto *phSeries = new QLineSeries();
+    phSeries->setName("pH");
+    phSeries->setColor(QColor("#2f8f63"));
+
+    auto *aciditeSeries = new QLineSeries();
+    aciditeSeries->setName("Acidité");
+    aciditeSeries->setColor(QColor("#b36b2c"));
+
+    auto *tempSeries = new QLineSeries();
+    tempSeries->setName("Température");
+    tempSeries->setColor(QColor("#4c83c3"));
+
+    QSqlQuery queryProfile;
+    queryProfile.prepare("SELECT id_lot, NVL(ph,0) AS ph, NVL(acidite,0) AS acidite, NVL(temperature_production,0) AS temperature_production FROM QUALITE ORDER BY id_lot");
+
+    int pointIndex = 0;
+    double maxLeftAxis = 14.0;
+    double maxTemp = 0.0;
+    if (queryProfile.exec()) {
+        while (queryProfile.next()) {
+            const double ph = queryProfile.value("ph").toDouble();
+            const double acidite = queryProfile.value("acidite").toDouble();
+            const double temp = queryProfile.value("temperature_production").toDouble();
+            phSeries->append(pointIndex, ph);
+            aciditeSeries->append(pointIndex, acidite);
+            tempSeries->append(pointIndex, temp);
+            maxLeftAxis = std::max(maxLeftAxis, std::max(ph, acidite) + 1.0);
+            maxTemp = std::max(maxTemp, temp);
+            ++pointIndex;
+        }
+    }
+    if (pointIndex == 0) {
+        phSeries->append(0, 0);
+        aciditeSeries->append(0, 0);
+        tempSeries->append(0, 0);
+        pointIndex = 1;
+    }
+
+    auto *lineChart = new QChart();
+    lineChart->setBackgroundVisible(false);
+    lineChart->setMargins(QMargins(10, 10, 10, 10));
+    lineChart->setAnimationOptions(QChart::SeriesAnimations);
+    lineChart->legend()->setAlignment(Qt::AlignBottom);
+    lineChart->legend()->setLabelColor(QColor("#415033"));
+    lineChart->addSeries(phSeries);
+    lineChart->addSeries(aciditeSeries);
+    lineChart->addSeries(tempSeries);
+
+    auto *xAxis = new QValueAxis();
+    xAxis->setTitleText("Index de lot");
+    xAxis->setRange(0, std::max(1, pointIndex - 1));
+    xAxis->setTickCount(std::min(6, std::max(2, pointIndex)));
+    xAxis->setGridLineColor(QColor("#edf2e3"));
+    xAxis->setLabelsColor(QColor("#556B2F"));
+    xAxis->setLinePenColor(QColor("#74855c"));
+
+    auto *yAxisLeft = new QValueAxis();
+    yAxisLeft->setTitleText("pH / Acidité");
+    yAxisLeft->setRange(0, maxLeftAxis);
+    yAxisLeft->setGridLineColor(QColor("#edf2e3"));
+    yAxisLeft->setLabelsColor(QColor("#556B2F"));
+    yAxisLeft->setLinePenColor(QColor("#74855c"));
+
+    auto *yAxisRight = new QValueAxis();
+    yAxisRight->setTitleText("Température");
+    yAxisRight->setRange(0, std::max(10.0, maxTemp + 5.0));
+    yAxisRight->setLabelsColor(QColor("#4c83c3"));
+    yAxisRight->setLinePenColor(QColor("#4c83c3"));
+
+    lineChart->addAxis(xAxis, Qt::AlignBottom);
+    lineChart->addAxis(yAxisLeft, Qt::AlignLeft);
+    lineChart->addAxis(yAxisRight, Qt::AlignRight);
+
+    phSeries->attachAxis(xAxis);
+    phSeries->attachAxis(yAxisLeft);
+    aciditeSeries->attachAxis(xAxis);
+    aciditeSeries->attachAxis(yAxisLeft);
+    tempSeries->attachAxis(xAxis);
+    tempSeries->attachAxis(yAxisRight);
+
+    m_lineChartView->setChart(lineChart);
+
+    QString insight = QString("Conformité globale : %1 %. ").arg(QString::number(conformityRate, 'f', 1));
+    if (conformityRate >= 80.0)
+        insight += "La majorité des lots est conforme, ce qui est rassurant pour la qualité globale.";
+    else if (conformityRate >= 50.0)
+        insight += "La conformité est moyenne : il faut surveiller les lots en cours et réduire les rejets.";
+    else
+        insight += "Le niveau de conformité est faible : il faut analyser rapidement les causes de non-conformité.";
+
+    if (totalLots > 0) {
+        QSqlQuery queryTopLot;
+        queryTopLot.prepare(
+            "SELECT id_lot, NVL(quantite_produite,0) AS quantite_produite FROM ("
+            "SELECT id_lot, quantite_produite FROM QUALITE ORDER BY quantite_produite DESC NULLS LAST, id_lot"
+            ") WHERE ROWNUM = 1"
+        );
+        if (queryTopLot.exec() && queryTopLot.next()) {
+            insight += QString(" Lot principal : lot %1 avec %2 L produits.")
+                       .arg(queryTopLot.value("id_lot").toString(),
+                            QString::number(queryTopLot.value("quantite_produite").toDouble(), 'f', 1));
+        }
+    }
+    insight += QString(" pH moyen : %1. Acidité moyenne : %2.")
+               .arg(QString::number(avgPh, 'f', 2), QString::number(avgAcidite, 'f', 2));
+
+    if (m_huileInsightLabel)
+        m_huileInsightLabel->setText(insight);
+}
+
+void MainWindow::on_btnStatHuile_clicked()
+{
+    if (ui->metiershuile) {
+        ui->metiershuile->setCurrentIndex(2);
+        chargerStatistiquesHuile();
+    }
+}
+// ════════════════════════════════════════════════════════════════════════════
+//  HUILE - TRI ET RECHARGEMENT
+// ════════════════════════════════════════════════════════════════════════════
+
+void MainWindow::on_trihuileButton_clicked()
+{
+    qDebug() << "Bouton tri cliqué";
+
+    QSqlQuery query;
+    query.prepare("SELECT id_lot, responsable_controle, date_production, "
+                  "quantite_produite, ph, acidite, amerture, statut_qualite, "
+                  "id_stock, code_couleur "
+                  "FROM QUALITE ORDER BY date_production DESC");
+
+    ui->tableWidget_4->setRowCount(0);
+
+    if (!query.exec()) {
+        QMessageBox::warning(this, "Erreur", "Erreur lors du tri: " + query.lastError().text());
+        return;
+    }
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidget_4->insertRow(row);
+        ui->tableWidget_4->setItem(row, 0, new QTableWidgetItem(query.value("id_lot").toString()));
+        ui->tableWidget_4->setItem(row, 1, new QTableWidgetItem(query.value("responsable_controle").toString()));
+        ui->tableWidget_4->setItem(row, 2, new QTableWidgetItem(query.value("date_production").toString()));
+        ui->tableWidget_4->setItem(row, 3, new QTableWidgetItem(query.value("quantite_produite").toString()));
+        ui->tableWidget_4->setItem(row, 4, new QTableWidgetItem(query.value("ph").toString()));
+        ui->tableWidget_4->setItem(row, 5, new QTableWidgetItem(query.value("acidite").toString()));
+        ui->tableWidget_4->setItem(row, 6, new QTableWidgetItem(query.value("amerture").toString()));
+        ui->tableWidget_4->setItem(row, 7, new QTableWidgetItem(query.value("statut_qualite").toString()));
+        ui->tableWidget_4->setItem(row, 8, new QTableWidgetItem(query.value("id_stock").toString()));
+        ui->tableWidget_4->setItem(row, 9, new QTableWidgetItem(query.value("code_couleur").toString()));
+        addHuileActionButtonsToRow(row);
+        row++;
+    }
+
+    QMessageBox::information(this, "Tri", QString("%1 lignes triées par date décroissante").arg(row));
+}
+
+void MainWindow::on_reloadhuilebutton_clicked()
+{
+    qDebug() << "Bouton rechargement cliqué";
+
+    QSqlQuery query;
+    query.prepare("SELECT id_lot, responsable_controle, date_production, "
+                  "quantite_produite, ph, acidite, amerture, statut_qualite, "
+                  "id_stock, code_couleur "
+                  "FROM QUALITE ORDER BY id_lot");
+
+    ui->tableWidget_4->setRowCount(0);
+
+    if (!query.exec()) {
+        QMessageBox::warning(this, "Erreur", "Erreur lors du rechargement: " + query.lastError().text());
+        return;
+    }
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidget_4->insertRow(row);
+        ui->tableWidget_4->setItem(row, 0, new QTableWidgetItem(query.value("id_lot").toString()));
+        ui->tableWidget_4->setItem(row, 1, new QTableWidgetItem(query.value("responsable_controle").toString()));
+        ui->tableWidget_4->setItem(row, 2, new QTableWidgetItem(query.value("date_production").toString()));
+        ui->tableWidget_4->setItem(row, 3, new QTableWidgetItem(query.value("quantite_produite").toString()));
+        ui->tableWidget_4->setItem(row, 4, new QTableWidgetItem(query.value("ph").toString()));
+        ui->tableWidget_4->setItem(row, 5, new QTableWidgetItem(query.value("acidite").toString()));
+        ui->tableWidget_4->setItem(row, 6, new QTableWidgetItem(query.value("amerture").toString()));
+        ui->tableWidget_4->setItem(row, 7, new QTableWidgetItem(query.value("statut_qualite").toString()));
+        ui->tableWidget_4->setItem(row, 8, new QTableWidgetItem(query.value("id_stock").toString()));
+        ui->tableWidget_4->setItem(row, 9, new QTableWidgetItem(query.value("code_couleur").toString()));
+        addHuileActionButtonsToRow(row);
+        row++;
+    }
+
+    QMessageBox::information(this, "Actualisation", QString("%1 lignes chargées").arg(row));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EVENT FILTER
+// ════════════════════════════════════════════════════════════════════════════
+
+bool MainWindow::eventFilter(QObject* obj, QEvent* event)
+{
+    if (obj == ui->codecouleurLineEdit && event->type() == QEvent::MouseButtonPress) {
+        QColor initial = QColor(ui->codecouleurLineEdit->text());
+        if (!initial.isValid()) initial = Qt::white;
+
+        QColor color = QColorDialog::getColor(initial, this, "Choisissez une couleur");
+        if (color.isValid()) {
+            QString hex = color.name();
+            ui->codecouleurLineEdit->setText(hex);
+            ui->codecouleurLineEdit->setStyleSheet(
+                QString("background-color: %1; color: %2; border: 2px solid #ccc; border-radius: 4px;")
+                    .arg(hex)
+                    .arg(color.lightness() > 128 ? "#000000" : "#ffffff"));
+        }
+        return true;
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+void MainWindow::on_btnAdvHuile_clicked()
+{
+    if (ui->metiershuile) {
+        // Aller à l'index de la page "metieravancee"
+        // L'index 3 correspond à la page "metieravancee" dans metiershuile
+        ui->metiershuile->setCurrentIndex(3);
+
+        QMessageBox::information(this, "Mode Avancé",
+                                 "Fonctionnalités avancées - Page en développement");
+    }
+}
+
+
+// ════════════════════════════════════════════════════════════════════════════
+//  MACHINES — INTÉGRATION
+// ════════════════════════════════════════════════════════════════════════════
+
+void MainWindow::setupModule5()
+{
+    ensureMachineTopBarVisible();
+    ensureSerieComboInMachineForm();
+    ensureMachineExtraFields();
+    ensureMachineSearchModes();
+    ensureSerieUiInAdvanced();
+    ensureMachineTableColumns();
+    setupMachineHeaderSorting();
+    setupValidatorsModule5();
+
+    if (auto *lbl = findChild<QLabel*>("statusmachineLabel")) {
+        lbl->setText("Etat machine");
+    }
+    if (auto *lbl = findChild<QLabel*>("fonctionmachinelabel")) {
+        lbl->setText("Type de machine");
+    }
+    if (auto *lbl = findChild<QLabel*>("datefonctmachinelabel")) {
+        lbl->setText("Date d'installation");
+    }
+
+    if (ui->metierspersonnel_2 && ui->consulterpersonnel_3)
+        ui->metierspersonnel_2->setCurrentWidget(ui->consulterpersonnel_3);
+
+    if (btnRefreshAdvanced) {
+        connect(btnRefreshAdvanced, &QPushButton::clicked, this, [this]() {
+            refreshAdvancedAnalytics();
+        });
+    }
+    if (btnApplyRiskFormula) {
+        connect(btnApplyRiskFormula, &QPushButton::clicked, this, [this]() {
+            refreshAdvancedAnalytics();
+        });
+    }
+    if (btnExportAdvanced) {
+        connect(btnExportAdvanced, &QPushButton::clicked, this, [this]() {
+            exportTableToCsv(advMachineTable, "analyse_machines_avancee.csv");
+        });
+    }
+
+    if (dbOpen()) {
+        fillSeriesCombo();
+        loadMachines();
+        updateMachineCharts();
+        refreshAdvancedAnalytics();
+    }
+}
+
+void MainWindow::ensureMachineTopBarVisible()
+{
+    if (auto *top = findChild<QWidget*>("horizontalLayoutWidget_7")) {
+        top->setGeometry(QRect(430, 10, 430, 60));
+        if (auto *lay = qobject_cast<QHBoxLayout*>(top->layout())) {
+            lay->setContentsMargins(0, 0, 0, 0);
+            lay->setSpacing(14);
+        }
+    }
+
+    const QList<QToolButton*> buttons = {
+        findChild<QToolButton*>("btnConsulterMachines"),
+        findChild<QToolButton*>("btnAjouterMachines"),
+        findChild<QToolButton*>("btnStatMachines"),
+        findChild<QToolButton*>("btnAvanceMachines")
+    };
+
+    for (auto *btn : buttons) {
+        if (!btn) continue;
+        btn->setMinimumWidth(84);
+        btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        btn->setIconSize(QSize(24, 24));
+    }
+}
+
+void MainWindow::ensureMachineExtraFields()
+{
+    if (!ui->ajoutpersonnel_3) return;
+
+    auto *form = ui->ajoutpersonnel_3->findChild<QFormLayout*>("formLayout_6");
+    if (!form) return;
+
+    if (!findMachineHoursEdit()) {
+        auto *hours = new QLineEdit(ui->ajoutpersonnel_3);
+        hours->setObjectName("heuresmachine");
+        hours->setPlaceholderText("Heures de fonctionnement");
+        form->insertRow(4, new QLabel("Heures de fonctionnement", ui->ajoutpersonnel_3), hours);
+    }
+
+    if (!findMachineTempEdit()) {
+        auto *temp = new QLineEdit(ui->ajoutpersonnel_3);
+        temp->setObjectName("temperaturemachine");
+        temp->setPlaceholderText("Température actuelle (°C)");
+        form->insertRow(5, new QLabel("Température actuelle", ui->ajoutpersonnel_3), temp);
+    }
+
+    if (auto *btn = ui->ajoutpersonnel_3->findChild<QPushButton*>("ajoutermachine")) {
+        btn->setText(editMachineId == -1 ? "Ajouter" : "Enregistrer");
+    }
+
+    if (auto *cbEtat = findMachineEtatCombo()) {
+        QString current = cbEtat->currentText().trimmed();
+        cbEtat->clear();
+        cbEtat->addItems({"Actif", "Maintenance", "Panne"});
+        if (current.compare("Non actif", Qt::CaseInsensitive) == 0)
+            current = "Panne";
+        int idx = cbEtat->findText(current);
+        cbEtat->setCurrentIndex(idx >= 0 ? idx : 0);
+    }
+}
+
+void MainWindow::ensureMachineSearchModes()
+{
+    if (ui->datmachinne) {
+        const QString current = ui->datmachinne->currentText();
+        ui->datmachinne->clear();
+        ui->datmachinne->addItems({"ID", "Nom", "Type", "Etat", "Date"});
+        int idx = ui->datmachinne->findText(current);
+        ui->datmachinne->setCurrentIndex(idx >= 0 ? idx : 1);
+    }
+
+    if (ui->trie) {
+        const QString current = ui->trie->currentText().trimmed().toLower();
+        ui->trie->clear();
+        ui->trie->addItems({"id", "nom", "datefonctionnement", "etat", "type", "heures", "temperature"});
+        int idx = ui->trie->findText(current, Qt::MatchFixedString);
+        ui->trie->setCurrentIndex(idx >= 0 ? idx : 0);
+    }
+}
+
+void MainWindow::setupValidatorsModule5()
+{
+    if (auto *cap = findChild<QLineEdit*>("capacitelineprod")) {
+        auto *v = new QDoubleValidator(0, 1e12, 2, cap);
+        v->setNotation(QDoubleValidator::StandardNotation);
+        cap->setValidator(v);
+        cap->setPlaceholderText("Ex: 1500");
+    }
+
+    if (auto *hours = findMachineHoursEdit()) {
+        auto *v = new QDoubleValidator(0, 1e12, 2, hours);
+        v->setNotation(QDoubleValidator::StandardNotation);
+        hours->setValidator(v);
+    }
+
+    if (auto *temp = findMachineTempEdit()) {
+        auto *v = new QDoubleValidator(-20, 200, 2, temp);
+        v->setNotation(QDoubleValidator::StandardNotation);
+        temp->setValidator(v);
+    }
+
+    auto trimOnEditFinished = [](QLineEdit* le){
+        if (!le) return;
+        QObject::connect(le, &QLineEdit::editingFinished, le, [le](){
+            le->setText(le->text().trimmed());
+        });
+    };
+
+    trimOnEditFinished(findChild<QLineEdit*>("nommachine"));
+    trimOnEditFinished(findChild<QLineEdit*>("nomserielinemachine_2"));
+    trimOnEditFinished(findMachineHoursEdit());
+    trimOnEditFinished(findMachineTempEdit());
+
+    if (auto *d = findChild<QDateEdit*>("datefonctioserienmachine_2")) {
+        d->setCalendarPopup(true);
+        if (!d->date().isValid()) d->setDate(QDate::currentDate());
+    }
+    if (auto *d = findChild<QDateEdit*>("datefonctionmachine")) {
+        d->setCalendarPopup(true);
+        if (!d->date().isValid()) d->setDate(QDate::currentDate());
+    }
+}
+
+void MainWindow::ensureSerieComboInMachineForm()
+{
+    if (!ui->ajoutpersonnel_3) return;
+
+    auto *formHost = ui->ajoutpersonnel_3->findChild<QWidget*>("formLayoutWidget_6");
+    auto *form = ui->ajoutpersonnel_3->findChild<QFormLayout*>("formLayout_6");
+    if (!form) return;
+
+    cbSerieMachine = ui->ajoutpersonnel_3->findChild<QComboBox*>("cbSerieMachine");
+    if (!cbSerieMachine) {
+        cbSerieMachine = new QComboBox(ui->ajoutpersonnel_3);
+        cbSerieMachine->setObjectName("cbSerieMachine");
+        form->addRow(new QLabel("Série machine", ui->ajoutpersonnel_3), cbSerieMachine);
+    }
+
+    if (!ui->ajoutpersonnel_3->findChild<QGroupBox*>("serieMachineBox")) {
+        if (formHost) {
+            formHost->setGeometry(QRect(20, 50, 300, 380));
+        }
+
+        auto *box = new QGroupBox("Série machine", ui->ajoutpersonnel_3);
+        box->setObjectName("serieMachineBox");
+        box->setGeometry(QRect(340, 50, 270, 320));
+
+        auto *lay = new QFormLayout(box);
+        lay->setContentsMargins(12, 16, 12, 12);
+        lay->setVerticalSpacing(14);
+
+        auto *nom = new QLineEdit(box);
+        nom->setObjectName("nomserielinemachine_2");
+        nom->setPlaceholderText("Nom série");
+        lay->addRow("Nom série", nom);
+
+        auto *cap = new QLineEdit(box);
+        cap->setObjectName("capacitelineprod");
+        cap->setPlaceholderText("Capacité");
+        lay->addRow("Capacité", cap);
+
+        auto *date = new QDateEdit(box);
+        date->setObjectName("datefonctioserienmachine_2");
+        date->setCalendarPopup(true);
+        date->setDate(QDate::currentDate());
+        lay->addRow("Date service", date);
+
+        auto *etat = new QComboBox(box);
+        etat->setObjectName("statulineseriesmachine_2");
+        etat->addItems({"Actif", "Non actif"});
+        lay->addRow("Etat", etat);
+
+        auto *btn = new QPushButton("Ajouter série", box);
+        btn->setObjectName("ajouterlineseriemachine_2");
+        lay->addRow(QString(), btn);
+        connect(btn, &QPushButton::clicked, this, &MainWindow::on_ajouterlineseriemachine_2_clicked);
+    }
+}
+
+
+void MainWindow::ensureSerieUiInAdvanced()
+{
+    if (!ui->metieravancee_4) return;
+
+    auto *page = ui->metieravancee_4;
+    auto *scroll = page->findChild<QScrollArea*>("machineAdvancedScroll", Qt::FindDirectChildrenOnly);
+    if (!scroll) {
+        if (auto *oldLayout = page->layout()) {
+            QLayoutItem *item;
+            while ((item = oldLayout->takeAt(0)) != nullptr) {
+                if (item->widget()) item->widget()->deleteLater();
+                delete item;
+            }
+            delete oldLayout;
+        }
+        const auto children = page->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+        for (auto *child : children) {
+            if (child) child->deleteLater();
+        }
+
+        auto *pageLayout = new QVBoxLayout(page);
+        pageLayout->setContentsMargins(0, 0, 0, 0);
+        pageLayout->setSpacing(0);
+
+        scroll = new QScrollArea(page);
+        scroll->setObjectName("machineAdvancedScroll");
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pageLayout->addWidget(scroll);
+
+        auto *container = new QWidget(scroll);
+        container->setObjectName("machineAdvancedContainer");
+        scroll->setWidget(container);
+
+        auto *root = new QVBoxLayout(container);
+        root->setContentsMargins(20, 18, 20, 24);
+        root->setSpacing(16);
+
+        auto *title = new QLabel("Métiers avancés : maintenance prédictive et analyse de performance", container);
+        title->setWordWrap(true);
+        title->setStyleSheet("font-size:16px; font-weight:700; color:#22311a;");
+        root->addWidget(title);
+
+        auto makeValue = [container](const QString &objectName) {
+            auto *lbl = new QLabel("0", container);
+            lbl->setObjectName(objectName);
+            lbl->setAlignment(Qt::AlignCenter);
+            lbl->setMinimumHeight(54);
+            lbl->setStyleSheet("font-size:20px; font-weight:700; background:#f5f7ef; border:1px solid #d9dfc8; border-radius:10px; padding:8px;");
+            return lbl;
+        };
+
+        auto *kpiBox = new QGroupBox("Résumé intelligent", container);
+        auto *kpiGrid = new QGridLayout(kpiBox);
+        kpiGrid->setContentsMargins(14, 18, 14, 14);
+        kpiGrid->setHorizontalSpacing(14);
+        kpiGrid->setVerticalSpacing(8);
+        for (int i = 0; i < 4; ++i)
+            kpiGrid->setColumnStretch(i, 1);
+
+        advTotalValue = makeValue("advTotalValue");
+        advActiveValue = makeValue("advActiveValue");
+        advCriticalValue = makeValue("advCriticalValue");
+        advAvgPerfValue = makeValue("advAvgPerfValue");
+
+        kpiGrid->addWidget(new QLabel("Total machines", kpiBox), 0, 0);
+        kpiGrid->addWidget(new QLabel("Machines actives", kpiBox), 0, 1);
+        kpiGrid->addWidget(new QLabel("Risque critique", kpiBox), 0, 2);
+        kpiGrid->addWidget(new QLabel("Performance moyenne", kpiBox), 0, 3);
+        kpiGrid->addWidget(advTotalValue, 1, 0);
+        kpiGrid->addWidget(advActiveValue, 1, 1);
+        kpiGrid->addWidget(advCriticalValue, 1, 2);
+        kpiGrid->addWidget(advAvgPerfValue, 1, 3);
+        root->addWidget(kpiBox);
+
+        auto *formulaBox = new QGroupBox("Formule modifiable du risque", container);
+        auto *formulaRoot = new QVBoxLayout(formulaBox);
+        formulaRoot->setContentsMargins(14, 18, 14, 14);
+        formulaRoot->setSpacing(12);
+
+        auto *formulaHelp = new QLabel("Modifie les paramètres puis clique sur “Appliquer la formule” pour recalculer le risque et recolorer automatiquement chaque machine.", formulaBox);
+        formulaHelp->setWordWrap(true);
+        formulaHelp->setStyleSheet("color:#5c624d;");
+        formulaRoot->addWidget(formulaHelp);
+
+        auto makeDoubleSpin = [formulaBox](const QString &objectName, double min, double max, double value, double step, const QString &suffix = QString(), int decimals = 1) {
+            auto *spin = new QDoubleSpinBox(formulaBox);
+            spin->setObjectName(objectName);
+            spin->setRange(min, max);
+            spin->setDecimals(decimals);
+            spin->setSingleStep(step);
+            spin->setValue(value);
+            spin->setMinimumWidth(150);
+            spin->setMinimumHeight(34);
+            spin->setAlignment(Qt::AlignCenter);
+            if (!suffix.isEmpty()) spin->setSuffix(suffix);
+            spin->setStyleSheet("QDoubleSpinBox { background:white; border:1px solid #cfd8bb; border-radius:8px; padding:4px 8px; } QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width:18px; }");
+            return spin;
+        };
+
+        auto makeIntSpin = [formulaBox](const QString &objectName, int min, int max, int value, const QString &suffix = QString()) {
+            auto *spin = new QSpinBox(formulaBox);
+            spin->setObjectName(objectName);
+            spin->setRange(min, max);
+            spin->setValue(value);
+            spin->setMinimumWidth(150);
+            spin->setMinimumHeight(34);
+            spin->setAlignment(Qt::AlignCenter);
+            if (!suffix.isEmpty()) spin->setSuffix(suffix);
+            spin->setStyleSheet("QSpinBox { background:white; border:1px solid #cfd8bb; border-radius:8px; padding:4px 8px; } QSpinBox::up-button, QSpinBox::down-button { width:18px; }");
+            return spin;
+        };
+
+        advTempReferenceSpin = makeDoubleSpin("advTempReferenceSpin", 0.0, 150.0, 45.0, 1.0, " °C", 1);
+        advTempCoeffSpin = makeDoubleSpin("advTempCoeffSpin", 0.0, 10.0, 1.2, 0.1, "", 1);
+        advHoursCoeffSpin = makeDoubleSpin("advHoursCoeffSpin", 0.0, 20.0, 4.0, 0.5, "", 1);
+        advAgeCoeffSpin = makeDoubleSpin("advAgeCoeffSpin", 0.0, 20.0, 2.5, 0.5, "", 1);
+        advMaintenancePenaltySpin = makeIntSpin("advMaintenancePenaltySpin", 0, 100, 18, " pts");
+        advPannePenaltySpin = makeIntSpin("advPannePenaltySpin", 0, 100, 35, " pts");
+        advOrangeMinSpin = makeIntSpin("advOrangeMinSpin", 0, 100, 40, " /100");
+        advRedMinSpin = makeIntSpin("advRedMinSpin", 0, 100, 70, " /100");
+
+        auto *formsRow = new QHBoxLayout();
+        formsRow->setSpacing(24);
+        auto *leftForm = new QFormLayout();
+        auto *rightForm = new QFormLayout();
+        leftForm->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        rightForm->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        leftForm->setFormAlignment(Qt::AlignTop);
+        rightForm->setFormAlignment(Qt::AlignTop);
+        leftForm->setHorizontalSpacing(12);
+        rightForm->setHorizontalSpacing(12);
+        leftForm->setVerticalSpacing(10);
+        rightForm->setVerticalSpacing(10);
+        leftForm->addRow("Température de référence", advTempReferenceSpin);
+        leftForm->addRow("Coefficient heures (par 1000 h)", advHoursCoeffSpin);
+        leftForm->addRow("Pénalité maintenance", advMaintenancePenaltySpin);
+        leftForm->addRow("Seuil orange", advOrangeMinSpin);
+        rightForm->addRow("Coefficient température", advTempCoeffSpin);
+        rightForm->addRow("Coefficient ancienneté (par an)", advAgeCoeffSpin);
+        rightForm->addRow("Pénalité panne", advPannePenaltySpin);
+        rightForm->addRow("Seuil rouge", advRedMinSpin);
+        formsRow->addLayout(leftForm, 1);
+        formsRow->addLayout(rightForm, 1);
+        formulaRoot->addLayout(formsRow);
+
+        advFormulaSummaryLabel = new QLabel(formulaBox);
+        advFormulaSummaryLabel->setObjectName("advFormulaSummaryLabel");
+        advFormulaSummaryLabel->setWordWrap(true);
+        advFormulaSummaryLabel->setStyleSheet("color:#4f5a3c; background:#f7f9f1; border:1px solid #d9dfc8; border-radius:8px; padding:8px;");
+        formulaRoot->addWidget(advFormulaSummaryLabel);
+
+        auto *formulaBtnRow = new QHBoxLayout();
+        formulaBtnRow->addStretch();
+        btnApplyRiskFormula = new QPushButton("Appliquer la formule", formulaBox);
+        btnApplyRiskFormula->setObjectName("btnApplyRiskFormula");
+        btnApplyRiskFormula->setMinimumHeight(38);
+        btnApplyRiskFormula->setStyleSheet("QPushButton { padding:8px 16px; border:1px solid #8aa04b; border-radius:10px; background:white; } QPushButton:hover { background:#f6f9ed; }");
+        formulaBtnRow->addWidget(btnApplyRiskFormula);
+        formulaRoot->addLayout(formulaBtnRow);
+        root->addWidget(formulaBox);
+
+        auto *analysisBox = new QGroupBox("Analyse prédictive des machines", container);
+        auto *analysisLayout = new QVBoxLayout(analysisBox);
+        analysisLayout->setContentsMargins(14, 18, 14, 14);
+        analysisLayout->setSpacing(12);
+
+        auto *btnRow = new QHBoxLayout();
+        btnRow->addStretch();
+        btnRefreshAdvanced = new QPushButton("Actualiser l'analyse", analysisBox);
+        btnRefreshAdvanced->setObjectName("btnRefreshAdvanced");
+        btnRefreshAdvanced->setMinimumHeight(38);
+        btnRefreshAdvanced->setStyleSheet("QPushButton { padding:8px 16px; border:1px solid #8aa04b; border-radius:10px; background:white; } QPushButton:hover { background:#f6f9ed; }");
+        btnExportAdvanced = new QPushButton("Exporter l'analyse", analysisBox);
+        btnExportAdvanced->setObjectName("btnExportAdvanced");
+        btnExportAdvanced->setMinimumHeight(38);
+        btnExportAdvanced->setStyleSheet("QPushButton { padding:8px 16px; border:1px solid #d6dbe8; border-radius:10px; background:white; } QPushButton:hover { background:#f8f9fc; }");
+        btnRow->addWidget(btnRefreshAdvanced);
+        btnRow->addWidget(btnExportAdvanced);
+        analysisLayout->addLayout(btnRow);
+
+        advMachineTable = new QTableWidget(analysisBox);
+        advMachineTable->setObjectName("advMachineTable");
+        advMachineTable->setColumnCount(8);
+        advMachineTable->setHorizontalHeaderLabels({"ID", "Machine", "Série", "Heures", "Température", "Âge (jours)", "Risque", "Performance"});
+        advMachineTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        advMachineTable->setSelectionMode(QAbstractItemView::NoSelection);
+        advMachineTable->setAlternatingRowColors(false);
+        advMachineTable->verticalHeader()->setVisible(false);
+        advMachineTable->setWordWrap(true);
+        advMachineTable->setTextElideMode(Qt::ElideRight);
+        advMachineTable->setMinimumHeight(320);
+        advMachineTable->setMaximumHeight(420);
+        advMachineTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        advMachineTable->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        advMachineTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        advMachineTable->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        advMachineTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        advMachineTable->setStyleSheet(
+            "QTableWidget { border:1px solid #dfe7cf; border-radius:10px; gridline-color:#d6dfc4; background:white; color:#22311a; selection-background-color:#eef4df; selection-color:#22311a; }"
+            "QHeaderView::section { background:#eff4e5; color:#2f3b1f; font-weight:700; border:none; border-right:1px solid #d6dfc4; border-bottom:1px solid #d6dfc4; padding:8px 10px; }"
+            "QTableWidget::item { padding:8px 10px; color:#22311a; }"
+        );
+        auto *hh = advMachineTable->horizontalHeader();
+        hh->setStretchLastSection(false);
+        hh->setDefaultAlignment(Qt::AlignCenter);
+        hh->setMinimumSectionSize(90);
+        hh->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+        hh->setSectionResizeMode(1, QHeaderView::Stretch);
+        hh->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+        hh->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+        hh->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+        hh->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+        hh->setSectionResizeMode(6, QHeaderView::ResizeToContents);
+        hh->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+        advMachineTable->setColumnWidth(1, 220);
+        advMachineTable->setColumnWidth(2, 120);
+        advMachineTable->setColumnWidth(6, 110);
+        advMachineTable->setColumnWidth(7, 120);
+        analysisLayout->addWidget(advMachineTable);
+
+        auto *legend = new QLabel("Le tableau se colore automatiquement selon le risque : vert = faible, orange = moyen, rouge = élevé. Les colonnes Machine, Risque et Performance restent visibles et utilisent un texte foncé pour une meilleure lisibilité.", analysisBox);
+        legend->setWordWrap(true);
+        legend->setStyleSheet("color:#5c624d;");
+        analysisLayout->addWidget(legend);
+
+        root->addWidget(analysisBox);
+        root->addStretch();
+    }
+
+    advTotalValue = page->findChild<QLabel*>("advTotalValue");
+    advActiveValue = page->findChild<QLabel*>("advActiveValue");
+    advCriticalValue = page->findChild<QLabel*>("advCriticalValue");
+    advAvgPerfValue = page->findChild<QLabel*>("advAvgPerfValue");
+    advMachineTable = page->findChild<QTableWidget*>("advMachineTable");
+    btnRefreshAdvanced = page->findChild<QPushButton*>("btnRefreshAdvanced");
+    btnExportAdvanced = page->findChild<QPushButton*>("btnExportAdvanced");
+    btnApplyRiskFormula = page->findChild<QPushButton*>("btnApplyRiskFormula");
+    advTempReferenceSpin = page->findChild<QDoubleSpinBox*>("advTempReferenceSpin");
+    advTempCoeffSpin = page->findChild<QDoubleSpinBox*>("advTempCoeffSpin");
+    advHoursCoeffSpin = page->findChild<QDoubleSpinBox*>("advHoursCoeffSpin");
+    advAgeCoeffSpin = page->findChild<QDoubleSpinBox*>("advAgeCoeffSpin");
+    advMaintenancePenaltySpin = page->findChild<QSpinBox*>("advMaintenancePenaltySpin");
+    advPannePenaltySpin = page->findChild<QSpinBox*>("advPannePenaltySpin");
+    advOrangeMinSpin = page->findChild<QSpinBox*>("advOrangeMinSpin");
+    advRedMinSpin = page->findChild<QSpinBox*>("advRedMinSpin");
+    advFormulaSummaryLabel = page->findChild<QLabel*>("advFormulaSummaryLabel");
+}
+
+void MainWindow::ensureMachineTableColumns()
+{
+    if (!ui->tablemachine) return;
+
+    ui->tablemachine->setColumnCount(9);
+    ui->tablemachine->setHorizontalHeaderLabels({"Id","Nom","Type","Date","Etat","Heures","Température","Série","Actions"});
+    ui->tablemachine->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tablemachine->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tablemachine->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    for (int c = 0; c < 8; ++c)
+        ui->tablemachine->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+
+    ui->tablemachine->horizontalHeader()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
+    ui->tablemachine->setColumnWidth(8, 120);
+}
+
+void MainWindow::setupMachineHeaderSorting()
+{
+    if (!ui->tablemachine || !ui->tablemachine->horizontalHeader())
+        return;
+
+    QHeaderView *header = ui->tablemachine->horizontalHeader();
+    header->setSectionsClickable(true);
+    header->setSortIndicatorShown(false);
+
+    disconnect(header, &QHeaderView::sectionClicked,
+               this, &MainWindow::showMachineSortMenu);
+
+    connect(header, &QHeaderView::sectionClicked,
+            this, &MainWindow::showMachineSortMenu);
+}
+
+QString MainWindow::machineColumnTitle(int logicalIndex) const
+{
+    switch (logicalIndex) {
+    case 0: return "Id";
+    case 1: return "Nom";
+    case 2: return "Type";
+    case 3: return "Date";
+    case 4: return "Etat";
+    case 5: return "Heures";
+    case 6: return "Température";
+    case 7: return "Série";
+    default: return "";
+    }
+}
+
+QString MainWindow::machineColumnToSql(int logicalIndex) const
+{
+    switch (logicalIndex) {
+    case 0: return "m.id_machine";
+    case 1: return "m.nom_machine";
+    case 2: return "m.type_machine";
+    case 3: return "m.date_installation";
+    case 4: return "m.etat_machine";
+    case 5: return "m.heures_fonctionnement";
+    case 6: return "m.temperature_actuelle";
+    case 7: return machineSupportsSeries() ? "s.nom_serie" : "m.nom_machine";
+    default: return "";
+    }
+}
+
+void MainWindow::showMachineSortMenu(int logicalIndex)
+{
+    if (!ui->tablemachine || !ui->tablemachine->horizontalHeader())
+        return;
+
+    if (logicalIndex == 8)
+        return;
+
+    const QString sqlColumn = machineColumnToSql(logicalIndex);
+    const QString title = machineColumnTitle(logicalIndex);
+    if (sqlColumn.isEmpty())
+        return;
+
+    QMenu menu(this);
+    menu.setStyleSheet(
+        "QMenu { background-color: white; border: 1px solid #cfcfcf; padding: 6px; }"
+        "QMenu::item { padding: 8px 22px; }"
+        "QMenu::item:selected { background-color: #dfe8cf; color: black; }"
+    );
+
+    QAction *ascAction = menu.addAction("Trier " + title + " : croissant");
+    QAction *descAction = menu.addAction("Trier " + title + " : décroissant");
+
+    QHeaderView *header = ui->tablemachine->horizontalHeader();
+    QPoint pos = header->mapToGlobal(QPoint(header->sectionPosition(logicalIndex), header->height()));
+
+    QAction *chosen = menu.exec(pos);
+    if (!chosen)
+        return;
+
+    orderByMachine = sqlColumn;
+    machineSortColumn = logicalIndex;
+    machineSortOrder = (chosen == ascAction) ? Qt::AscendingOrder : Qt::DescendingOrder;
+
+    loadMachines(lastMachineWhereSql, lastMachineBinds);
+}
+
+bool MainWindow::dbOpen() const
+{
+    auto db = QSqlDatabase::database();
+    return db.isValid() && db.isOpen();
+}
+
+bool MainWindow::tableHasColumn(const QString& table, const QString& column) const
+{
+    if (!dbOpen()) return false;
+
+    QSqlQuery q;
+    if (!q.exec("SELECT * FROM " + table + " WHERE 1=0"))
+        return false;
+
+    const QSqlRecord rec = q.record();
+    return rec.indexOf(column) >= 0
+        || rec.indexOf(column.toUpper()) >= 0
+        || rec.indexOf(column.toLower()) >= 0;
+}
+
+bool MainWindow::machineSupportsSeries() const
+{
+    if (!dbOpen()) return false;
+    QSqlQuery q;
+    if (!q.exec("SELECT * FROM SERIE_MACHINE WHERE 1=0"))
+        return false;
+    return tableHasColumn("MACHINE", "ID_SERIE");
+}
+
+int MainWindow::nextId(const QString& table, const QString& col) const
+{
+    QSqlQuery q;
+    q.prepare("SELECT NVL(MAX(" + col + "),0)+1 FROM " + table);
+    if(!q.exec() || !q.next()) return 1;
+    return q.value(0).toInt();
+}
+
+QString MainWindow::mapMachineEtatToDb(const QString& uiText) const
+{
+    QString t = uiText.trimmed().toLower();
+    if (t.startsWith("act")) return "ACTIVE";
+    if (t.contains("maint")) return "MAINTENANCE";
+    if (t.contains("pann")) return "PANNE";
+    if (t.contains("non")) return "PANNE";
+    return "ACTIVE";
+}
+
+QLineEdit* MainWindow::findMachineNameEdit() const
+{
+    if (auto *w = findChild<QLineEdit*>("nommachine")) return w;
+    return ui->ajoutpersonnel_3 ? ui->ajoutpersonnel_3->findChild<QLineEdit*>("nommachine") : nullptr;
+}
+
+QLineEdit* MainWindow::findMachineHoursEdit() const
+{
+    if (auto *w = findChild<QLineEdit*>("heuresmachine")) return w;
+    return ui->ajoutpersonnel_3 ? ui->ajoutpersonnel_3->findChild<QLineEdit*>("heuresmachine") : nullptr;
+}
+
+QLineEdit* MainWindow::findMachineTempEdit() const
+{
+    if (auto *w = findChild<QLineEdit*>("temperaturemachine")) return w;
+    return ui->ajoutpersonnel_3 ? ui->ajoutpersonnel_3->findChild<QLineEdit*>("temperaturemachine") : nullptr;
+}
+
+QComboBox* MainWindow::findMachineTypeCombo() const
+{
+    if (auto *w = findChild<QComboBox*>("fonctionmachine")) return w;
+    return ui->ajoutpersonnel_3 ? ui->ajoutpersonnel_3->findChild<QComboBox*>("fonctionmachine") : nullptr;
+}
+
+QComboBox* MainWindow::findMachineEtatCombo() const
+{
+    if (auto *w = findChild<QComboBox*>("statusmachine")) return w;
+    return nullptr;
+}
+
+QDateEdit* MainWindow::findMachineDateEdit() const
+{
+    if (auto *w = findChild<QDateEdit*>("datefonctionmachine")) return w;
+    return ui->ajoutpersonnel_3 ? ui->ajoutpersonnel_3->findChild<QDateEdit*>("datefonctionmachine") : nullptr;
+}
+
+void MainWindow::fillSeriesCombo()
+{
+    if (!cbSerieMachine) return;
+    cbSerieMachine->clear();
+
+    if (!dbOpen()) {
+        cbSerieMachine->setEnabled(false);
+        cbSerieMachine->addItem("-- DB fermée --", -1);
+        return;
+    }
+
+    if (!machineSupportsSeries()) {
+        cbSerieMachine->setEnabled(false);
+        cbSerieMachine->addItem("-- schéma sans série --", -1);
+        return;
+    }
+
+    cbSerieMachine->setEnabled(true);
+
+    QSqlQuery q;
+    if(!q.exec("SELECT id_serie, nom_serie FROM SERIE_MACHINE ORDER BY nom_serie")) {
+        qDebug() << "SERIE_MACHINE indisponible:" << q.lastError().text();
+        cbSerieMachine->setEnabled(false);
+        cbSerieMachine->addItem("-- aucune série --", -1);
+        return;
+    }
+
+    while(q.next()) {
+        cbSerieMachine->addItem(q.value(1).toString(), q.value(0).toInt());
+    }
+
+    if(cbSerieMachine->count() == 0)
+        cbSerieMachine->addItem("-- aucune série --", -1);
+}
+
+void MainWindow::loadMachines(const QString& whereSql, const QVariantList& binds)
+{
+    if (!dbOpen() || !ui->tablemachine) return;
+
+    lastMachineWhereSql = whereSql;
+    lastMachineBinds = binds;
+
+    const bool withSeries = machineSupportsSeries();
+    QString sql;
+
+    if (withSeries) {
+        sql =
+            "SELECT m.id_machine, m.nom_machine, m.type_machine, m.date_installation, m.etat_machine, "
+            "NVL(m.heures_fonctionnement,0), NVL(m.temperature_actuelle,0), NVL(s.nom_serie, '-') "
+            "FROM MACHINE m LEFT JOIN SERIE_MACHINE s ON m.id_serie = s.id_serie ";
+    } else {
+        sql =
+            "SELECT m.id_machine, m.nom_machine, m.type_machine, m.date_installation, m.etat_machine, "
+            "NVL(m.heures_fonctionnement,0), NVL(m.temperature_actuelle,0), '-' AS nom_serie "
+            "FROM MACHINE m ";
+    }
+
+    if (!whereSql.trimmed().isEmpty())
+        sql += whereSql + " ";
+
+    sql += "ORDER BY " + orderByMachine;
+    sql += (machineSortOrder == Qt::AscendingOrder) ? " ASC" : " DESC";
+
+    QSqlQuery q;
+    q.prepare(sql);
+    for (const auto &b : binds) q.addBindValue(b);
+
+    if(!q.exec()) {
+        QMessageBox::critical(this, "SQL", q.lastError().text());
+        return;
+    }
+
+    ui->tablemachine->setRowCount(0);
+    int row = 0;
+
+    while(q.next()) {
+        ui->tablemachine->insertRow(row);
+        ui->tablemachine->setItem(row,0,new QTableWidgetItem(q.value(0).toString()));
+        ui->tablemachine->setItem(row,1,new QTableWidgetItem(q.value(1).toString()));
+        ui->tablemachine->setItem(row,2,new QTableWidgetItem(q.value(2).toString()));
+        QDate d = q.value(3).toDate();
+        ui->tablemachine->setItem(row,3,new QTableWidgetItem(d.isValid()? d.toString("yyyy-MM-dd") : ""));
+        ui->tablemachine->setItem(row,4,new QTableWidgetItem(q.value(4).toString()));
+        ui->tablemachine->setItem(row,5,new QTableWidgetItem(QString::number(q.value(5).toDouble(), 'f', 0)));
+        ui->tablemachine->setItem(row,6,new QTableWidgetItem(QString::number(q.value(6).toDouble(), 'f', 1) + " °C"));
+        ui->tablemachine->setItem(row,7,new QTableWidgetItem(q.value(7).toString()));
+        addActionsToMachineRow(row, q.value(0).toInt());
+        row++;
+    }
+}
+
+void MainWindow::addActionsToMachineRow(int row, int idMachine)
+{
+    QWidget *container = new QWidget(ui->tablemachine);
+    auto *h = new QHBoxLayout(container);
+    h->setContentsMargins(0,0,0,0);
+    h->setSpacing(6);
+    h->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+    auto *btnEdit = new QPushButton(container);
+    btnEdit->setToolTip("Modifier");
+    btnEdit->setIcon(QIcon(":/img/edit.svg"));
+    btnEdit->setIconSize(QSize(16,16));
+    btnEdit->setFixedSize(32,24);
+    btnEdit->setFocusPolicy(Qt::NoFocus);
+
+    auto *btnDel = new QPushButton(container);
+    btnDel->setToolTip("Supprimer");
+    btnDel->setIcon(QIcon(":/img/delete.svg"));
+    btnDel->setIconSize(QSize(16,16));
+    btnDel->setFixedSize(32,24);
+    btnDel->setFocusPolicy(Qt::NoFocus);
+
+    h->addWidget(btnEdit);
+    h->addWidget(btnDel);
+    ui->tablemachine->setCellWidget(row, 8, container);
+    ui->tablemachine->setRowHeight(row, 34);
+
+    connect(btnEdit, &QPushButton::clicked, this, [this, idMachine](){ handleEditMachine(idMachine); });
+    connect(btnDel, &QPushButton::clicked, this, [this, idMachine](){ handleDeleteMachine(idMachine); });
+}
+
+void MainWindow::saveMachineFromForm()
+{
+    if (busyMachine) return;
+    busyMachine = true;
+
+    if (!dbOpen()) {
+        QMessageBox::warning(this, "DB", "Connexion fermée.");
+        busyMachine = false;
+        return;
+    }
+
+    auto *leNom = findMachineNameEdit();
+    auto *leHours = findMachineHoursEdit();
+    auto *leTemp = findMachineTempEdit();
+    auto *cbType = findMachineTypeCombo();
+    auto *cbEtatUi = findMachineEtatCombo();
+    auto *de = findMachineDateEdit();
+
+    QString nom = leNom ? leNom->text().trimmed() : "";
+    QString type = cbType ? cbType->currentText().trimmed() : "";
+    QDate dateInstall = de ? de->date() : QDate::currentDate();
+    QString etatDb = mapMachineEtatToDb(cbEtatUi ? cbEtatUi->currentText() : "Actif");
+    const bool withSeries = machineSupportsSeries();
+    int serieId = (withSeries && cbSerieMachine) ? cbSerieMachine->currentData().toInt() : -1;
+
+    bool okHours = false;
+    double hours = leHours ? leHours->text().trimmed().toDouble(&okHours) : 0.0;
+    bool okTemp = false;
+    double temp = leTemp ? leTemp->text().trimmed().toDouble(&okTemp) : 0.0;
+
+    if (nom.isEmpty()) {
+        QMessageBox::warning(this, "Machine", "Nom machine obligatoire.");
+        if (leNom) leNom->setFocus();
+        busyMachine = false;
+        return;
+    }
+    if (type.isEmpty()) {
+        QMessageBox::warning(this, "Machine", "Type obligatoire.");
+        if (cbType) cbType->setFocus();
+        busyMachine = false;
+        return;
+    }
+    if (leHours && !leHours->text().trimmed().isEmpty() && (!okHours || hours < 0)) {
+        QMessageBox::warning(this, "Machine", "Les heures de fonctionnement doivent être un nombre positif.");
+        leHours->setFocus();
+        busyMachine = false;
+        return;
+    }
+    if (leTemp && !leTemp->text().trimmed().isEmpty() && (!okTemp || temp < -20 || temp > 200)) {
+        QMessageBox::warning(this, "Machine", "La température actuelle doit être entre -20 et 200 °C.");
+        leTemp->setFocus();
+        busyMachine = false;
+        return;
+    }
+    if (withSeries && serieId <= 0) {
+        QMessageBox::warning(this, "Machine", "Choisissez d'abord une série machine.");
+        if (cbSerieMachine) cbSerieMachine->setFocus();
+        busyMachine = false;
+        return;
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+    QSqlQuery q;
+    bool ok = false;
+
+    if (editMachineId != -1) {
+        if (withSeries) {
+            q.prepare("UPDATE MACHINE SET nom_machine=?, type_machine=?, etat_machine=?, date_installation=?, heures_fonctionnement=?, temperature_actuelle=?, id_serie=? WHERE id_machine=?");
+            q.addBindValue(nom);
+            q.addBindValue(type);
+            q.addBindValue(etatDb);
+            q.addBindValue(dateInstall);
+            q.addBindValue(hours);
+            q.addBindValue(temp);
+            q.addBindValue(serieId);
+            q.addBindValue(editMachineId);
+        } else {
+            q.prepare("UPDATE MACHINE SET nom_machine=?, type_machine=?, etat_machine=?, date_installation=?, heures_fonctionnement=?, temperature_actuelle=? WHERE id_machine=?");
+            q.addBindValue(nom);
+            q.addBindValue(type);
+            q.addBindValue(etatDb);
+            q.addBindValue(dateInstall);
+            q.addBindValue(hours);
+            q.addBindValue(temp);
+            q.addBindValue(editMachineId);
+        }
+        ok = q.exec();
+    } else {
+        if (withSeries) {
+            q.prepare("INSERT INTO MACHINE (nom_machine, type_machine, etat_machine, date_installation, heures_fonctionnement, temperature_actuelle, id_serie) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            q.addBindValue(nom);
+            q.addBindValue(type);
+            q.addBindValue(etatDb);
+            q.addBindValue(dateInstall);
+            q.addBindValue(hours);
+            q.addBindValue(temp);
+            q.addBindValue(serieId);
+        } else {
+            q.prepare("INSERT INTO MACHINE (nom_machine, type_machine, etat_machine, date_installation, heures_fonctionnement, temperature_actuelle) VALUES (?, ?, ?, ?, ?, ?)");
+            q.addBindValue(nom);
+            q.addBindValue(type);
+            q.addBindValue(etatDb);
+            q.addBindValue(dateInstall);
+            q.addBindValue(hours);
+            q.addBindValue(temp);
+        }
+        ok = q.exec();
+        if(!ok && q.lastError().text().toUpper().contains("ID_MACHINE")) {
+            int id = nextId("MACHINE","id_machine");
+            q.clear();
+            if (withSeries) {
+                q.prepare("INSERT INTO MACHINE (id_machine, nom_machine, type_machine, etat_machine, date_installation, heures_fonctionnement, temperature_actuelle, id_serie) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                q.addBindValue(id);
+                q.addBindValue(nom);
+                q.addBindValue(type);
+                q.addBindValue(etatDb);
+                q.addBindValue(dateInstall);
+                q.addBindValue(hours);
+                q.addBindValue(temp);
+                q.addBindValue(serieId);
+            } else {
+                q.prepare("INSERT INTO MACHINE (id_machine, nom_machine, type_machine, etat_machine, date_installation, heures_fonctionnement, temperature_actuelle) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                q.addBindValue(id);
+                q.addBindValue(nom);
+                q.addBindValue(type);
+                q.addBindValue(etatDb);
+                q.addBindValue(dateInstall);
+                q.addBindValue(hours);
+                q.addBindValue(temp);
+            }
+            ok = q.exec();
+        }
+    }
+
+    if(!ok) {
+        db.rollback();
+        QMessageBox::critical(this, "SQL", q.lastError().text());
+        busyMachine = false;
+        return;
+    }
+
+    db.commit();
+    QMessageBox::information(this, "OK", (editMachineId==-1) ? "Machine ajoutée" : "Machine modifiée");
+
+    editMachineId = -1;
+    if (ui->ajoutermachine) ui->ajoutermachine->setText("Ajouter");
+    if (leNom) leNom->clear();
+    if (leHours) leHours->clear();
+    if (leTemp) leTemp->clear();
+    if (cbEtatUi) cbEtatUi->setCurrentIndex(0);
+    if (de) de->setDate(QDate::currentDate());
+
+    loadMachines();
+    updateMachineCharts();
+    refreshAdvancedAnalytics();
+    busyMachine = false;
+}
+
+void MainWindow::handleEditMachine(int idMachine)
+{
+    if (!dbOpen()) return;
+
+    const bool withSeries = machineSupportsSeries();
+    QSqlQuery q;
+    if (withSeries) {
+        q.prepare("SELECT nom_machine, type_machine, etat_machine, date_installation, heures_fonctionnement, temperature_actuelle, id_serie FROM MACHINE WHERE id_machine=?");
+    } else {
+        q.prepare("SELECT nom_machine, type_machine, etat_machine, date_installation, heures_fonctionnement, temperature_actuelle FROM MACHINE WHERE id_machine=?");
+    }
+    q.addBindValue(idMachine);
+
+    if(!q.exec() || !q.next()) {
+        QMessageBox::critical(this, "SQL", q.lastError().text());
+        return;
+    }
+
+    if (ui->metierspersonnel_2 && ui->ajoutpersonnel_3)
+        ui->metierspersonnel_2->setCurrentWidget(ui->ajoutpersonnel_3);
+
+    auto *leNom = findMachineNameEdit();
+    auto *leHours = findMachineHoursEdit();
+    auto *leTemp = findMachineTempEdit();
+    auto *cbType = findMachineTypeCombo();
+    auto *cbEtatUi = findMachineEtatCombo();
+    auto *de = findMachineDateEdit();
+
+    if (leNom) leNom->setText(q.value(0).toString());
+    if (cbType) {
+        int idxT = cbType->findText(q.value(1).toString());
+        if (idxT < 0) {
+            cbType->addItem(q.value(1).toString());
+            idxT = cbType->findText(q.value(1).toString());
+        }
+        cbType->setCurrentIndex(idxT >= 0 ? idxT : 0);
+    }
+
+    QString etDb = q.value(2).toString().toUpper();
+    QString etUi = (etDb == "ACTIVE") ? "Actif" : (etDb == "MAINTENANCE" ? "Maintenance" : "Panne");
+    if (cbEtatUi) {
+        int idxE = cbEtatUi->findText(etUi);
+        if (idxE < 0) idxE = 0;
+        cbEtatUi->setCurrentIndex(idxE);
+    }
+
+    QDate d = q.value(3).toDate();
+    if (de && d.isValid()) de->setDate(d);
+    if (leHours) leHours->setText(QString::number(q.value(4).toDouble(), 'f', 0));
+    if (leTemp) leTemp->setText(QString::number(q.value(5).toDouble(), 'f', 1));
+
+    if (withSeries && cbSerieMachine) {
+        fillSeriesCombo();
+        int serieId = q.value(6).toInt();
+        int idxS = cbSerieMachine->findData(serieId);
+        cbSerieMachine->setCurrentIndex(idxS >= 0 ? idxS : 0);
+    }
+
+    editMachineId = idMachine;
+    if (ui->ajoutermachine) ui->ajoutermachine->setText("Enregistrer");
+}
+
+void MainWindow::handleDeleteMachine(int idMachine)
+{
+    auto reply = QMessageBox::question(this, "Suppression", QString("Supprimer la machine ID=%1 ?").arg(idMachine));
+    if (reply != QMessageBox::Yes) return;
+
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+    QSqlQuery q;
+    q.prepare("DELETE FROM MACHINE WHERE id_machine=?");
+    q.addBindValue(idMachine);
+
+    if(!q.exec()) {
+        db.rollback();
+        QMessageBox::critical(this, "SQL", q.lastError().text());
+        return;
+    }
+
+    db.commit();
+    QMessageBox::information(this, "OK", "Machine supprimée");
+    loadMachines();
+    updateMachineCharts();
+    refreshAdvancedAnalytics();
+}
+
+void MainWindow::addSerieFromAddPage()
+{
+    if (busySerie) return;
+    busySerie = true;
+
+    if (!dbOpen()) {
+        QMessageBox::warning(this, "DB", "Connexion fermée.");
+        busySerie = false;
+        return;
+    }
+
+    if (!machineSupportsSeries()) {
+        QMessageBox::information(this, "Série", "Votre schéma actuel ne gère pas SERIE_MACHINE. Cette étape est optionnelle avec votre SQL local.");
+        busySerie = false;
+        return;
+    }
+
+    auto *leNom = findChild<QLineEdit*>("nomserielinemachine_2");
+    auto *leCap = findChild<QLineEdit*>("capacitelineprod");
+    auto *deDate = findChild<QDateEdit*>("datefonctioserienmachine_2");
+    auto *cbEtat = findChild<QComboBox*>("statulineseriesmachine_2");
+
+    QString nom = leNom ? leNom->text().trimmed() : "";
+    bool okCap = false;
+    double cap = leCap ? leCap->text().trimmed().toDouble(&okCap) : 0;
+    QDate d = deDate ? deDate->date() : QDate::currentDate();
+    QString etat = cbEtat ? cbEtat->currentText().trimmed() : "Actif";
+
+    if (nom.isEmpty()) {
+        QMessageBox::warning(this, "Série", "Nom série obligatoire.");
+        if (leNom) leNom->setFocus();
+        busySerie = false;
+        return;
+    }
+    if (!okCap || cap <= 0) {
+        QMessageBox::warning(this, "Série", "La capacité doit être un nombre > 0.");
+        if (leCap) leCap->setFocus();
+        busySerie = false;
+        return;
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+    QSqlQuery q;
+    bool ok = false;
+
+    q.prepare("INSERT INTO SERIE_MACHINE (nom_serie, capacite_production, date_mise_service, etat_serie, responsable, description) VALUES (?, ?, ?, ?, ?, ?)");
+    q.addBindValue(nom);
+    q.addBindValue(cap);
+    q.addBindValue(d);
+    q.addBindValue(etat.toUpper());
+    q.addBindValue(QString("Admin"));
+    q.addBindValue(QVariant());
+    ok = q.exec();
+
+    if(!ok && q.lastError().text().toUpper().contains("ID_SERIE")) {
+        int id = nextId("SERIE_MACHINE","id_serie");
+        q.clear();
+        q.prepare("INSERT INTO SERIE_MACHINE (id_serie, nom_serie, capacite_production, date_mise_service, etat_serie, responsable, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        q.addBindValue(id);
+        q.addBindValue(nom);
+        q.addBindValue(cap);
+        q.addBindValue(d);
+        q.addBindValue(etat.toUpper());
+        q.addBindValue(QString("Admin"));
+        q.addBindValue(QVariant());
+        ok = q.exec();
+    }
+
+    if(!ok) {
+        db.rollback();
+        QMessageBox::critical(this, "SQL", q.lastError().text());
+        busySerie = false;
+        return;
+    }
+
+    db.commit();
+    QMessageBox::information(this, "OK", "Série ajoutée");
+    fillSeriesCombo();
+    if (leNom) leNom->clear();
+    if (leCap) leCap->clear();
+    if (deDate) deDate->setDate(QDate::currentDate());
+    if (cbEtat) cbEtat->setCurrentIndex(0);
+    busySerie = false;
+}
+
+int MainWindow::computeMachineRiskScore(const QString& etat, double temp, double hours, int ageDays) const
+{
+    const double tempReference = advTempReferenceSpin ? advTempReferenceSpin->value() : 45.0;
+    const double tempCoeff = advTempCoeffSpin ? advTempCoeffSpin->value() : 1.2;
+    const double hoursCoeff = advHoursCoeffSpin ? advHoursCoeffSpin->value() : 4.0;
+    const double ageCoeff = advAgeCoeffSpin ? advAgeCoeffSpin->value() : 2.5;
+    const int maintenancePenalty = advMaintenancePenaltySpin ? advMaintenancePenaltySpin->value() : 18;
+    const int pannePenalty = advPannePenaltySpin ? advPannePenaltySpin->value() : 35;
+
+    double riskValue = 0.0;
+    const QString etatDb = etat.trimmed().toUpper();
+
+    if (etatDb == "PANNE") {
+        riskValue += pannePenalty;
+    } else if (etatDb == "MAINTENANCE") {
+        riskValue += maintenancePenalty;
+    } else if (!etatDb.isEmpty() && etatDb != "ACTIVE") {
+        riskValue += maintenancePenalty;
+    }
+
+    riskValue += tempCoeff * std::max(0.0, temp - tempReference);
+    riskValue += hoursCoeff * std::max(0.0, hours / 1000.0);
+    riskValue += ageCoeff * std::max(0.0, ageDays / 365.0);
+
+    return std::clamp(qRound(riskValue), 0, 100);
+}
+
+int MainWindow::computeMachinePerformanceScore(int risk) const
+{
+    return std::clamp(100 - risk, 0, 100);
+}
+
+QString MainWindow::riskBandLabel(int risk) const
+{
+    int orangeMin = advOrangeMinSpin ? advOrangeMinSpin->value() : 40;
+    int redMin = advRedMinSpin ? advRedMinSpin->value() : 70;
+    if (redMin <= orangeMin)
+        redMin = orangeMin + 1;
+
+    if (risk >= redMin)
+        return "Élevé";
+    if (risk >= orangeMin)
+        return "Moyen";
+    return "Faible";
+}
+
+void MainWindow::applyRiskColorsToAdvancedRow(int row, int risk)
+{
+    if (!advMachineTable) return;
+
+    int orangeMin = advOrangeMinSpin ? advOrangeMinSpin->value() : 40;
+    int redMin = advRedMinSpin ? advRedMinSpin->value() : 70;
+    if (redMin <= orangeMin)
+        redMin = orangeMin + 1;
+
+    QColor rowColor;
+    QColor highlightColor;
+    QColor accentColor;
+    const QColor textColor("#22311a");
+
+    if (risk >= redMin) {
+        rowColor = QColor("#fdeeee");
+        highlightColor = QColor("#f8d4d1");
+        accentColor = QColor("#f1b1aa");
+    } else if (risk >= orangeMin) {
+        rowColor = QColor("#fff6e8");
+        highlightColor = QColor("#ffe8c7");
+        accentColor = QColor("#ffd699");
+    } else {
+        rowColor = QColor("#eef8ef");
+        highlightColor = QColor("#d7eed8");
+        accentColor = QColor("#bddfbe");
+    }
+
+    for (int col = 0; col < advMachineTable->columnCount(); ++col) {
+        auto *item = advMachineTable->item(row, col);
+        if (!item) continue;
+        item->setBackground(QBrush(rowColor));
+        item->setForeground(QBrush(textColor));
+        item->setTextAlignment(Qt::AlignCenter);
+        QFont f = item->font();
+        f.setBold(false);
+        item->setFont(f);
+    }
+
+    const QList<int> tintedColumns{1, 6, 7};
+    for (int col : tintedColumns) {
+        if (auto *item = advMachineTable->item(row, col)) {
+            item->setBackground(QBrush(highlightColor));
+            item->setForeground(QBrush(textColor));
+            QFont f = item->font();
+            f.setBold(true);
+            item->setFont(f);
+        }
+    }
+
+    if (auto *machineItem = advMachineTable->item(row, 1))
+        machineItem->setBackground(QBrush(accentColor));
+
+    if (auto *riskItem = advMachineTable->item(row, 6))
+        riskItem->setBackground(QBrush(accentColor));
+
+    if (auto *perfItem = advMachineTable->item(row, 7))
+        perfItem->setBackground(QBrush(accentColor));
+}
+
+void MainWindow::refreshAdvancedAnalytics()
+{
+    if (!advMachineTable) return;
+
+    advMachineTable->setRowCount(0);
+
+    int orangeMin = advOrangeMinSpin ? advOrangeMinSpin->value() : 40;
+    int redMin = advRedMinSpin ? advRedMinSpin->value() : 70;
+    if (redMin <= orangeMin) {
+        redMin = orangeMin + 1;
+        if (advRedMinSpin)
+            advRedMinSpin->setValue(redMin);
+    }
+
+    if (advFormulaSummaryLabel) {
+        const double tempReference = advTempReferenceSpin ? advTempReferenceSpin->value() : 45.0;
+        const double tempCoeff = advTempCoeffSpin ? advTempCoeffSpin->value() : 1.2;
+        const double hoursCoeff = advHoursCoeffSpin ? advHoursCoeffSpin->value() : 4.0;
+        const double ageCoeff = advAgeCoeffSpin ? advAgeCoeffSpin->value() : 2.5;
+        const int maintenancePenalty = advMaintenancePenaltySpin ? advMaintenancePenaltySpin->value() : 18;
+        const int pannePenalty = advPannePenaltySpin ? advPannePenaltySpin->value() : 35;
+
+        advFormulaSummaryLabel->setText(
+            QString("Formule active : risque = pénalité état + %1 × max(0, température - %2) + %3 × (heures / 1000) + %4 × (âge en jours / 365). "
+                    "Pénalité maintenance = %5 pts, pénalité panne = %6 pts. Couleurs : vert < %7, orange de %7 à %8, rouge à partir de %8.")
+                .arg(QString::number(tempCoeff, 'f', 1))
+                .arg(QString::number(tempReference, 'f', 1))
+                .arg(QString::number(hoursCoeff, 'f', 1))
+                .arg(QString::number(ageCoeff, 'f', 1))
+                .arg(maintenancePenalty)
+                .arg(pannePenalty)
+                .arg(orangeMin)
+                .arg(redMin));
+    }
+
+    if (!dbOpen()) {
+        if (advTotalValue) advTotalValue->setText("0");
+        if (advActiveValue) advActiveValue->setText("0");
+        if (advCriticalValue) advCriticalValue->setText("0");
+        if (advAvgPerfValue) advAvgPerfValue->setText("0 %");
+        return;
+    }
+
+    QSqlQuery q;
+    QString sql =
+        "SELECT m.id_machine, m.nom_machine, NVL(s.nom_serie, '-'), NVL(m.heures_fonctionnement,0), NVL(m.temperature_actuelle,0), m.date_installation, NVL(m.etat_machine,'ACTIVE') "
+        "FROM MACHINE m LEFT JOIN SERIE_MACHINE s ON m.id_serie = s.id_serie ORDER BY m.id_machine";
+
+    bool ok = q.exec(sql);
+    if (!ok) {
+        q.clear();
+        ok = q.exec(
+            "SELECT id_machine, nom_machine, '-' AS nom_serie, NVL(heures_fonctionnement,0), NVL(temperature_actuelle,0), date_installation, NVL(etat_machine,'ACTIVE') "
+            "FROM MACHINE ORDER BY id_machine");
+    }
+
+    if (!ok) {
+        QMessageBox::warning(this,
+                             "Analyse avancée",
+                             QString("Impossible de charger l'analyse avancée :\n%1")
+                                 .arg(q.lastError().text()));
+        return;
+    }
+
+    int total = 0;
+    int active = 0;
+    int critical = 0;
+    int perfSum = 0;
+
+    while (q.next()) {
+        const int id = q.value(0).toInt();
+        const QString rawMachine = q.value(1).toString().trimmed();
+        QString serie = q.value(2).toString().trimmed();
+        QString machine = rawMachine;
+        if (serie.isEmpty())
+            serie = "-";
+        if (machine.isEmpty() || machine == "-" || machine.compare("null", Qt::CaseInsensitive) == 0)
+            machine = (serie != "-") ? serie : QString("Machine %1").arg(id);
+        const double hours = q.value(3).toDouble();
+        const double temp = q.value(4).toDouble();
+        const QDate installDate = q.value(5).toDate();
+        const QString etat = q.value(6).toString().trimmed().toUpper();
+        const int ageDays = installDate.isValid() ? installDate.daysTo(QDate::currentDate()) : 0;
+
+        const int risk = computeMachineRiskScore(etat, temp, hours, ageDays);
+        const int perf = computeMachinePerformanceScore(risk);
+        const QString band = riskBandLabel(risk);
+
+        QString predictedAction;
+        QString recommendation;
+        if (risk >= redMin) {
+            predictedAction = "Maintenance urgente";
+            recommendation = "Machine critique : intervention immédiate, contrôle thermique et vérification des pièces sensibles.";
+        } else if (risk >= orangeMin) {
+            predictedAction = "Contrôle planifié";
+            recommendation = "Risque moyen : planifier une maintenance préventive et surveiller la température et les heures.";
+        } else {
+            predictedAction = "Surveillance normale";
+            recommendation = "Risque faible : conserver le rythme actuel de suivi.";
+        }
+
+        auto makeItem = [](const QString &value, const QString &tooltip = QString()) {
+            auto *item = new QTableWidgetItem(value);
+            item->setTextAlignment(Qt::AlignCenter);
+            if (!tooltip.isEmpty())
+                item->setToolTip(tooltip);
+            return item;
+        };
+
+        const QString tooltip = QStringLiteral("Etat : %1\nAction predite : %2\n%3")
+                                    .arg(etat.isEmpty() ? "ACTIVE" : etat,
+                                         predictedAction,
+                                         recommendation);
+
+        const int row = advMachineTable->rowCount();
+        advMachineTable->insertRow(row);
+        advMachineTable->setItem(row, 0, makeItem(QString::number(id), tooltip));
+        advMachineTable->setItem(row, 1, makeItem(machine, tooltip));
+        advMachineTable->setItem(row, 2, makeItem(serie, tooltip));
+        advMachineTable->setItem(row, 3, makeItem(QString::number(hours, 'f', 0), tooltip));
+        advMachineTable->setItem(row, 4, makeItem(QString::number(temp, 'f', 1) + " °C", tooltip));
+        advMachineTable->setItem(row, 5, makeItem(QString::number(ageDays), tooltip));
+        advMachineTable->setItem(row, 6, makeItem(QString("%1 %").arg(risk), QString("Niveau de risque : %1\n%2").arg(band, tooltip)));
+        advMachineTable->setItem(row, 7, makeItem(QString("%1 %").arg(perf), tooltip));
+        advMachineTable->setRowHeight(row, 38);
+        applyRiskColorsToAdvancedRow(row, risk);
+
+        total++;
+        if (etat == "ACTIVE") active++;
+        if (risk >= redMin) critical++;
+        perfSum += perf;
+    }
+
+    advMachineTable->resizeColumnsToContents();
+    advMachineTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    advMachineTable->setColumnWidth(1, std::max(advMachineTable->columnWidth(1), 220));
+    advMachineTable->setColumnWidth(6, std::max(advMachineTable->columnWidth(6), 110));
+
+    if (advTotalValue) advTotalValue->setText(QString::number(total));
+    if (advActiveValue) advActiveValue->setText(QString::number(active));
+    if (advCriticalValue) advCriticalValue->setText(QString::number(critical));
+    if (advAvgPerfValue) advAvgPerfValue->setText(total > 0 ? QString::number(perfSum / total) + " %" : "0 %");
+}
+
+void MainWindow::exportTableToCsv(QTableWidget* t, const QString& defaultName) const
+{
+    if (!t) return;
+
+    QString path = QFileDialog::getSaveFileName(nullptr, "Export CSV", defaultName, "CSV (*.csv)");
+    if (path.isEmpty()) return;
+
+    QFile f(path);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(nullptr, "Export", "Impossible d'ouvrir le fichier.");
+        return;
+    }
+
+    QTextStream out(&f);
+    int lastCol = t->columnCount();
+    if (lastCol > 0) {
+        auto *lastHeader = t->horizontalHeaderItem(lastCol - 1);
+        if (lastHeader && lastHeader->text().trimmed().compare("Actions", Qt::CaseInsensitive) == 0)
+            lastCol -= 1;
+    }
+
+    for(int c = 0; c < lastCol; ++c) {
+        auto *h = t->horizontalHeaderItem(c);
+        out << '"' << (h ? h->text().replace('"', "''") : QString()) << '"';
+        if (c < lastCol - 1) out << ';';
+    }
+    out << "\n";
+
+    for(int r = 0; r < t->rowCount(); ++r) {
+        for(int c = 0; c < lastCol; ++c) {
+            auto *it = t->item(r,c);
+            out << '"' << (it ? it->text().replace('"', "''") : QString()) << '"';
+            if (c < lastCol - 1) out << ';';
+        }
+        out << "\n";
+    }
+
+    f.close();
+    QMessageBox::information(nullptr, "Export", "Export terminé.");
+}
+
+void MainWindow::exportMachineTableToPdf(QTableWidget* t, const QString& title, const QString& defaultName) const
+{
+    if (!t) return;
+
+    QString path = QFileDialog::getSaveFileName(nullptr, "Export PDF", defaultName, "PDF (*.pdf)");
+    if (path.isEmpty()) return;
+
+    QString html =
+        "<html><head><meta charset='utf-8'>"
+        "<style>"
+        "body{font-family:Arial,sans-serif;color:#2f3b1f;}"
+        "h1{color:#556B2F;margin-bottom:6px;}"
+        ".meta{color:#666;margin-bottom:16px;}"
+        "table{width:100%;border-collapse:collapse;}"
+        "th,td{border:1px solid #d9dfc8;padding:8px;text-align:left;}"
+        "th{background:#f5f7ef;color:#556B2F;}"
+        "tr:nth-child(even){background:#fafcf6;}"
+        "</style></head><body>";
+
+    html += "<h1>" + title.toHtmlEscaped() + "</h1>";
+    html += "<div class='meta'>Généré le : " + QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss") + "</div>";
+    html += "<table><thead><tr>";
+
+    int lastCol = t->columnCount();
+    if (lastCol > 0) {
+        auto *lastHeader = t->horizontalHeaderItem(lastCol - 1);
+        if (lastHeader && lastHeader->text().trimmed().compare("Actions", Qt::CaseInsensitive) == 0)
+            lastCol -= 1;
+    }
+
+    for (int c = 0; c < lastCol; ++c) {
+        auto *h = t->horizontalHeaderItem(c);
+        html += "<th>" + (h ? h->text().toHtmlEscaped() : QString()) + "</th>";
+    }
+    html += "</tr></thead><tbody>";
+
+    for (int r = 0; r < t->rowCount(); ++r) {
+        html += "<tr>";
+        for (int c = 0; c < lastCol; ++c) {
+            auto *it = t->item(r, c);
+            html += "<td>" + (it ? it->text().toHtmlEscaped() : QString()) + "</td>";
+        }
+        html += "</tr>";
+    }
+
+    html += "</tbody></table></body></html>";
+
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(path);
+    printer.setPageSize(QPageSize(QPageSize::A4));
+    printer.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QTextDocument doc;
+    doc.setHtml(html);
+    doc.print(&printer);
+
+    QMessageBox::information(nullptr, "Export", "PDF exporté avec succès.");
+}
+
+
+void MainWindow::updateMachineCharts()
+{
+    if (!ui->statPersonnel_3) return;
+
+    auto *page = ui->statPersonnel_3;
+    auto *scroll = page->findChild<QScrollArea*>("machineStatsScroll", Qt::FindDirectChildrenOnly);
+    if (!scroll) {
+        if (auto *oldLayout = page->layout()) {
+            QLayoutItem *item;
+            while ((item = oldLayout->takeAt(0)) != nullptr) {
+                if (item->widget()) item->widget()->deleteLater();
+                delete item;
+            }
+            delete oldLayout;
+        }
+        const auto children = page->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+        for (auto *child : children) {
+            if (child) child->deleteLater();
+        }
+
+        auto *pageLayout = new QVBoxLayout(page);
+        pageLayout->setContentsMargins(0, 0, 0, 0);
+        pageLayout->setSpacing(0);
+
+        scroll = new QScrollArea(page);
+        scroll->setObjectName("machineStatsScroll");
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pageLayout->addWidget(scroll);
+
+        auto *container = new QWidget(scroll);
+        container->setObjectName("machineStatsContainer");
+        scroll->setWidget(container);
+
+        auto *mainLayout = new QVBoxLayout(container);
+        mainLayout->setContentsMargins(20, 18, 20, 24);
+        mainLayout->setSpacing(16);
+
+        auto *hero = new QFrame(container);
+        hero->setStyleSheet("QFrame { background:#fbfcf8; border:1px solid #dfe7cf; border-radius:20px; } QLabel[role='title'] { font-size:18px; font-weight:800; color:#22311a; } QLabel[role='sub'] { color:#667255; }");
+        auto *heroLayout = new QVBoxLayout(hero);
+        heroLayout->setContentsMargins(18, 16, 18, 16);
+        heroLayout->setSpacing(8);
+        auto *heroTitle = new QLabel("Tableau de bord des machines", hero);
+        heroTitle->setProperty("role", "title");
+        heroTitle->setWordWrap(true);
+        auto *heroSub = new QLabel("Suivi visuel de l'état, de la disponibilité, de la température et de l'utilisation des machines de l'huilerie.", hero);
+        heroSub->setProperty("role", "sub");
+        heroSub->setWordWrap(true);
+        heroLayout->addWidget(heroTitle);
+        heroLayout->addWidget(heroSub);
+        mainLayout->addWidget(hero);
+
+        auto createStatCard = [container](const QString &title, QLabel **valueLabel, const QString &accent, const QString &bg, const QString &subText) -> QFrame* {
+            auto *card = new QFrame(container);
+            card->setMinimumHeight(130);
+            card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+            card->setStyleSheet(QString(
+                "QFrame { background:%1; border:1px solid #dfe7cf; border-radius:18px; }"
+                "QLabel[role='title'] { color:#344126; font-size:13px; font-weight:700; }"
+                "QLabel[role='value'] { color:#1c2815; font-size:28px; font-weight:800; }"
+                "QLabel[role='pill'] { background:%2; color:white; border-radius:12px; padding:5px 10px; font-size:11px; font-weight:700; }"
+                "QLabel[role='sub'] { color:#677255; font-size:11px; }"
+            ).arg(bg, accent));
+            auto *layout = new QVBoxLayout(card);
+            layout->setContentsMargins(16, 14, 16, 14);
+            layout->setSpacing(8);
+            auto *top = new QHBoxLayout();
+            auto *titleLabel = new QLabel(title, card);
+            titleLabel->setProperty("role", "title");
+            titleLabel->setWordWrap(true);
+            auto *pill = new QLabel("KPI", card);
+            pill->setProperty("role", "pill");
+            pill->setAlignment(Qt::AlignCenter);
+            top->addWidget(titleLabel, 1);
+            top->addWidget(pill, 0);
+            auto *value = new QLabel("0", card);
+            value->setProperty("role", "value");
+            auto *sub = new QLabel(subText, card);
+            sub->setProperty("role", "sub");
+            sub->setWordWrap(true);
+            layout->addLayout(top);
+            layout->addWidget(value);
+            layout->addWidget(sub);
+            if (valueLabel) *valueLabel = value;
+            return card;
+        };
+
+        auto *cardsGrid = new QGridLayout();
+        cardsGrid->setHorizontalSpacing(16);
+        cardsGrid->setVerticalSpacing(16);
+        cardsGrid->addWidget(createStatCard("Total des machines", &statMachineTotalValue, "#556B2F", "#f4f8eb", "Nombre total d'équipements suivis dans ce module."), 0, 0);
+        cardsGrid->addWidget(createStatCard("Machines actives", &statMachineActiveValue, "#2f8f63", "#eef9f3", "Machines actuellement opérationnelles."), 0, 1);
+        cardsGrid->addWidget(createStatCard("Machines en maintenance", &statMachineMaintenanceValue, "#c48a1f", "#fff8ea", "Machines prises en charge en maintenance préventive ou corrective."), 1, 0);
+        cardsGrid->addWidget(createStatCard("Machines en panne", &statMachinePanneValue, "#a23d3d", "#fff1f1", "Machines indisponibles nécessitant une intervention."), 1, 1);
+        auto *cardsWidget = new QWidget(container);
+        cardsWidget->setLayout(cardsGrid);
+        mainLayout->addWidget(cardsWidget);
+
+        auto createSectionFrame = [container](const QString &title, const QString &subtitle, QChartView **chartView, int minHeight) -> QFrame* {
+            auto *frame = new QFrame(container);
+            frame->setStyleSheet("QFrame { background:white; border:1px solid #e7ecdc; border-radius:22px; } QLabel[role='sectionTitle'] { color:#2f3b1f; font-size:17px; font-weight:800; } QLabel[role='sectionSub'] { color:#78806e; font-size:11px; }");
+            auto *layout = new QVBoxLayout(frame);
+            layout->setContentsMargins(18, 18, 18, 18);
+            layout->setSpacing(10);
+            auto *titleLabel = new QLabel(title, frame);
+            titleLabel->setProperty("role", "sectionTitle");
+            titleLabel->setWordWrap(true);
+            auto *subtitleLabel = new QLabel(subtitle, frame);
+            subtitleLabel->setProperty("role", "sectionSub");
+            subtitleLabel->setWordWrap(true);
+            auto *view = new QChartView(frame);
+            view->setMinimumHeight(minHeight);
+            view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            view->setRenderHint(QPainter::Antialiasing);
+            view->setStyleSheet("background: transparent;");
+            layout->addWidget(titleLabel);
+            layout->addWidget(subtitleLabel);
+            layout->addWidget(view, 1);
+            if (chartView) *chartView = view;
+            return frame;
+        };
+
+        mainLayout->addWidget(createSectionFrame("Répartition par état", "Diagramme en anneau pour visualiser rapidement les machines actives, en maintenance et en panne.", &chartStatusView, 260));
+        mainLayout->addWidget(createSectionFrame("Répartition par type", "Histogramme comparatif du nombre de machines pour chaque type déclaré dans la base.", &chartTypeView, 260));
+
+        auto *bottomFrame = new QFrame(container);
+        bottomFrame->setStyleSheet("QFrame { background:white; border:1px solid #e7ecdc; border-radius:22px; } QLabel[role='sectionTitle'] { color:#2f3b1f; font-size:17px; font-weight:800; } QLabel[role='sectionSub'] { color:#78806e; font-size:11px; } QLabel[role='insight'] { background:#f7f9f2; border:1px solid #e5ead7; border-radius:14px; padding:12px; color:#425136; font-size:12px; }");
+        auto *bottomLayout = new QVBoxLayout(bottomFrame);
+        bottomLayout->setContentsMargins(18, 18, 18, 18);
+        bottomLayout->setSpacing(10);
+        auto *bottomTitle = new QLabel("Machines les plus sollicitées", bottomFrame);
+        bottomTitle->setProperty("role", "sectionTitle");
+        bottomTitle->setWordWrap(true);
+        auto *bottomSub = new QLabel("Top 5 selon les heures de fonctionnement, utile pour anticiper la maintenance préventive et prioriser les contrôles.", bottomFrame);
+        bottomSub->setProperty("role", "sectionSub");
+        bottomSub->setWordWrap(true);
+        chartHoursView = new QChartView(bottomFrame);
+        chartHoursView->setMinimumHeight(280);
+        chartHoursView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        chartHoursView->setRenderHint(QPainter::Antialiasing);
+        chartHoursView->setStyleSheet("background: transparent;");
+        statMachineInsightLabel = new QLabel(bottomFrame);
+        statMachineInsightLabel->setProperty("role", "insight");
+        statMachineInsightLabel->setWordWrap(true);
+        bottomLayout->addWidget(bottomTitle);
+        bottomLayout->addWidget(bottomSub);
+        bottomLayout->addWidget(chartHoursView, 1);
+        bottomLayout->addWidget(statMachineInsightLabel);
+        mainLayout->addWidget(bottomFrame);
+        mainLayout->addStretch();
+    }
+
+
+    if (!dbOpen()) {
+        if (statMachineTotalValue) statMachineTotalValue->setText("0");
+        if (statMachineActiveValue) statMachineActiveValue->setText("0");
+        if (statMachineMaintenanceValue) statMachineMaintenanceValue->setText("0");
+        if (statMachinePanneValue) statMachinePanneValue->setText("0");
+        if (statMachineInsightLabel) statMachineInsightLabel->setText("Aucune connexion à la base de données. Ouvre Oracle puis recharge les statistiques.");
+        return;
+    }
+
+    int total = 0;
+    int active = 0;
+    int maintenance = 0;
+    int panne = 0;
+    double avgTemp = 0.0;
+    QString hottestMachine = "-";
+    double hottestTemp = 0.0;
+
+    QSqlQuery summaryQuery;
+    if (summaryQuery.exec("SELECT NVL(etat_machine, 'INCONNU') AS etat, COUNT(*) AS nb FROM MACHINE GROUP BY NVL(etat_machine, 'INCONNU')")) {
+        while (summaryQuery.next()) {
+            const QString etat = summaryQuery.value(0).toString().trimmed().toUpper();
+            const int nb = summaryQuery.value(1).toInt();
+            total += nb;
+            if (etat == "ACTIVE") active = nb;
+            else if (etat == "MAINTENANCE") maintenance = nb;
+            else if (etat == "PANNE") panne = nb;
+        }
+    }
+
+    QSqlQuery tempQuery;
+    if (tempQuery.exec("SELECT NVL(AVG(temperature_actuelle),0), NVL(MAX(temperature_actuelle),0) FROM MACHINE")) {
+        if (tempQuery.next()) {
+            avgTemp = tempQuery.value(0).toDouble();
+            hottestTemp = tempQuery.value(1).toDouble();
+        }
+    }
+
+    QSqlQuery hottestQuery;
+    if (hottestQuery.exec("SELECT nom_machine, NVL(temperature_actuelle,0) FROM MACHINE ORDER BY NVL(temperature_actuelle,0) DESC")) {
+        if (hottestQuery.next()) {
+            hottestMachine = hottestQuery.value(0).toString();
+            if (hottestMachine.trimmed().isEmpty()) hottestMachine = "Machine sans nom";
+        }
+    }
+
+    if (statMachineTotalValue) statMachineTotalValue->setText(QString::number(total));
+    if (statMachineActiveValue) statMachineActiveValue->setText(QString::number(active));
+    if (statMachineMaintenanceValue) statMachineMaintenanceValue->setText(QString::number(maintenance));
+    if (statMachinePanneValue) statMachinePanneValue->setText(QString::number(panne));
+
+    auto *stateSeries = new QPieSeries();
+    stateSeries->setHoleSize(0.46);
+    struct StateItem { QString name; int count; QColor color; };
+    const QList<StateItem> stateItems = {
+        {"ACTIVE", active, QColor("#2f9cdb")},
+        {"MAINTENANCE", maintenance, QColor("#d4a437")},
+        {"PANNE", panne, QColor("#16364c")}
+    };
+
+    int maxState = 0;
+    for (const auto &item : stateItems) maxState = std::max(maxState, item.count);
+    bool hasStateData = false;
+    for (const auto &item : stateItems) {
+        if (item.count <= 0) continue;
+        hasStateData = true;
+        auto *slice = stateSeries->append(item.name + " (" + QString::number(item.count) + ")", item.count);
+        slice->setBrush(item.color);
+        slice->setBorderColor(Qt::white);
+        slice->setLabelVisible(true);
+        if (item.count == maxState) {
+            slice->setExploded(true);
+            slice->setExplodeDistanceFactor(0.08);
+        }
+    }
+    if (!hasStateData) {
+        auto *slice = stateSeries->append("Aucune donnée", 1);
+        slice->setBrush(QColor("#d8decb"));
+        slice->setLabelVisible(true);
+    }
+
+    auto *stateChart = new QChart();
+    stateChart->addSeries(stateSeries);
+    stateChart->setBackgroundVisible(false);
+    stateChart->setMargins(QMargins(6, 6, 6, 6));
+    stateChart->legend()->setAlignment(Qt::AlignBottom);
+    stateChart->legend()->setLabelColor(QColor("#415033"));
+    stateChart->setAnimationOptions(QChart::SeriesAnimations);
+    if (chartStatusView) chartStatusView->setChart(stateChart);
+
+    auto *typeSet = new QBarSet("Machines");
+    typeSet->setColor(QColor("#8aa04b"));
+    QStringList typeCategories;
+    int typeMax = 1;
+    QSqlQuery typeQuery;
+    if (typeQuery.exec("SELECT NVL(type_machine, 'Non défini') AS type_machine, COUNT(*) AS nb FROM MACHINE GROUP BY NVL(type_machine, 'Non défini') ORDER BY nb DESC")) {
+        while (typeQuery.next()) {
+            typeCategories << typeQuery.value(0).toString();
+            const int count = typeQuery.value(1).toInt();
+            *typeSet << count;
+            typeMax = std::max(typeMax, count);
+        }
+    }
+    if (typeCategories.isEmpty()) {
+        typeCategories << "Aucune donnée";
+        *typeSet << 0;
+    }
+
+    auto *typeSeries = new QBarSeries();
+    typeSeries->append(typeSet);
+    typeSeries->setLabelsVisible(true);
+
+    auto *typeChart = new QChart();
+    typeChart->addSeries(typeSeries);
+    typeChart->setBackgroundVisible(false);
+    typeChart->legend()->hide();
+    typeChart->setMargins(QMargins(6, 6, 6, 6));
+    typeChart->setAnimationOptions(QChart::SeriesAnimations);
+
+    auto *typeAxisX = new QBarCategoryAxis();
+    typeAxisX->append(typeCategories);
+    typeChart->addAxis(typeAxisX, Qt::AlignBottom);
+    typeSeries->attachAxis(typeAxisX);
+    auto *typeAxisY = new QValueAxis();
+    typeAxisY->setRange(0, typeMax + 1);
+    typeAxisY->setLabelFormat("%d");
+    typeAxisY->setTickCount(std::max(2, typeMax + 1));
+    typeChart->addAxis(typeAxisY, Qt::AlignLeft);
+    typeSeries->attachAxis(typeAxisY);
+    if (chartTypeView) chartTypeView->setChart(typeChart);
+
+    auto *hoursSet = new QBarSet("Heures de fonctionnement");
+    hoursSet->setColor(QColor("#c28a2c"));
+    QStringList hourCategories;
+    qreal maxHours = 1.0;
+    QString mostUsedMachine = "-";
+    qreal mostUsedHours = 0.0;
+
+    QSqlQuery hoursQuery;
+    if (hoursQuery.exec("SELECT nom_machine, h FROM (SELECT NVL(nom_machine, 'Machine') AS nom_machine, NVL(heures_fonctionnement,0) AS h FROM MACHINE ORDER BY NVL(heures_fonctionnement,0) DESC) WHERE ROWNUM <= 5")) {
+        bool firstRow = true;
+        while (hoursQuery.next()) {
+            const QString machineName = hoursQuery.value(0).toString();
+            const qreal hours = hoursQuery.value(1).toDouble();
+            hourCategories << machineName;
+            *hoursSet << hours;
+            maxHours = std::max(maxHours, hours);
+            if (firstRow) {
+                mostUsedMachine = machineName;
+                mostUsedHours = hours;
+                firstRow = false;
+            }
+        }
+    }
+    if (hourCategories.isEmpty()) {
+        hourCategories << "Aucune donnée";
+        *hoursSet << 0;
+    }
+
+    auto *hoursSeries = new QHorizontalBarSeries();
+    hoursSeries->append(hoursSet);
+    hoursSeries->setLabelsVisible(true);
+    hoursSeries->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+
+    auto *hoursChart = new QChart();
+    hoursChart->addSeries(hoursSeries);
+    hoursChart->setBackgroundVisible(false);
+    hoursChart->legend()->hide();
+    hoursChart->setMargins(QMargins(6, 6, 6, 6));
+    hoursChart->setAnimationOptions(QChart::SeriesAnimations);
+
+    auto *hoursAxisX = new QValueAxis();
+    hoursAxisX->setRange(0, maxHours + std::max<qreal>(10.0, maxHours * 0.15));
+    hoursAxisX->setLabelFormat("%.0f h");
+    hoursChart->addAxis(hoursAxisX, Qt::AlignBottom);
+    hoursSeries->attachAxis(hoursAxisX);
+    auto *hoursAxisY = new QBarCategoryAxis();
+    hoursAxisY->append(hourCategories);
+    hoursChart->addAxis(hoursAxisY, Qt::AlignLeft);
+    hoursSeries->attachAxis(hoursAxisY);
+    if (chartHoursView) chartHoursView->setChart(hoursChart);
+
+    QString healthMessage;
+    if (panne > 0) {
+        healthMessage = "Attention : des machines sont en panne, il faut prioriser une intervention corrective.";
+    } else if (maintenance > 0) {
+        healthMessage = "Bon signal : aucune panne bloquante, mais une maintenance préventive est déjà en cours.";
+    } else {
+        healthMessage = "Excellent : le parc machine est entièrement opérationnel pour le moment.";
+    }
+
+    if (statMachineInsightLabel) {
+        statMachineInsightLabel->setText(
+            QString("Insight intelligent : la machine la plus sollicitée est <b>%1</b> avec <b>%2 h</b>. "
+                    "La température moyenne du parc est de <b>%3 °C</b> et la plus chaude est <b>%4</b> avec <b>%5 °C</b>. %6")
+                .arg(mostUsedMachine.isEmpty() ? "-" : mostUsedMachine)
+                .arg(QString::number(mostUsedHours, 'f', 0))
+                .arg(QString::number(avgTemp, 'f', 1))
+                .arg(hottestMachine)
+                .arg(QString::number(hottestTemp, 'f', 1))
+                .arg(healthMessage));
+    }
+}
+
+
+void MainWindow::on_btnConsulterMachines_clicked()
+{
+    if (ui->metierspersonnel_2 && ui->consulterpersonnel_3)
+        ui->metierspersonnel_2->setCurrentWidget(ui->consulterpersonnel_3);
+    if (dbOpen()) loadMachines();
+}
+
+void MainWindow::on_btnAjouterMachines_clicked()
+{
+    if (ui->metierspersonnel_2 && ui->ajoutpersonnel_3)
+        ui->metierspersonnel_2->setCurrentWidget(ui->ajoutpersonnel_3);
+    if (dbOpen()) fillSeriesCombo();
+}
+
+void MainWindow::on_btnStatMachines_clicked()
+{
+    if (ui->metierspersonnel_2 && ui->statPersonnel_3)
+        ui->metierspersonnel_2->setCurrentWidget(ui->statPersonnel_3);
+    updateMachineCharts();
+}
+
+void MainWindow::on_btnAvanceMachines_clicked()
+{
+    if (ui->metierspersonnel_2 && ui->metieravancee_4)
+        ui->metierspersonnel_2->setCurrentWidget(ui->metieravancee_4);
+    refreshAdvancedAnalytics();
+}
+
+void MainWindow::on_ajoutermachine_clicked()
+{
+    saveMachineFromForm();
+}
+
+void MainWindow::on_rechrchemahine_clicked()
+{
+    QString txt = ui->recherchemachine ? ui->recherchemachine->text().trimmed() : "";
+    if (txt.isEmpty()) {
+        loadMachines();
+        return;
+    }
+
+    QString mode = ui->datmachinne ? ui->datmachinne->currentText().trimmed().toUpper() : "NOM";
+    if (mode == "DATE") {
+        loadMachines("WHERE TO_CHAR(m.date_installation,'YYYY-MM-DD') = ?", {txt});
+    } else if (mode == "ID") {
+        loadMachines("WHERE TO_CHAR(m.id_machine) LIKE ?", { "%" + txt + "%" });
+    } else if (mode == "TYPE") {
+        loadMachines("WHERE UPPER(m.type_machine) LIKE UPPER(?)", { "%" + txt + "%" });
+    } else if (mode == "ETAT") {
+        loadMachines("WHERE UPPER(m.etat_machine) LIKE UPPER(?)", { "%" + txt + "%" });
+    } else {
+        loadMachines("WHERE UPPER(m.nom_machine) LIKE UPPER(?)", { "%" + txt + "%" });
+    }
+}
+
+void MainWindow::on_filtrer_clicked()
+{
+    if (ui->recherchemachine) ui->recherchemachine->clear();
+    loadMachines();
+}
+
+void MainWindow::on_oktrie_clicked()
+{
+    QString v = ui->trie ? ui->trie->currentText().trimmed().toLower() : "id";
+    if (v == "id") { orderByMachine = "m.id_machine"; machineSortColumn = 0; }
+    else if (v == "nom") { orderByMachine = "m.nom_machine"; machineSortColumn = 1; }
+    else if (v == "datefonctionnement") { orderByMachine = "m.date_installation"; machineSortColumn = 3; }
+    else if (v == "etat") { orderByMachine = "m.etat_machine"; machineSortColumn = 4; }
+    else if (v == "type") { orderByMachine = "m.type_machine"; machineSortColumn = 2; }
+    else if (v == "heures") { orderByMachine = "m.heures_fonctionnement"; machineSortColumn = 5; }
+    else if (v == "temperature") { orderByMachine = "m.temperature_actuelle"; machineSortColumn = 6; }
+    else { orderByMachine = "m.id_machine"; machineSortColumn = 0; }
+
+    machineSortOrder = Qt::AscendingOrder;
+    loadMachines(lastMachineWhereSql, lastMachineBinds);
+}
+
+void MainWindow::on_exportmachine_clicked()
+{
+    exportMachineTableToPdf(ui->tablemachine, "Liste des machines", "machines.pdf");
+}
+
+void MainWindow::on_exportermachinne_clicked()
+{
+    exportTableToCsv(ui->tablemachine, "machines.csv");
+}
+
+void MainWindow::on_ajouterlineseriemachine_2_clicked()
+{
+    addSerieFromAddPage();
+}
