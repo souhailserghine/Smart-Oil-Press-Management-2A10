@@ -271,27 +271,24 @@ bool Stocks::tryAutoAssignForSerie(int serieId, QString& detailMessage)
         return false;
     }
 
-    const bool hasDateFin = tableColumnExists(QStringLiteral("EMP_MACH"), QStringLiteral("DATE_FIN"));
-    const QString activeJoin = hasDateFin ? QStringLiteral(" AND em.date_fin IS NULL") : QString();
-    const QString activeExists = hasDateFin ? QStringLiteral(" AND ex.date_fin IS NULL") : QString();
-
+    // Count TOTAL affectations for the configured limit, but only block duplicate
+    // ACTIVE affectations for the same employee and machine series.
     QSqlQuery pick(stockDb());
-    const QString sql = QStringLiteral(
+    pick.prepare(QStringLiteral(
         "SELECT id_emp FROM ("
-        "  SELECT e.id_emp, COUNT(em.id_serie) AS cnt "
+        "  SELECT e.id_emp, COUNT(em.id_affectation) AS total_count "
         "  FROM EMPLOYE e "
-        "  LEFT JOIN EMP_MACH em ON em.id_emp = e.id_emp%1 "
+        "  LEFT JOIN EMP_MACH em ON em.id_emp = e.id_emp "
         "  WHERE NOT EXISTS ("
         "    SELECT 1 FROM EMP_MACH ex "
-        "    WHERE ex.id_emp = e.id_emp AND ex.id_serie = :serie%2"
+        "    WHERE ex.id_emp = e.id_emp "
+        "      AND ex.id_serie = :serie "
+        "      AND (ex.date_fin IS NULL OR UPPER(NVL(ex.etat_affectation, 'TERMINEE')) = 'ACTIVE')"
         "  ) "
         "  GROUP BY e.id_emp "
-        "  HAVING COUNT(em.id_serie) < :max_aff "
-        "  ORDER BY cnt ASC, e.id_emp ASC"
-        ") WHERE ROWNUM = 1"
-    ).arg(activeJoin, activeExists);
-
-    pick.prepare(sql);
+        "  HAVING COUNT(em.id_affectation) < :max_aff "
+        "  ORDER BY total_count ASC, e.id_emp ASC"
+        ") WHERE ROWNUM = 1"));
     pick.bindValue(QStringLiteral(":serie"), serieId);
     pick.bindValue(QStringLiteral(":max_aff"), m_maxAffectationsPerEmployee);
 
@@ -310,35 +307,14 @@ bool Stocks::tryAutoAssignForSerie(int serieId, QString& detailMessage)
         return false;
     }
 
-    const bool hasPoste = tableColumnExists(QStringLiteral("EMP_MACH"), QStringLiteral("POSTE"));
-    const bool hasDateDebut = tableColumnExists(QStringLiteral("EMP_MACH"), QStringLiteral("DATE_DEBUT"));
-
-    QStringList columns{QStringLiteral("id_serie"), QStringLiteral("id_emp")};
-    QStringList values{QStringLiteral(":id_serie"), QStringLiteral(":id_emp")};
-    if (hasPoste) {
-        columns << QStringLiteral("poste");
-        values << QStringLiteral(":poste");
-    }
-    if (hasDateDebut) {
-        columns << QStringLiteral("date_debut");
-        values << QStringLiteral(":date_debut");
-    }
-    if (hasDateFin) {
-        columns << QStringLiteral("date_fin");
-        values << QStringLiteral(":date_fin");
-    }
-
     QSqlQuery insert(stockDb());
-    insert.prepare(QStringLiteral("INSERT INTO EMP_MACH (%1) VALUES (%2)")
-                       .arg(columns.join(QStringLiteral(", ")), values.join(QStringLiteral(", "))));
+    insert.prepare(QStringLiteral(
+        "INSERT INTO EMP_MACH (id_serie, id_emp, poste, date_debut, date_fin) "
+        "VALUES (:id_serie, :id_emp, :poste, :date_debut, CAST(NULL AS DATE))"));
     insert.bindValue(QStringLiteral(":id_serie"), serieId);
     insert.bindValue(QStringLiteral(":id_emp"), empId);
-    if (hasPoste)
-        insert.bindValue(QStringLiteral(":poste"), tr("Auto stock"));
-    if (hasDateDebut)
-        insert.bindValue(QStringLiteral(":date_debut"), QDate::currentDate());
-    if (hasDateFin)
-        insert.bindValue(QStringLiteral(":date_fin"), QVariant(QMetaType(QMetaType::QDate)));
+    insert.bindValue(QStringLiteral(":poste"), tr("Auto stock"));
+    insert.bindValue(QStringLiteral(":date_debut"), QDate::currentDate());
 
     if (!insert.exec()) {
         detailMessage = tr("erreur SQL insertion affectation : %1").arg(insert.lastError().text());
@@ -357,6 +333,7 @@ bool Stocks::tryAutoAssignForSerie(int serieId, QString& detailMessage)
         : tr("Affectation automatique réalisée : %1 affecté à la série %2.").arg(empName).arg(serieId);
     return true;
 }
+
 
 Stocks::~Stocks()
 {

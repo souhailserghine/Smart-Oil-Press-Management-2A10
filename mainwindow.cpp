@@ -7730,30 +7730,53 @@ void MainWindow::updateAffectationRemainingInfo()
         return;
     }
 
-    int used = 0;
+    int totalUsed = 0;
+    int activeUsed = 0;
+
     QSqlQuery q;
     q.prepare(QStringLiteral(
-        "SELECT COUNT(*) FROM EMP_MACH "
-        "WHERE id_emp = :id_emp AND date_fin IS NULL"));
+        "SELECT COUNT(*), "
+        "       NVL(SUM(CASE WHEN date_fin IS NULL "
+        "                    OR UPPER(NVL(etat_affectation, 'TERMINEE')) = 'ACTIVE' "
+        "                    THEN 1 ELSE 0 END), 0) "
+        "FROM EMP_MACH "
+        "WHERE id_emp = :id_emp"));
     q.bindValue(QStringLiteral(":id_emp"), empId);
-    if (q.exec() && q.next()) used = q.value(0).toInt();
 
-    const int remaining = qMax(0, m_maxAffectationsPerEmployee - used);
+    if (!q.exec()) {
+        ui->affRemainingInfoLabel->setText(
+            tr("Erreur calcul affectations : %1").arg(q.lastError().text()));
+        return;
+    }
+
+    if (q.next()) {
+        totalUsed = q.value(0).toInt();
+        activeUsed = q.value(1).toInt();
+    }
+
+    const int remaining = qMax(0, m_maxAffectationsPerEmployee - totalUsed);
     ui->affRemainingInfoLabel->setText(
-        tr("Affectations actives : %1 / %2 — restantes : %3")
-            .arg(used).arg(m_maxAffectationsPerEmployee).arg(remaining));
+        tr("Affectations : %1 / %2 — restantes : %3 — actives : %4")
+            .arg(totalUsed)
+            .arg(m_maxAffectationsPerEmployee)
+            .arg(remaining)
+            .arg(activeUsed));
 }
+
 
 bool MainWindow::hasDuplicateAffectation(int empId, int serieId) const
 {
     QSqlQuery q;
     q.prepare(QStringLiteral(
         "SELECT COUNT(*) FROM EMP_MACH "
-        "WHERE id_emp = :id_emp AND id_serie = :id_serie"));
+        "WHERE id_emp = :id_emp "
+        "  AND id_serie = :id_serie "
+        "  AND (date_fin IS NULL OR UPPER(NVL(etat_affectation, 'TERMINEE')) = 'ACTIVE')"));
     q.bindValue(QStringLiteral(":id_emp"), empId);
     q.bindValue(QStringLiteral(":id_serie"), serieId);
     return q.exec() && q.next() && q.value(0).toInt() > 0;
 }
+
 
 void MainWindow::prepareInsertAffectationQuery(QSqlQuery& query,
                                                int empId,
@@ -7762,15 +7785,28 @@ void MainWindow::prepareInsertAffectationQuery(QSqlQuery& query,
                                                const QDate& dateDeb,
                                                const QVariant& dateFinValue) const
 {
-    query.prepare(QStringLiteral(
-        "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
-        "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)"));
+    const bool activeWithoutEndDate = !dateFinValue.isValid() || dateFinValue.isNull();
+
+    if (activeWithoutEndDate) {
+        query.prepare(QStringLiteral(
+            "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
+            "VALUES (:id_emp, :id_serie, :poste, :date_debut, CAST(NULL AS DATE))"));
+    } else {
+        query.prepare(QStringLiteral(
+            "INSERT INTO EMP_MACH (id_emp, id_serie, poste, date_debut, date_fin) "
+            "VALUES (:id_emp, :id_serie, :poste, :date_debut, :date_fin)"));
+    }
+
     query.bindValue(QStringLiteral(":id_emp"), empId);
     query.bindValue(QStringLiteral(":id_serie"), serieId);
     query.bindValue(QStringLiteral(":poste"), poste);
     query.bindValue(QStringLiteral(":date_debut"), dateDeb);
-    query.bindValue(QStringLiteral(":date_fin"), dateFinValue);
+
+    if (!activeWithoutEndDate) {
+        query.bindValue(QStringLiteral(":date_fin"), dateFinValue.toDate());
+    }
 }
+
 
 void MainWindow::loadAffectationTable()
 {
@@ -7780,14 +7816,15 @@ void MainWindow::loadAffectationTable()
     table->setSortingEnabled(false);
     table->clearContents();
     table->setRowCount(0);
-    table->setColumnCount(9);
+    table->setColumnCount(10);
     table->setHorizontalHeaderLabels({
-        tr("ID Emp"), tr("Employé"), tr("Série"), tr("Machine"),
+        tr("ID Aff"), tr("ID Emp"), tr("Employé"), tr("Série"), tr("Machine"),
         tr("Poste"), tr("Date début"), tr("Date fin"), tr("État"), tr("Actions")
     });
 
     QSqlQuery q(QStringLiteral(
-        "SELECT em.id_emp, "
+        "SELECT em.id_affectation, "
+        "       em.id_emp, "
         "       e.nom_emp || ' ' || e.prenom_emp, "
         "       em.id_serie, "
         "       s.nom_serie, "
@@ -7795,35 +7832,39 @@ void MainWindow::loadAffectationTable()
         "       NVL(em.poste, '-'), "
         "       TO_CHAR(em.date_debut, 'DD/MM/YYYY'), "
         "       TO_CHAR(em.date_fin, 'DD/MM/YYYY'), "
-        "       CASE WHEN em.date_fin IS NULL THEN 'ACTIVE' ELSE 'TERMINEE' END "
+        "       CASE WHEN em.date_fin IS NULL OR UPPER(NVL(em.etat_affectation, 'TERMINEE')) = 'ACTIVE' "
+        "            THEN 'ACTIVE' ELSE 'TERMINEE' END "
         "FROM EMP_MACH em "
         "JOIN EMPLOYE e ON e.id_emp = em.id_emp "
         "JOIN SERIE_MACHINE s ON s.id_serie = em.id_serie "
         "LEFT JOIN MACHINE m ON m.id_serie = em.id_serie "
-        "ORDER BY e.nom_emp, e.prenom_emp, s.nom_serie"));
+        "ORDER BY e.nom_emp, e.prenom_emp, s.nom_serie, em.id_affectation"));
 
     while (q.next()) {
         const int row = table->rowCount();
         table->insertRow(row);
-        const int idEmp = q.value(0).toInt();
-        const int idSerie = q.value(2).toInt();
+        const int idAff = q.value(0).toInt();
+        const int idEmp = q.value(1).toInt();
+        const int idSerie = q.value(3).toInt();
 
         const QStringList values = {
+            QString::number(idAff),
             QString::number(idEmp),
-            q.value(1).toString(),
-            q.value(3).toString(),
+            q.value(2).toString(),
             q.value(4).toString(),
             q.value(5).toString(),
             q.value(6).toString(),
             q.value(7).toString(),
-            q.value(8).toString()
+            q.value(8).toString(),
+            q.value(9).toString()
         };
 
         for (int c = 0; c < values.size(); ++c) {
             auto* item = new QTableWidgetItem(values[c]);
             item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-            if (c == 2) item->setData(Qt::UserRole, idSerie);
-            if (c == 7) item->setTextAlignment(Qt::AlignCenter);
+            if (c == 0) item->setData(Qt::UserRole, idAff);
+            if (c == 3) item->setData(Qt::UserRole, idSerie);
+            if (c == 8) item->setTextAlignment(Qt::AlignCenter);
             table->setItem(row, c, item);
         }
 
@@ -7851,30 +7892,31 @@ void MainWindow::loadAffectationTable()
 
         rowLayout->addWidget(editBtn);
         rowLayout->addWidget(deleteBtn);
-        table->setCellWidget(row, 8, cell);
+        table->setCellWidget(row, 9, cell);
         table->setRowHeight(row, 48);
 
-        connect(editBtn, &QToolButton::clicked, this, [this, idEmp, idSerie, row]() {
+        connect(editBtn, &QToolButton::clicked, this, [this, idAff, idEmp, idSerie, row]() {
             if (!ui) return;
             const int empIdx = ui->affEmpCombo->findData(idEmp);
             if (empIdx >= 0) ui->affEmpCombo->setCurrentIndex(empIdx);
             const int serieIdx = ui->affSerieCombo->findData(idSerie);
             if (serieIdx >= 0) ui->affSerieCombo->setCurrentIndex(serieIdx);
-            if (auto* posteItem = ui->affTable->item(row, 4)) {
+            if (auto* posteItem = ui->affTable->item(row, 5)) {
                 const int idx = ui->affPosteCombo->findText(posteItem->text());
                 if (idx >= 0) ui->affPosteCombo->setCurrentIndex(idx);
             }
-            if (auto* dateDebItem = ui->affTable->item(row, 5)) {
+            if (auto* dateDebItem = ui->affTable->item(row, 6)) {
                 const QDate date = QDate::fromString(dateDebItem->text(), QStringLiteral("dd/MM/yyyy"));
                 ui->affDateDebEdit->setDate(date.isValid() ? date : QDate::currentDate());
             }
-            const QString dateFinText = ui->affTable->item(row, 6) ? ui->affTable->item(row, 6)->text() : QString();
+            const QString dateFinText = ui->affTable->item(row, 7) ? ui->affTable->item(row, 7)->text() : QString();
             const bool openEnded = dateFinText.trimmed().isEmpty();
             if (ui->affOpenEndedCheck) ui->affOpenEndedCheck->setChecked(openEnded);
             if (!openEnded) {
                 const QDate date = QDate::fromString(dateFinText, QStringLiteral("dd/MM/yyyy"));
                 ui->affDateFinEdit->setDate(date.isValid() ? date : QDate::currentDate());
             }
+            m_editingAffId = idAff;
             m_editingAffIdEmp = idEmp;
             m_editingAffIdSerie = idSerie;
             if (ui->affSaveBtn) ui->affSaveBtn->setText(tr("Modifier"));
@@ -7882,16 +7924,15 @@ void MainWindow::loadAffectationTable()
             updateAffectationRemainingInfo();
         });
 
-        connect(deleteBtn, &QToolButton::clicked, this, [this, idEmp, idSerie]() {
+        connect(deleteBtn, &QToolButton::clicked, this, [this, idAff]() {
             if (QMessageBox::question(this, tr("Suppression"),
                                       tr("Supprimer cette affectation ?")) != QMessageBox::Yes) {
                 return;
             }
             QSqlQuery del;
             del.prepare(QStringLiteral(
-                "DELETE FROM EMP_MACH WHERE id_emp = :id_emp AND id_serie = :id_serie"));
-            del.bindValue(QStringLiteral(":id_emp"), idEmp);
-            del.bindValue(QStringLiteral(":id_serie"), idSerie);
+                "DELETE FROM EMP_MACH WHERE id_affectation = :id_affectation"));
+            del.bindValue(QStringLiteral(":id_affectation"), idAff);
             if (!del.exec()) {
                 QMessageBox::critical(this, tr("Erreur"), del.lastError().text());
                 return;
@@ -7902,13 +7943,15 @@ void MainWindow::loadAffectationTable()
     }
 
     if (table->horizontalHeader()) {
+        table->hideColumn(0);
         table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-        table->horizontalHeader()->setSectionResizeMode(8, QHeaderView::Fixed);
-        table->setColumnWidth(8, 210);
+        table->horizontalHeader()->setSectionResizeMode(9, QHeaderView::Fixed);
+        table->setColumnWidth(9, 210);
     }
     table->setSortingEnabled(true);
     filterAffTable();
 }
+
 
 void MainWindow::filterAffTable()
 {
@@ -7922,14 +7965,14 @@ void MainWindow::filterAffTable()
 
     for (int r = 0; r < ui->affTable->rowCount(); ++r) {
         bool textMatch = needle.isEmpty();
-        for (int c = 0; !textMatch && c < ui->affTable->columnCount() - 1; ++c) {
+        for (int c = 1; !textMatch && c < ui->affTable->columnCount() - 1; ++c) {
             const auto* item = ui->affTable->item(r, c);
             textMatch = item && item->text().contains(needle, Qt::CaseInsensitive);
         }
 
         bool statusMatch = true;
         if (filterActive || filterDone) {
-            const QString rowStatus = ui->affTable->item(r, 7) ? ui->affTable->item(r, 7)->text() : QString();
+            const QString rowStatus = ui->affTable->item(r, 8) ? ui->affTable->item(r, 8)->text() : QString();
             statusMatch = filterActive ? rowStatus.compare(QStringLiteral("ACTIVE"), Qt::CaseInsensitive) == 0
                                        : rowStatus.compare(QStringLiteral("TERMINEE"), Qt::CaseInsensitive) == 0;
         }
@@ -7974,7 +8017,8 @@ void MainWindow::on_affSaveBtn_clicked()
     const int serieId = ui->affSerieCombo->currentData().toInt();
     const QString poste = ui->affPosteCombo ? ui->affPosteCombo->currentText().trimmed() : QString();
     const QDate dateDeb = ui->affDateDebEdit ? ui->affDateDebEdit->date() : QDate::currentDate();
-    const QVariant dateFinValue = (ui->affOpenEndedCheck && ui->affOpenEndedCheck->isChecked())
+    const bool openEnded = ui->affOpenEndedCheck && ui->affOpenEndedCheck->isChecked();
+    const QVariant dateFinValue = openEnded
                                   ? QVariant()
                                   : QVariant(ui->affDateFinEdit ? ui->affDateFinEdit->date() : QDate::currentDate());
 
@@ -7983,19 +8027,47 @@ void MainWindow::on_affSaveBtn_clicked()
         return;
     }
 
-    const bool editMode = (m_editingAffIdEmp > 0 && m_editingAffIdSerie > 0);
-    if (!editMode && hasDuplicateAffectation(empId, serieId)) {
-        QMessageBox::warning(this, tr("Affectation"), tr("Cette affectation existe déjà."));
+    if (!openEnded && dateFinValue.toDate().isValid() && dateFinValue.toDate() < dateDeb) {
+        QMessageBox::warning(this, tr("Affectation"),
+                             tr("La date fin doit être supérieure ou égale à la date début."));
         return;
     }
+
+    const bool editMode = (m_editingAffId > 0);
+
+    if (!editMode && hasDuplicateAffectation(empId, serieId)) {
+        QMessageBox::warning(this, tr("Affectation"), tr("Cet employé est déjà affecté activement à cette série."));
+        return;
+    }
+
+    int totalForEmployee = 0;
+    QSqlQuery countQuery;
+    countQuery.prepare(QStringLiteral(
+        "SELECT COUNT(*) FROM EMP_MACH "
+        "WHERE id_emp = :id_emp "
+        "  AND (:editing_id <= 0 OR id_affectation <> :editing_id)"));
+    countQuery.bindValue(QStringLiteral(":id_emp"), empId);
+    countQuery.bindValue(QStringLiteral(":editing_id"), editMode ? m_editingAffId : 0);
+    if (countQuery.exec() && countQuery.next())
+        totalForEmployee = countQuery.value(0).toInt();
+
+    if (totalForEmployee >= m_maxAffectationsPerEmployee) {
+        QMessageBox::warning(this, tr("Affectation"),
+                             tr("Cet employé a déjà atteint la limite de %1 affectation(s).")
+                                 .arg(m_maxAffectationsPerEmployee));
+        return;
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    const bool inTransaction = db.transaction();
 
     if (editMode) {
         QSqlQuery del;
         del.prepare(QStringLiteral(
-            "DELETE FROM EMP_MACH WHERE id_emp = :id_emp AND id_serie = :id_serie"));
-        del.bindValue(QStringLiteral(":id_emp"), m_editingAffIdEmp);
-        del.bindValue(QStringLiteral(":id_serie"), m_editingAffIdSerie);
+            "DELETE FROM EMP_MACH WHERE id_affectation = :id_affectation"));
+        del.bindValue(QStringLiteral(":id_affectation"), m_editingAffId);
         if (!del.exec()) {
+            if (inTransaction) db.rollback();
             QMessageBox::critical(this, tr("Erreur"), del.lastError().text());
             return;
         }
@@ -8004,22 +8076,27 @@ void MainWindow::on_affSaveBtn_clicked()
     QSqlQuery ins;
     prepareInsertAffectationQuery(ins, empId, serieId, poste, dateDeb, dateFinValue);
     if (!ins.exec()) {
+        if (inTransaction) db.rollback();
         QMessageBox::critical(this, tr("Erreur"), ins.lastError().text());
         return;
     }
 
+    if (inTransaction) db.commit();
     resetAffectationEditState();
     loadAffectationTable();
     updateAffectationRemainingInfo();
     if (ui->affStack) ui->affStack->setCurrentIndex(1);
 }
 
+
 void MainWindow::resetAffectationEditState()
 {
+    m_editingAffId = -1;
     m_editingAffIdEmp = -1;
     m_editingAffIdSerie = -1;
     if (ui && ui->affSaveBtn) ui->affSaveBtn->setText(tr("Enregistrer l'affectation"));
 }
+
 
 void MainWindow::setupSettingsAutoAssignOption()
 {
@@ -8163,24 +8240,23 @@ bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
         return false;
     }
 
-    // Choose the least-loaded employee who is not already actively assigned
-    // to this series and who is still under the configured active limit.
+    // Choose the least-loaded employee by TOTAL affectations, while still
+    // preventing two ACTIVE rows for the same employee/series.
     QSqlQuery pick;
     pick.prepare(QStringLiteral(
         "SELECT id_emp FROM ("
-        "  SELECT e.id_emp, "
-        "         NVL(SUM(CASE WHEN em.date_fin IS NULL THEN 1 ELSE 0 END), 0) AS active_count "
+        "  SELECT e.id_emp, COUNT(em.id_affectation) AS total_count "
         "  FROM EMPLOYE e "
         "  LEFT JOIN EMP_MACH em ON em.id_emp = e.id_emp "
         "  WHERE NOT EXISTS ("
         "      SELECT 1 FROM EMP_MACH em2 "
         "      WHERE em2.id_emp = e.id_emp "
         "        AND em2.id_serie = :serie_not_exists "
-        "        AND em2.date_fin IS NULL"
+        "        AND (em2.date_fin IS NULL OR UPPER(NVL(em2.etat_affectation, 'TERMINEE')) = 'ACTIVE')"
         "  ) "
         "  GROUP BY e.id_emp "
-        "  HAVING NVL(SUM(CASE WHEN em.date_fin IS NULL THEN 1 ELSE 0 END), 0) < :max_aff "
-        "  ORDER BY active_count ASC, e.id_emp ASC"
+        "  HAVING COUNT(em.id_affectation) < :max_aff "
+        "  ORDER BY total_count ASC, e.id_emp ASC"
         ") WHERE ROWNUM = 1"));
     pick.bindValue(QStringLiteral(":serie_not_exists"), serieId);
     pick.bindValue(QStringLiteral(":max_aff"), m_maxAffectationsPerEmployee);
@@ -8190,7 +8266,7 @@ bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
         return false;
     }
     if (!pick.next()) {
-        detailMessage = tr("aucun employé disponible sous la limite de %1 affectation(s) active(s).")
+        detailMessage = tr("aucun employé disponible sous la limite de %1 affectation(s).")
                             .arg(m_maxAffectationsPerEmployee);
         return false;
     }
@@ -8207,7 +8283,7 @@ bool MainWindow::tryAutoAssignForSerie(int serieId, QString& detailMessage)
     }
 
     QSqlQuery ins;
-    const QVariant activeEndDate = QVariant(QMetaType(QMetaType::QDate)); // typed NULL for Oracle DATE
+    const QVariant activeEndDate;
     prepareInsertAffectationQuery(ins, empId, serieId, tr("Auto"), QDate::currentDate(), activeEndDate);
     if (!ins.exec()) {
         detailMessage = tr("erreur insertion affectation : %1").arg(ins.lastError().text());

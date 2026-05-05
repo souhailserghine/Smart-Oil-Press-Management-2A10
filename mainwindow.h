@@ -356,6 +356,7 @@ void openStocksWindow(int pageIndex = -1);
     int m_pendingFingerprintId = -1;
     bool m_fingerprintEnrollInProgress = false;
     // Composite PK tracking for EMP_MACH edit mode
+    int  m_editingAffId = -1;          // id_affectation being edited (-1 = insert mode)
     int  m_editingAffIdEmp   = -1;     // id_emp being edited (-1 = insert mode)
     int  m_editingAffIdSerie = -1;     // id_serie being edited (-1 = insert mode)
     int  m_maxAffectationsPerEmployee = 3;

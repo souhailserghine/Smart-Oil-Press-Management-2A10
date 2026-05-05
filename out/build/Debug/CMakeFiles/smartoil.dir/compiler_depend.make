@@ -1154,6 +1154,7 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/6.7.3/mingw_64/include/QtCharts/qtchartsexports.h \
   C:/Qt/6.7.3/mingw_64/include/QtCharts/qvalueaxis.h \
   C:/Qt/6.7.3/mingw_64/include/QtCharts/qxyseries.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QDateTime \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QList \
@@ -1164,8 +1165,8 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/6.7.3/mingw_64/include/QtCore/QRegularExpression \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QSizeF \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/QString \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
-  C:/Qt/6.7.3/mingw_64/include/QtCore/QThread \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QTimer \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QVariant \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
@@ -1254,6 +1255,8 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/6.7.3/mingw_64/include/QtCore/qpair.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qpoint.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qprocessordetection.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qrect.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qrefcount.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
@@ -1288,7 +1291,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/6.7.3/mingw_64/include/QtCore/qtdeprecationmarkers.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qtenvironmentvariables.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qtextstream.h \
-  C:/Qt/6.7.3/mingw_64/include/QtCore/qthread.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qtimer.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qtimezone.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/qtmetamacros.h \
@@ -1373,6 +1375,13 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupport-config.h \
   C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupportexports.h \
   C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
+  C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlDatabase \
   C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlError \
   C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlQuery \
   C:/Qt/6.7.3/mingw_64/include/QtSql/qsqldatabase.h \
@@ -1473,7 +1482,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/allocated_ptr.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/allocator.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/atomic_base.h \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/atomic_futex.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/atomic_lockfree_defines.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.tcc \
@@ -1532,8 +1540,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/sstream.tcc \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_abs.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_function.h \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_mutex.h \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_thread.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_algo.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_algobase.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_bvector.h \
@@ -1560,7 +1566,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/string_view.tcc \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stringfwd.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/uniform_int_dist.h \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/unique_lock.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/unique_ptr.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/unordered_map.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/uses_allocator.h \
@@ -1572,7 +1577,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/clocale \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cmath \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/codecvt \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/condition_variable \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cstddef \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cstdint \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cstdio \
@@ -1584,6 +1588,7 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/debug/assertions.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/debug/debug.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/exception \
+  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ext/aligned_buffer.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ext/alloc_traits.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ext/atomicity.h \
@@ -1594,7 +1599,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ext/type_traits.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/filesystem \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/functional \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/future \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/initializer_list \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/iomanip \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ios \
@@ -1606,7 +1610,6 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/locale \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/map \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/memory \
-  C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/mutex \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/new \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/numeric \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/optional \
@@ -1708,6 +1711,7 @@ CMakeFiles/smartoil.dir/citernes.cpp.obj: C:/Users/Administrator/Documents/Smart
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wctype.h \
   smartoil_autogen/include/ui_citernes.h \
+  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.h \
   C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/citernes.h
 
 CMakeFiles/smartoil.dir/connection.cpp.obj: C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.cpp \
@@ -6003,6 +6007,7 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: smartoil_auto
   C:/Qt/6.7.3/mingw_64/include/QtSql/qtsql-config.h \
   C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlexports.h \
   C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlglobal.h \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsView \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsWidget \
@@ -6011,15 +6016,18 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: smartoil_auto
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMainWindow \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QProgressBar \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QScrollArea \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidgetItem \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/QWidget \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractscrollarea.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcombobox.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
@@ -6033,6 +6041,7 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: smartoil_auto
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmainwindow.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmessagebox.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qprogressbar.h \
+  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollarea.h \
   C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsizepolicy.h \
@@ -6988,8 +6997,6 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qnamespace.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_function.h:
 
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_thread.h:
-
 C:/Qt/6.7.3/mingw_64/include/QtCore/QTimer:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qtversionchecks.h:
@@ -7527,8 +7534,6 @@ C:/Qt/6.7.3/mingw_64/include/QtCore/qhashfunctions.h:
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/iosfwd:
 
 C:/Qt/6.7.3/mingw_64/include/QtGui/qimagereader.h:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/condition_variable:
 
 C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/pthread_compat.h:
 
@@ -8068,15 +8073,11 @@ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidgetItem:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/QWidget:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qthread.h:
-
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractscrollarea.h:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/future:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h:
 
@@ -8162,8 +8163,6 @@ C:/Qt/6.7.3/mingw_64/include/QtCharts/qhorizontalstackedbarseries.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/QMap:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/QThread:
-
 C:/Qt/6.7.3/mingw_64/include/QtCore/qbasictimer.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtCore/qdir.h:
@@ -8198,6 +8197,8 @@ C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupportexports.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h:
 
+C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlDatabase:
+
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/QApplication:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/QCommandLinkButton:
@@ -8230,10 +8231,6 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/uniq
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtoolbutton.h:
 
-C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcheckbox.h:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/atomic_futex.h:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/basic_ios.tcc:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/codecvt.h:
@@ -8256,16 +8253,6 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/loca
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/quoted_string.h:
 
-C:/Qt/6.7.3/mingw_64/include/QtCore/qbuffer.h:
-
-C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/main.cpp:
-
-C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/barcode.hpp:
-
-C:/opencv/sources/modules/core/include/opencv2/core/mat.hpp:
-
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_mutex.h:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/codecvt:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/filesystem:
@@ -8282,8 +8269,6 @@ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/istream:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/locale:
 
-C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/mutex:
-
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/ctype_inline.h:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/time_members.h:
@@ -8293,8 +8278,6 @@ smartoil_autogen/include/ui_citernes.h:
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/citernes.h:
 
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.cpp:
-
-C:/Qt/6.7.3/mingw_64/include/QtSql/QSqlDatabase:
 
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/connection.h:
 
@@ -8312,9 +8295,21 @@ C:/Qt/6.7.3/mingw_64/include/QtSql/qsqlquerymodel.h:
 
 C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/face_capture_dialog.cpp:
 
+C:/Qt/6.7.3/mingw_64/include/QtCore/qbuffer.h:
+
+C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/main.cpp:
+
+C:/opencv/sources/modules/objdetect/include/opencv2/objdetect/barcode.hpp:
+
+C:/opencv/sources/modules/core/include/opencv2/core/mat.hpp:
+
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/std_mutex.h:
+
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/cfloat:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/complex:
+
+C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/mutex:
 
 C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/emmintrin.h:
 
@@ -8437,6 +8432,8 @@ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMenu:
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSizePolicy:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpinBox:
+
+C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcheckbox.h:
 
 C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcolordialog.h:
 

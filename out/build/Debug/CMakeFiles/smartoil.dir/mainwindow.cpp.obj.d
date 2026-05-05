@@ -624,6 +624,8 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qdatetime.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QProgressBar \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qprogressbar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
  C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\stocks.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
@@ -666,7 +668,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/qvalueaxis.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QVBoxLayout \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHBoxLayout \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidget \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
@@ -774,7 +775,6 @@ CMakeFiles/smartoil.dir/mainwindow.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGridLayout \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGroupBox \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDateEdit \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QLineEdit \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSpinBox \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDoubleSpinBox \

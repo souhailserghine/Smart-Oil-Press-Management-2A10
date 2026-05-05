@@ -236,6 +236,7 @@ smartoil_autogen/timestamp: \
 	C:/Qt/6.7.3/mingw_64/include/QtSql/qtsql-config.h \
 	C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlexports.h \
 	C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlglobal.h \
+	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsView \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QGraphicsWidget \
@@ -244,15 +245,18 @@ smartoil_autogen/timestamp: \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMainWindow \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QMessageBox \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QProgressBar \
+	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QScrollArea \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QTableWidgetItem \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/QWidget \
+	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractscrollarea.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
+	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcombobox.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qframe.h \
@@ -266,6 +270,7 @@ smartoil_autogen/timestamp: \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmainwindow.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qmessagebox.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qprogressbar.h \
+	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollarea.h \
 	C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsizepolicy.h \

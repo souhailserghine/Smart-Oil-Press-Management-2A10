@@ -394,6 +394,31 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QProgressBar \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qprogressbar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
+ C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QPushButton \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qpushbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractbutton.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/QComboBox \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qcombobox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyleoption.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qslider.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyle.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtabbar.h \
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qabstractitemmodel.h \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QChart \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/qchart.h \
  C:/Qt/6.7.3/mingw_64/include/QtCharts/QAbstractSeries \
@@ -459,31 +484,24 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qscrollarea.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractscrollarea.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qgraphicsscene.h \
+ C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.h \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
+ C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qtextcursor.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qtextformat.h \
  C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\out\build\Debug\smartoil_autogen\EWIEGA46WW/moc_face_capture_dialog.cpp \
  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/face_capture_dialog.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qdialog.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QByteArray \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qbytearray.h \
  C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\out\build\Debug\smartoil_autogen\EWIEGA46WW/moc_face_recognition_dialog.cpp \
  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/face_recognition_dialog.h \
  C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\out\build\Debug\smartoil_autogen\EWIEGA46WW/moc_fingerprintservice.cpp \
  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/fingerprintservice.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QObject \
- C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/arduino.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialport.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qproperty.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qpropertyprivate.h \
- C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/experimental/source_location \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportglobal.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qtserialportexports.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/qserialportinfo.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qdebug.h \
  C:\Users\Administrator\Documents\Smart\ Oil\ Press\ Management\Smart-Oil-Press-Management-2A10\out\build\Debug\smartoil_autogen\EWIEGA46WW/moc_mainwindow.cpp \
  C:/Users/Administrator/Documents/Smart\ Oil\ Press\ Management/Smart-Oil-Press-Management-2A10/mainwindow.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QStackedWidget \
@@ -502,8 +520,6 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtSql/qtsqlexports.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/QColor \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qcolor.h \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPort \
- C:/Qt/6.7.3/mingw_64/include/QtSerialPort/QSerialPortInfo \
  C:/opencv/sources/modules/objdetect/include/opencv2/objdetect.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core.hpp \
  C:/opencv/sources/modules/core/include/opencv2/core/cvdef.h \
@@ -581,18 +597,7 @@ CMakeFiles/smartoil.dir/smartoil_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtablewidget.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtableview.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemview.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qabstractitemmodel.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qitemselectionmodel.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyleoption.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractspinbox.h \
- C:/Qt/6.7.3/mingw_64/include/QtGui/qvalidator.h \
- C:/Qt/6.7.3/mingw_64/include/QtCore/qregularexpression.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qslider.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qabstractslider.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qstyle.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qtabbar.h \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qrubberband.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QDate \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QHeaderView \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qheaderview.h \
