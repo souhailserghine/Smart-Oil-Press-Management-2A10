@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="MainStacked">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="loginpage">
        <widget class="QLabel" name="logintext">
@@ -53,7 +53,7 @@
 border-bottom-right-radius : 50px;</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QLineEdit" name="pwdinput">
@@ -76,7 +76,7 @@ color : rgba(0,0,0,240);
 padding-bottom: 7px;</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::EchoMode::Password</enum>
@@ -98,7 +98,7 @@ padding-bottom: 7px;</string>
          <string>Se connecter à l'application</string>
         </property>
         <property name="styleSheet">
-         <string notr="true" />
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>&amp;Connexion</string>
@@ -180,7 +180,7 @@ padding-bottom: 7px;</string>
 border-top-left-radius : 50px;</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QLabel" name="sidebarlogo_2">
@@ -205,10 +205,10 @@ border-top-left-radius : 50px;</string>
          </size>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
         <property name="pixmap">
-         <pixmap>:/img/logo2.png</pixmap>
+         <pixmap resource="img.qrc">:/img/logo2.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -225,12 +225,6 @@ border-top-left-radius : 50px;</string>
       </widget>
       <widget class="QWidget" name="mainprogram">
        <widget class="QWidget" name="mainprogramLayoutHost">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -238,6 +232,12 @@ border-top-left-radius : 50px;</string>
           <width>1325</width>
           <height>1005</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="visible">
          <bool>false</bool>
@@ -261,12 +261,6 @@ border-top-left-radius : 50px;</string>
         </layout>
        </widget>
        <widget class="QWidget" name="contentArea">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="geometry">
          <rect>
           <x>220</x>
@@ -274,6 +268,12 @@ border-top-left-radius : 50px;</string>
           <width>1105</width>
           <height>1005</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <layout class="QVBoxLayout" name="contentLayout">
          <property name="spacing">
@@ -325,7 +325,7 @@ border-top-left-radius : 50px;</string>
               <x>140</x>
               <y>20</y>
               <width>700</width>
-              <height>595</height>
+              <height>672</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout">
@@ -530,17 +530,17 @@ border-top-left-radius : 50px;</string>
              </item>
              <item row="8" column="1">
               <widget class="QPushButton" name="enrollFingerprintBtn">
-               <property name="toolTip">
-                <string>Lancer l'enrôlement d'empreinte sur le terminal.</string>
-               </property>
-               <property name="text">
-                <string>Enrôler empreinte</string>
-               </property>
                <property name="minimumSize">
                 <size>
                  <width>0</width>
                  <height>34</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>Lancer l'enrôlement d'empreinte sur le terminal.</string>
+               </property>
+               <property name="text">
+                <string>Enrôler empreinte</string>
                </property>
                <property name="icon">
                 <iconset resource="img.qrc">
@@ -614,11 +614,11 @@ border-top-left-radius : 50px;</string>
             <property name="text">
              <string>Remplissez le formulaire pour vérifier la validité des champs.</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+            </property>
             <property name="wordWrap">
              <bool>true</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
            </widget>
           </widget>
@@ -779,7 +779,7 @@ border-top-left-radius : 50px;</string>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
-              <row />
+              <row/>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -884,7 +884,7 @@ border-top-left-radius : 50px;</string>
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QComboBox" name="affEmpCombo" />
+                   <widget class="QComboBox" name="affEmpCombo"/>
                   </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="affSerieLabel">
@@ -894,7 +894,7 @@ border-top-left-radius : 50px;</string>
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QComboBox" name="affSerieCombo" />
+                   <widget class="QComboBox" name="affSerieCombo"/>
                   </item>
                   <item row="2" column="0">
                    <widget class="QLabel" name="affPosteLabel">
@@ -1202,7 +1202,7 @@ border-top-left-radius : 50px;</string>
             <x>520</x>
             <y>8</y>
             <width>460</width>
-            <height>52</height>
+            <height>56</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -1326,10 +1326,10 @@ border-top-left-radius : 50px;</string>
            <string>Personnel</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="img.qrc">
             <normaloff>:/img/people.svg</normaloff>:/img/people.svg</iconset>
           </property>
           <property name="iconSize">
@@ -1627,7 +1627,7 @@ border-top-left-radius : 50px;</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
-               <widget class="QLineEdit" name="lineEdit_2" />
+               <widget class="QLineEdit" name="lineEdit_2"/>
               </item>
               <item>
                <widget class="QComboBox" name="comboBox_2">
@@ -1740,7 +1740,7 @@ border-top-left-radius : 50px;</string>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
-              <row />
+              <row/>
               <column>
                <property name="text">
                 <string>Id</string>
@@ -1945,7 +1945,7 @@ border-top-left-radius : 50px;</string>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="metieravancee_2" />
+          <widget class="QWidget" name="metieravancee_2"/>
          </widget>
          <widget class="QLabel" name="label_2">
           <property name="geometry">
@@ -1973,10 +1973,10 @@ border-top-left-radius : 50px;</string>
            <string>Stocks</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="img.qrc">
             <normaloff>:/img/stock.svg</normaloff>:/img/stock.svg</iconset>
           </property>
           <property name="iconSize">
@@ -2271,7 +2271,7 @@ border-top-left-radius : 50px;</string>
               </layout>
              </item>
              <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="SaiTem" />
+              <widget class="QDoubleSpinBox" name="SaiTem"/>
              </item>
             </layout>
            </widget>
@@ -2281,7 +2281,7 @@ border-top-left-radius : 50px;</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_7">
               <item>
-               <widget class="QLineEdit" name="SaiRecherche" />
+               <widget class="QLineEdit" name="SaiRecherche"/>
               </item>
               <item>
                <widget class="QToolButton" name="Recherche">
@@ -2355,7 +2355,7 @@ border-top-left-radius : 50px;</string>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
-              <row />
+              <row/>
               <column>
                <property name="text">
                 <string>Id</string>
@@ -2490,7 +2490,7 @@ border-top-left-radius : 50px;</string>
                 </rect>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="center"&gt;&lt;span style=" font-size:10pt; font-weight:700;"&gt;Faire les statistiques de &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Faire les statistiques de &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
               <widget class="QComboBox" name="X">
@@ -2647,10 +2647,10 @@ border-top-left-radius : 50px;</string>
            <string>Citernes</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="img.qrc">
             <normaloff>:/img/cistern.svg</normaloff>:/img/cistern.svg</iconset>
           </property>
           <property name="iconSize">
@@ -3031,7 +3031,7 @@ border-top-left-radius : 50px;</string>
              <item row="6" column="1">
               <widget class="QLabel" name="typeamerture">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </item>
@@ -3043,7 +3043,7 @@ border-top-left-radius : 50px;</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>
-               <widget class="QLineEdit" name="recherchelot" />
+               <widget class="QLineEdit" name="recherchelot"/>
               </item>
               <item>
                <widget class="QComboBox" name="comboBoxrecherche">
@@ -3156,7 +3156,7 @@ border-top-left-radius : 50px;</string>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
-              <row />
+              <row/>
               <column>
                <property name="text">
                 <string>ID lot</string>
@@ -3209,47 +3209,47 @@ border-top-left-radius : 50px;</string>
               </column>
               <item row="0" column="0">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="1">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="2">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="3">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="4">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="5">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="6">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="7">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
               <item row="0" column="8">
                <property name="text">
-                <string />
+                <string/>
                </property>
               </item>
              </widget>
@@ -3321,7 +3321,7 @@ border-top-left-radius : 50px;</string>
                 </rect>
                </property>
                <property name="styleSheet">
-                <string notr="true">font: 12pt "Segoe UI";
+                <string notr="true">font: 12pt &quot;Segoe UI&quot;;
 color: rgb(0, 0, 0);</string>
                </property>
                <property name="text">
@@ -3382,7 +3382,7 @@ color: rgb(0, 0, 0);</string>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="metieravancee_3" />
+          <widget class="QWidget" name="metieravancee_3"/>
          </widget>
          <widget class="QLabel" name="label_huile">
           <property name="geometry">
@@ -3410,10 +3410,10 @@ color: rgb(0, 0, 0);</string>
            <string>Qualité</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="img.qrc">
             <normaloff>:/img/olive_oil.svg</normaloff>:/img/olive_oil.svg</iconset>
           </property>
           <property name="iconSize">
@@ -3558,10 +3558,10 @@ color: rgb(0, 0, 0);</string>
            <string>Machines</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="img.qrc">
             <normaloff>:/img/machine.svg</normaloff>:/img/machine.svg</iconset>
           </property>
           <property name="iconSize">
@@ -3643,7 +3643,7 @@ color: rgb(0, 0, 0);</string>
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QDateEdit" name="datefonctionmachine" />
+              <widget class="QDateEdit" name="datefonctionmachine"/>
              </item>
              <item row="3" column="0">
               <widget class="QLabel" name="statusmachineLabel">
@@ -3708,7 +3708,7 @@ color: rgb(0, 0, 0);</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <item>
-               <widget class="QLineEdit" name="recherchemachine" />
+               <widget class="QLineEdit" name="recherchemachine"/>
               </item>
               <item>
                <widget class="QComboBox" name="datmachinne">
@@ -3806,7 +3806,7 @@ color: rgb(0, 0, 0);</string>
             </item>
             <item>
              <widget class="QTableWidget" name="tablemachine">
-              <row />
+              <row/>
               <column>
                <property name="text">
                 <string>Id</string>
@@ -3857,7 +3857,7 @@ color: rgb(0, 0, 0);</string>
                 <string>Actvie</string>
                </property>
                <property name="icon">
-                <iconset theme="QIcon::ThemeIcon::ContactNew" />
+                <iconset theme="QIcon::ThemeIcon::ContactNew"/>
                </property>
               </item>
              </widget>
@@ -3967,7 +3967,7 @@ color: rgb(0, 0, 0);</string>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="metieravancee_4" />
+          <widget class="QWidget" name="metieravancee_4"/>
          </widget>
         </widget>
         <widget class="QWidget" name="module6">
@@ -4101,7 +4101,7 @@ color: rgb(0, 0, 0);</string>
            <string>Agriculteurs</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
            <iconset resource="img.qrc">
@@ -4132,7 +4132,7 @@ color: rgb(0, 0, 0);</string>
           <widget class="QWidget" name="ajoutagriculteur">
            <layout class="QVBoxLayout" name="agriculteurModuleAddLayout">
             <item>
-             <widget class="AgriculteurModule" name="agriculteurModuleAdd">
+             <widget class="AgriculteurModule" name="agriculteurModuleAdd" native="true">
               <property name="minimumSize">
                <size>
                 <width>900</width>
@@ -4146,7 +4146,7 @@ color: rgb(0, 0, 0);</string>
           <widget class="QWidget" name="consulteragriculteur">
            <layout class="QVBoxLayout" name="agriculteurModuleConsultLayout">
             <item>
-             <widget class="AgriculteurModule" name="agriculteurModuleConsult">
+             <widget class="AgriculteurModule" name="agriculteurModuleConsult" native="true">
               <property name="minimumSize">
                <size>
                 <width>900</width>
@@ -4160,7 +4160,7 @@ color: rgb(0, 0, 0);</string>
           <widget class="QWidget" name="statAGriculteur">
            <layout class="QVBoxLayout" name="agriculteurModuleStatsLayout">
             <item>
-             <widget class="AgriculteurModule" name="agriculteurModuleStats">
+             <widget class="AgriculteurModule" name="agriculteurModuleStats" native="true">
               <property name="minimumSize">
                <size>
                 <width>900</width>
@@ -4174,7 +4174,7 @@ color: rgb(0, 0, 0);</string>
           <widget class="QWidget" name="metieravancee_5">
            <layout class="QVBoxLayout" name="agriculteurModuleAdvancedLayout">
             <item>
-             <widget class="AgriculteurModule" name="agriculteurModuleAdvanced">
+             <widget class="AgriculteurModule" name="agriculteurModuleAdvanced" native="true">
               <property name="minimumSize">
                <size>
                 <width>900</width>
@@ -4214,7 +4214,7 @@ color: rgb(0, 0, 0);</string>
            <string>Paramètres</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
           <property name="icon">
            <iconset resource="img.qrc">
@@ -4366,9 +4366,6 @@ color: rgb(0, 0, 0);</string>
           <height>56</height>
          </size>
         </property>
-        <property name="role" stdset="0">
-         <string>panel</string>
-        </property>
         <layout class="QHBoxLayout" name="userInfoLayout">
          <item>
           <spacer name="userInfoSpacer">
@@ -4386,7 +4383,7 @@ color: rgb(0, 0, 0);</string>
          <item>
           <widget class="QLabel" name="userNameLabel">
            <property name="font">
-            <font />
+            <font/>
            </property>
            <property name="text">
             <string>Utilisateur</string>
@@ -4429,6 +4426,12 @@ color: rgb(0, 0, 0);</string>
           <height>1005</height>
          </rect>
         </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -4441,17 +4444,11 @@ color: rgb(0, 0, 0);</string>
           <height>16777215</height>
          </size>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true" />
+         <string notr="true"/>
         </property>
         <widget class="QWidget" name="verticalLayoutWidget">
          <property name="geometry">
@@ -4522,10 +4519,10 @@ color: rgb(0, 0, 0);</string>
                </size>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="pixmap">
-               <pixmap>:/img/logo2.png</pixmap>
+               <pixmap resource="img.qrc">:/img/logo2.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -4554,7 +4551,7 @@ color: rgb(0, 0, 0);</string>
                <string>Réduire / étendre la barre latérale</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="img.qrc">
@@ -4575,9 +4572,6 @@ color: rgb(0, 0, 0);</string>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod1">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Aller au module Personnel</string>
             </property>
@@ -4585,7 +4579,7 @@ color: rgb(0, 0, 0);</string>
              <string>Personnel</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="img.qrc">
               <normaloff>:/img/people.svg</normaloff>:/img/people.svg</iconset>
             </property>
             <property name="iconSize">
@@ -4594,13 +4588,13 @@ color: rgb(0, 0, 0);</string>
               <height>20</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod2">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Aller au module Stock</string>
             </property>
@@ -4608,7 +4602,7 @@ color: rgb(0, 0, 0);</string>
              <string>Stock</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="img.qrc">
               <normaloff>:/img/stock.svg</normaloff>:/img/stock.svg</iconset>
             </property>
             <property name="iconSize">
@@ -4617,13 +4611,13 @@ color: rgb(0, 0, 0);</string>
               <height>20</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod3">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Aller au module Citernes</string>
             </property>
@@ -4631,7 +4625,7 @@ color: rgb(0, 0, 0);</string>
              <string>Citernes</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="img.qrc">
               <normaloff>:/img/cistern.svg</normaloff>:/img/cistern.svg</iconset>
             </property>
             <property name="iconSize">
@@ -4640,13 +4634,13 @@ color: rgb(0, 0, 0);</string>
               <height>20</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod4">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Aller au module Huile</string>
             </property>
@@ -4654,7 +4648,7 @@ color: rgb(0, 0, 0);</string>
              <string>Huile</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="img.qrc">
               <normaloff>:/img/olive_oil.svg</normaloff>:/img/olive_oil.svg</iconset>
             </property>
             <property name="iconSize">
@@ -4663,13 +4657,13 @@ color: rgb(0, 0, 0);</string>
               <height>20</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod5">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Aller au module Machine</string>
             </property>
@@ -4677,7 +4671,7 @@ color: rgb(0, 0, 0);</string>
              <string>Machine</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="img.qrc">
               <normaloff>:/img/machine.svg</normaloff>:/img/machine.svg</iconset>
             </property>
             <property name="iconSize">
@@ -4686,13 +4680,13 @@ color: rgb(0, 0, 0);</string>
               <height>20</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnmod6">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Aller au module Agriculteurs</string>
             </property>
@@ -4700,7 +4694,7 @@ color: rgb(0, 0, 0);</string>
              <string>Agriculteurs</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="img.qrc">
               <normaloff>:/img/farmer.svg</normaloff>:/img/farmer.svg</iconset>
             </property>
             <property name="iconSize">
@@ -4709,13 +4703,13 @@ color: rgb(0, 0, 0);</string>
               <height>20</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnSettings">
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
             <property name="toolTip">
              <string>Paramètres</string>
             </property>
@@ -4731,6 +4725,9 @@ color: rgb(0, 0, 0);</string>
               <width>20</width>
               <height>20</height>
              </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -4754,7 +4751,7 @@ color: rgb(0, 0, 0);</string>
      <string>Ouvrir le chat</string>
     </property>
     <property name="text">
-     <string />
+     <string/>
     </property>
     <property name="icon">
      <iconset resource="img.qrc">
@@ -4777,12 +4774,20 @@ color: rgb(0, 0, 0);</string>
      <x>0</x>
      <y>0</y>
      <width>1325</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar">
-   <widget class="QWidget" name="clockLeftSpacer">
+   <widget class="QWidget" name="clockLeftSpacer" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>100</width>
+      <height>30</height>
+     </rect>
+    </property>
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
       <horstretch>0</horstretch>
@@ -4791,6 +4796,14 @@ color: rgb(0, 0, 0);</string>
     </property>
    </widget>
    <widget class="QLabel" name="clockLabel">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>140</width>
+      <height>30</height>
+     </rect>
+    </property>
     <property name="minimumSize">
      <size>
       <width>140</width>
@@ -4798,13 +4811,21 @@ color: rgb(0, 0, 0);</string>
      </size>
     </property>
     <property name="text">
-     <string />
+     <string/>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QWidget" name="clockRightSpacer">
+   <widget class="QWidget" name="clockRightSpacer" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>100</width>
+      <height>30</height>
+     </rect>
+    </property>
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
       <horstretch>0</horstretch>
@@ -4822,7 +4843,7 @@ color: rgb(0, 0, 0);</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="img.qrc" />
+  <include location="img.qrc"/>
  </resources>
- <connections />
+ <connections/>
 </ui>
